@@ -1,0 +1,75 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env*"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        ".vitepress/dist/**",
+        "out"
+      ]
+    },
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "check-types": {
+      "dependsOn": [
+        "^check-types"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "preview": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "dist:win": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ],
+      "passThroughEnv": [
+        "GH_TOKEN"
+      ]
+    },
+    "dist:mac": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ],
+      "passThroughEnv": [
+        "GH_TOKEN"
+      ]
+    },
+    "dist:linux": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ],
+      "passThroughEnv": [
+        "GH_TOKEN"
+      ]
+    }
+  }
+}
