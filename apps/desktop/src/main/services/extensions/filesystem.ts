@@ -66,44 +66,7 @@ const getPageRequesterDataFromDirectory = async (dirPath: string): Promise<PageR
   });
 };
 
-const parseChapterMetadata = (
-  text: string,
-): {
-  title: string;
-  chapterNum: string;
-  volumeNum: string;
-  group: string;
-} => {
-  const matchChapterNum: RegExpMatchArray | null = text.match(/c\d*\.?\d+/g);
-  const matchVolumeNum: RegExpMatchArray | null = text.match(/v(\d)+/g);
-  const matchGroup: RegExpMatchArray | null = text.match(/\[.*\]/g);
-  const matchAnyNum: RegExpMatchArray | null = text.match(/\d*\.?\d+/g);
-
-  let chapterNum = '';
-  if (matchChapterNum === null) {
-    if (matchAnyNum !== null && matchVolumeNum === null) {
-      chapterNum = parseFloat(matchAnyNum[0]).toString();
-    }
-  } else {
-    const matchNumber = matchChapterNum[0].match(/\d*\.?\d+/g);
-    chapterNum = matchNumber ? parseFloat(matchNumber[0]).toString() : '';
-  }
-
-  let volumeNum = '';
-  if (matchVolumeNum !== null) {
-    const matchNumber = matchVolumeNum[0].match(/(\d)+/g);
-    volumeNum = matchNumber ? parseFloat(matchNumber[0]).toString() : '';
-  }
-
-  const group: string = matchGroup === null ? '' : matchGroup[0].replace('[', '').replace(']', '');
-
-  return {
-    title: text.trim(),
-    chapterNum,
-    volumeNum,
-    group: group.trim(),
-  };
-};
+import { parseChapterMetadata } from '@/main/util/chapterParser';
 
 export class FSExtensionClient extends ExtensionClientAbstract {
   extractPath?: string = undefined;
