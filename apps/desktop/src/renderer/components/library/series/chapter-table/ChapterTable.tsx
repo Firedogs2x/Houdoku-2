@@ -28,6 +28,7 @@ import {
   chapterLanguagesState,
   chapterListChOrderState,
   chapterListVolOrderState,
+  chapterListPageSizeState,
   customDownloadsDirState,
 } from '@/renderer/state/settingStates';
 import { Chapter, Languages, Series } from '@tiyo/common';
@@ -91,6 +92,7 @@ export function ChapterTable(props: ChapterTableProps) {
   );
   const customDownloadsDir = useRecoilValue(customDownloadsDirState);
   const downloaderCurrentTask = useRecoilValue(currentTaskState);
+  const chapterListPageSize = useRecoilValue(chapterListPageSizeState);
 
   const columns: ColumnDef<Chapter>[] = [
     {
@@ -243,6 +245,11 @@ export function ChapterTable(props: ChapterTableProps) {
     getPaginationRowModel: getPaginationRowModel(),
     manualSorting: true,
     manualFiltering: true,
+    initialState: {
+      pagination: {
+        pageSize: chapterListPageSize || 10,
+      },
+    },
   });
 
   const updateDownloadStatuses = () => {

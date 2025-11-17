@@ -6,24 +6,24 @@ function parseChapterMetadata(text) {
   const matchGroup = base.match(/\[([^\]]+)\]/g);
   const group = matchGroup === null ? '' : (matchGroup[0].replace('[', '').replace(']', '').trim());
   let working = base.replace(/\[[^\]]+\]/g, '').trim();
-  const volumeRegex = /\b(?:vol(?:ume)?|v)\.?\s*(\d+(?:\.\d+)?)\b/i;
-  const chapterRegex = /\b(?:chapter|chap|ch|c)\.?\s*(\d+(?:\.\d+)?)\b/i;
+  const volumeRegex = /\b(?:vol(?:ume)?|v)\.?\s*(\d+(?:[\.-]\d+)?)\b/i;
+  const chapterRegex = /\b(?:chapter|chap|ch|c)\.?\s*(\d+(?:[\.-]\d+)?)\b/i;
   let volumeNum = '';
   const volMatch = working.match(volumeRegex);
   if (volMatch) {
-    volumeNum = parseFloat(volMatch[1]).toString();
+    volumeNum = parseFloat(volMatch[1].replace('-', '.')).toString();
     working = working.replace(volMatch[0], '').trim();
   }
   let chapterNum = '';
   const chapMatch = working.match(chapterRegex);
   if (chapMatch) {
-    chapterNum = parseFloat(chapMatch[1]).toString();
+    chapterNum = parseFloat(chapMatch[1].replace('-', '.')).toString();
     working = working.replace(chapMatch[0], '').trim();
   } else {
-    const numberRegex = /(\d+(?:\.\d+)?)/g;
+    const numberRegex = /(\d+(?:[\.-]\d+)?)/g;
     const allNums = working.match(numberRegex);
     if (allNums && allNums.length > 0) {
-      chapterNum = parseFloat(allNums[0]).toString();
+      chapterNum = parseFloat(allNums[0].replace('-', '.')).toString();
       working = working.replace(allNums[0], '').trim();
     }
   }
@@ -56,6 +56,10 @@ const tests = [
   'v1.5 c2.1 - fractional.cbz',
   'Random name without numbers.cbz',
   '[Group] 12 The Return.cbz',
+  'Chapter 13-1 The Battle Begins.cbz',
+  'Chapter 13-1.cbz',
+  'Ch 13-1 Title.cbz',
+  'Vol.1 Chapter 5-2 Extra Content.cbz',
 ];
 
 console.log('Testing chapter parser on sample filenames:');

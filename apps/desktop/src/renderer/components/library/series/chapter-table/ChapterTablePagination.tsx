@@ -1,5 +1,6 @@
 import { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useSetRecoilState } from 'recoil';
 
 import { Button } from '@houdoku/ui/components/Button';
 import {
@@ -10,12 +11,15 @@ import {
   SelectValue,
 } from '@houdoku/ui/components/Select';
 import { Chapter } from '@tiyo/common';
+import { chapterListPageSizeState } from '@/renderer/state/settingStates';
 
 interface ChapterTablePagination {
   table: Table<Chapter>;
 }
 
 export function ChapterTablePagination({ table }: ChapterTablePagination) {
+  const setChapterListPageSize = useSetRecoilState(chapterListPageSizeState);
+
   return (
     <div className="flex items-center justify-end px-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -60,7 +64,9 @@ export function ChapterTablePagination({ table }: ChapterTablePagination) {
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              const pageSize = Number(value);
+              table.setPageSize(pageSize);
+              setChapterListPageSize(pageSize);
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
