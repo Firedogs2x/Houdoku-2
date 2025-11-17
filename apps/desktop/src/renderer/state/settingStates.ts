@@ -25,7 +25,7 @@ import {
 
 // Development flag: Set to true to clear all stored settings on startup
 // Useful when you've changed DefaultSettings and want to test with fresh defaults
-const CLEAR_SETTINGS_ON_STARTUP = true;
+const CLEAR_SETTINGS_ON_STARTUP = false;
 
 // Clear localStorage if flag is enabled
 if (CLEAR_SETTINGS_ON_STARTUP) {
