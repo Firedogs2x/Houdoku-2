@@ -260,7 +260,7 @@ export const DefaultSettings = {
   [GeneralSetting.LibraryFilterCategory]: '',
   [GeneralSetting.LibraryCropCovers]: true,
   [GeneralSetting.ChapterListVolOrder]: TableColumnSortOrder.None,
-  [GeneralSetting.ChapterListChOrder]: TableColumnSortOrder.Descending,
+  [GeneralSetting.ChapterListChOrder]: TableColumnSortOrder.Ascending,
   [GeneralSetting.ChapterListPageSize]: 10,
 
   [ReaderSetting.ReadingDirection]: ReadingDirection.LeftToRight,
