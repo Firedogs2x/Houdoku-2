@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 const { ipcRenderer } = require('electron');
 import { useRecoilState } from 'recoil';
 import ipcChannels from '@/common/constants/ipcChannels.json';
@@ -12,13 +12,19 @@ import { Checkbox } from '@houdoku/ui/components/Checkbox';
 import { Label } from '@houdoku/ui/components/Label';
 import { Button } from '@houdoku/ui/components/Button';
 
-const defaultDownloadsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.DEFAULT_DOWNLOADS_DIR);
-
 export const SettingsLibrary: React.FC = () => {
   const [refreshOnStart, setRefreshOnStart] = useRecoilState(refreshOnStartState);
   const [confirmRemoveSeries, setConfirmRemoveSeries] = useRecoilState(confirmRemoveSeriesState);
   const [libraryCropCovers, setLibraryCropCovers] = useRecoilState(libraryCropCoversState);
   const [customDownloadsDir, setCustomDownloadsDir] = useRecoilState(customDownloadsDirState);
+  const [defaultDownloadsDir, setDefaultDownloadsDir] = useState<string>('');
+
+  useEffect(() => {
+    ipcRenderer
+      .invoke(ipcChannels.GET_PATH.DEFAULT_DOWNLOADS_DIR)
+      .then((dir: string) => setDefaultDownloadsDir(dir))
+      .catch(console.error);
+  }, []);
 
   return (
     <>

@@ -3,10 +3,10 @@ import {
   BookOpenIcon,
   KeyboardIcon,
   LibraryBigIcon,
-  LucideProps,
   NotebookTextIcon,
   SettingsIcon,
   ToyBrickIcon,
+  FolderOpen,
 } from 'lucide-react';
 
 import {
@@ -35,10 +35,12 @@ import { SettingsReader } from './SettingsReader';
 import { SettingsKeybinds } from './SettingsKeybinds';
 import { SettingsIntegrations } from './SettingsIntegrations';
 import { SettingsTrackers } from './SettingsTrackers';
+import { SettingsFolders } from './SettingsFolders';
 
 export enum SettingsPage {
   General = 'General',
   Library = 'Library',
+  Folders = 'Folders',
   Reader = 'Reader',
   Keybinds = 'Keybinds',
   Trackers = 'Trackers',
@@ -47,14 +49,14 @@ export enum SettingsPage {
 
 type SettingsPageProps = {
   name: string;
-  icon: React.ForwardRefExoticComponent<
-    Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
-  >;
+  // accept lucide or react-icons style components
+  icon: React.ComponentType<any>;
   component: React.FC;
 };
 
 const PAGES: { [key in SettingsPage]: SettingsPageProps } = {
   [SettingsPage.General]: { name: 'General', icon: SettingsIcon, component: SettingsGeneral },
+  [SettingsPage.Folders]: { name: 'Folders', icon: FolderOpen, component: SettingsFolders },
   [SettingsPage.Library]: { name: 'Library', icon: LibraryBigIcon, component: SettingsLibrary },
   [SettingsPage.Reader]: { name: 'Reader', icon: BookOpenIcon, component: SettingsReader },
   [SettingsPage.Keybinds]: { name: 'Keybinds', icon: KeyboardIcon, component: SettingsKeybinds },
@@ -80,29 +82,52 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
   );
 
   return (
-    <DialogContent className="overflow-hidden !p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] text-foreground">
-      <DialogTitle className="sr-only">Settings</DialogTitle>
+    <>
+      <style>{`.settings-dialog * { border-color: #FF5A0000 !important; } .settings-dialog .border { border-color: #FF5A0000 !important; }`}</style>
+      <DialogContent className="settings-dialog overflow-hidden !p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] text-foreground">
+        <DialogTitle className="sr-only">Settings</DialogTitle>
       <SidebarProvider className="items-start">
         <Sidebar collapsible="none">
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupContent>
-                <SidebarMenu>
-                  {Object.entries(PAGES).map(([page, pageProps]) => {
-                    const pageKey: SettingsPage = page as SettingsPage;
-                    return (
-                      <SidebarMenuItem key={PAGES[pageKey].name}>
-                        <SidebarMenuButton
-                          isActive={pageKey === activePage}
-                          onClick={() => setActivePage(pageKey)}
-                        >
-                          {<pageProps.icon />}
-                          <span>{pageProps.name}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
+                  <SidebarMenu>
+                    {/** Diagnostic logging of pages (will appear in renderer console) */}
+                    {console.log(
+                      'SettingsDialogContent: pages',
+                      Object.entries(PAGES).map(([page, pageProps]) => ({
+                        page,
+                        componentType: typeof pageProps.component,
+                        isElement: React.isValidElement(pageProps.component),
+                        iconType: typeof pageProps.icon,
+                      })),
+                    )}
+                    {Object.entries(PAGES).map(([page, pageProps]) => {
+                      const pageKey: SettingsPage = page as SettingsPage;
+                      const Icon = pageProps.icon;
+
+                      // Icon can be either a component type or an already-created element.
+                      let iconElement: React.ReactNode = null;
+                      if (React.isValidElement(Icon)) {
+                        iconElement = Icon;
+                      } else if (typeof Icon === 'function') {
+                        const IconComp = Icon as React.ComponentType<any>;
+                        iconElement = <IconComp />;
+                      }
+
+                      return (
+                        <SidebarMenuItem key={PAGES[pageKey].name}>
+                          <SidebarMenuButton
+                            isActive={pageKey === activePage}
+                            onClick={() => setActivePage(pageKey)}
+                          >
+                            {iconElement}
+                            <span>{pageProps.name}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
@@ -124,10 +149,26 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4 pt-0 space-y-2">
-            {React.createElement(PAGES[activePage].component)}
+            {(() => {
+              const compOrElement: any = PAGES[activePage].component;
+              // Debugging guard: log unexpected types to help trace rendering issues
+              if (React.isValidElement(compOrElement)) {
+                console.error('SettingsDialogContent: component is a React element instead of a component for page', activePage, compOrElement);
+                return compOrElement;
+              }
+
+              if (typeof compOrElement !== 'function') {
+                console.error('SettingsDialogContent: component is not a function for page', activePage, compOrElement);
+                return null;
+              }
+
+              const ActiveComp = compOrElement as React.ComponentType<any>;
+              return <ActiveComp />;
+            })()}
           </div>
         </main>
       </SidebarProvider>
-    </DialogContent>
+      </DialogContent>
+    </>
   );
 }
