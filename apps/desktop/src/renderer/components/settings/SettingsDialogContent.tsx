@@ -83,7 +83,7 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
 
   return (
     <>
-      <style>{`.settings-dialog * { border-color: #FF5A0000 !important; } .settings-dialog .border { border-color: #FF5A0000 !important; }`}</style>
+      <style>{`.settings-dialog * { border-color: rgba(255, 90, 0, 0.4) !important; } .settings-dialog .border { border-color: rgba(255, 90, 0, 0.4) !important; }`}</style>
       <DialogContent className="settings-dialog overflow-hidden !p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] text-foreground">
         <DialogTitle className="sr-only">Settings</DialogTitle>
       <SidebarProvider className="items-start">

@@ -111,7 +111,7 @@ export const SettingsFolders: React.FC = () => {
 
       <div className="flex flex-col space-y-2">
         <div className="flex items-center space-x-2">
-          <Label className="text-muted-foreground text-sm w-40">Folder Name:</Label>
+          <Input readOnly value={'Folder Name:'} className="text-muted-foreground text-sm w-40" />
           <Input
             value={coverImageFolder}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoverImageFolder(e.target.value)}
@@ -121,7 +121,7 @@ export const SettingsFolders: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Label className="text-muted-foreground text-sm w-40">Cover Image Name:</Label>
+          <Input readOnly value={'Cover Image Name:'} className="text-muted-foreground text-sm w-40" />
           <Input
             value={coverImageName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoverImageName(e.target.value)}
