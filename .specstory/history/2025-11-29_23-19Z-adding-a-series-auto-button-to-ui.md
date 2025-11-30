@@ -239,7 +239,7 @@ The textarea now displays all the text with proper wrapping and no scrollbar nee
 
 ---
 
-_**User (2025-11-30 02:50Z)**_
+_**User (2025-11-30 02:51Z)**_
 
 Make the text box for “Cover Image:” and the text box below into one text box exactly like the text box for “Set Folder Functions:”.
 
@@ -267,7 +267,46 @@ I need to adjust the SettingsFolders.tsx by changing the "Cover Image:" label an
 
 The user earlier requested that the long explanatory text be positioned just below the Cover Image and wrapped properly. Now, they want it to match the style of the "Set Folder Functions" block. So, I’ll locate the relevant block in the file and replace it. It's important to keep the capitalization for "Folder Name:" and "Cover Image Name:" consistent. I’ll use the apply_patch tool to implement these changes and provide the correct context, crafting a patch that includes multiple lines of context for clarity.**Replacing existing block structure**
 
-I’m planning to replace the existing block that starts with `<div className="flex flex-col space-y-2">` and continue removing until the end of that block. I’ll copy the structure of the "Set Folder Functions" block
+I’m planning to replace the existing block that starts with `<div className="flex flex-col space-y-2">` and continue removing until the end of that block. I’ll copy the structure of the "Set Folder Functions" block. This means using an `<h3>` for "Cover Image:" and including a paragraph tag with the explanatory text styled with classes like `text-muted-foreground text-sm pt-0 !mt-0`. Below that, I’ll keep the two-row inputs for the Folder Name and Cover Image Name, ensuring they match the format the user wants.**Combined title and explanatory text update**
+
+The user wants to structure the title and explanatory text without merging them with the inputs. I’ll place the `<h3>` and `<p>` in a new block, replacing the entire current cover image block with a well-defined layout. This includes using a `<div className="flex items-start space-x-2">`, followed by the folder name and cover image name input rows. I may wrap them in another container `<div className="flex flex-col space-y-2">` to keep everything looking neat. Then, I’ll ensure the imports remain unchanged and run the `get_errors` function to check for any issues.I'll update `SettingsFolders.tsx` to replace the Cover Image textarea block with a `flex items-start` block (h3 + paragraph) matching the `Set Folder Functions` style, and keep the two input rows below it. Applying the patch now.
+```
+
+```
+Done — I updated `SettingsFolders.tsx` as requested.
+
+What I changed
+- Replaced the separate Cover Image label + textarea with a single block matching the "Set Folder Functions" style:
+  - Uses `<div className="flex items-start space-x-2"><div className="flex-1">...<h3>Cover Image:</h3><p>...</p></div></div>`
+  - The long explanation text is now a normal paragraph so it wraps exactly like the other setting descriptions.
+- Kept the editable inputs for "Folder Name" and "Cover Image Name" directly below, inside a `flex flex-col space-y-2` container so they remain grouped and stacked (Cover Name immediately below Folder Name).
+
+Files edited
+- `SettingsFolders.tsx`
+
+Notes & next steps
+- I ran a quick static check for the file — no TypeScript errors found.
+- If you want the description paragraph to use a different font size/weight to exactly match another row, tell me which element to match (e.g., the paragraph under `Set Master Folder:`), and I’ll align the classes.
+- If you'd like the inputs to be visually grouped inside a bordered box like a form section, I can add that styling as well.
+
+Would you like me to adjust spacing or styling to better match other setting blocks?
+
+---
+
+_**User (2025-11-30 05:11Z)**_
+
+I need some advice; I would like to select the “Series Auto” button and have the program go to a Master folder and scan all of the folders. Then add each one of those folders to the program, create a new series, just like if I manually went to the Add Series page.
+1)	Can you obtain and save the necessary data without using the Add Series page?
+2)	If you have to use the Add Series page, will you be able to use the existing setup without hampering the ability to also do the manual way of adding series.
+3)	Do you need to create a new automated version of Add Series separate from the manual process?
+Please show any ideas to make the process as easy to program and use.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+
 
 ---
 
