@@ -35,7 +35,7 @@ export const SettingsFolders: React.FC = () => {
   const folderDisplay = masterFolder ? masterFolder.split(/[\\/]/).pop() : 'Set as Master Folder';
 
   return (
-    <ScrollArea className="h-full w-full">
+    <ScrollArea className="h-full w-full [&>div>div:last-child]:border-l-0">
       <div className="flex flex-col space-y-4 pr-4">
       <div className="flex items-center space-x-2">
         <h3 className="pb-0 mb-0 font-medium">How to setup folders.</h3>
@@ -54,7 +54,7 @@ export const SettingsFolders: React.FC = () => {
       </div>
 
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" onClick={handleSelectMasterFolder}>
+        <Button variant="ghost" size="default" onClick={handleSelectMasterFolder} className="border border-input">
           <FolderOpen />
         </Button>
         <Input readOnly value={folderDisplay} className="flex-1" />
