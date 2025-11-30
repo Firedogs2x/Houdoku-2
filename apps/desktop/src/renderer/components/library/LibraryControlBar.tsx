@@ -8,6 +8,7 @@ import {
   reloadingSeriesListState,
   seriesListState,
 } from '@/renderer/state/libraryStates';
+import library from '@/renderer/services/library';
 import {
   libraryFilterStatusState,
   libraryFilterProgressState,
@@ -71,12 +72,8 @@ const LibraryControlBar: React.FC<Props> = (props: Props) => {
 
   const refreshHandler = () => {
     if (!reloadingSeriesList) {
-      reloadSeriesList(
-        props.getFilteredList(),
-        setSeriesList,
-        setReloadingSeriesList,
-        chapterLanguages,
-      );
+      // Always reload the full library regardless of current filters
+      reloadSeriesList(library.fetchSeriesList(), setSeriesList, setReloadingSeriesList, chapterLanguages);
     }
   };
 
