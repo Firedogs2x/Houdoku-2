@@ -13,6 +13,8 @@ import {
   useFolderAsTitleState,
   coverImageFolderState,
   coverImageNameState,
+  chapterFolderState,
+  chapterNameState,
 } from '@/renderer/state/settingStates';
 
 export const SettingsFolders: React.FC = () => {
@@ -20,6 +22,8 @@ export const SettingsFolders: React.FC = () => {
   const [useFolderAsTitle, setUseFolderAsTitle] = useRecoilState(useFolderAsTitleState);
   const [coverImageFolder, setCoverImageFolder] = useRecoilState(coverImageFolderState);
   const [coverImageName, setCoverImageName] = useRecoilState(coverImageNameState);
+  const [chapterFolder, setChapterFolder] = useRecoilState(chapterFolderState);
+  const [chapterName, setChapterName] = useRecoilState(chapterNameState);
 
   const handleSelectMasterFolder = () => {
     ipcRenderer
@@ -35,7 +39,7 @@ export const SettingsFolders: React.FC = () => {
   const folderDisplay = masterFolder ? masterFolder.split(/[\\/]/).pop() : 'Set as Master Folder';
 
   return (
-    <ScrollArea className="h-full w-full [&>div>div:last-child]:border-l-0">
+    <ScrollArea className="h-full w-full [&>div:nth-child(2)]:border-l-0 [&>div:nth-child(2)>div]:bg-transparent">
       <div className="flex flex-col space-y-4 pr-4">
       <div className="flex items-center space-x-2">
         <h3 className="pb-0 mb-0 font-medium">How to setup folders.</h3>
@@ -46,8 +50,8 @@ export const SettingsFolders: React.FC = () => {
           <div>
             <h3 className="pb-0 mb-0 font-medium">Set Master Folder:</h3>
             <p className="text-muted-foreground text-sm pt-0 !mt-0">
-              Here you will click the folder icon to open the file explorer. You will select the
-              folder where all of your mangas files will be located.
+              Set Master Folder: Click the folder icon to open the file explorer. Select the folder
+              where all of your series files are located.
             </p>
           </div>
         </div>
@@ -64,10 +68,10 @@ export const SettingsFolders: React.FC = () => {
         <div className="flex-1">
           <h3 className="pb-0 mb-0 font-medium">Set Folder Functions:</h3>
           <p className="text-muted-foreground text-sm pt-0 !mt-0">
-            This option will allow you to select if you want the name of the folders inside
-            the Master folder to be used as titles when adding the manga to the reader. If “No” is
-            selected this option will be ignored. If “Yes” is selected then the folder names will
-            be used as the manga's title.
+            Set Folder Functions: This option allows you to select if the names of the sub folders
+            (level one), below the Master folder, will be used as titles for the series. If “Yes” is
+            selected then sub folders names are used as titles. If “No” is selected this option is
+            ignored.
           </p>
         </div>
       </div>
@@ -100,11 +104,13 @@ export const SettingsFolders: React.FC = () => {
         <div className="flex-1">
           <h3 className="pb-0 mb-0 font-medium">Cover Image:</h3>
           <p className="text-muted-foreground text-sm pt-0 !mt-0">
-            Where is your cover image located? Type the folder where it is located. If the
-            cover image is to be located inside the folder selected to be used as the title
-            leave the default setting which is "Title". Otherwise click in the text box and
-            type in the name of the folder. Next type in the cover image name. (To use this
-            option the name of all of the cover images must be the same)
+            Cover Image: Set the folder where your cover image, per series, is located? Type the
+            folder name where the cover image is located. If the cover image is located inside the
+            sub folder (level one), below the Master folder, then leave the default setting which
+            is "Title". If the image is located in a sub folder (level two), below a sub folder
+            (level one), then click in the text box and type in the name of the folder. Next type
+            in the cover image name. (Currently this option only allows one name to be used for
+            all cover images.)
           </p>
         </div>
       </div>
@@ -129,6 +135,34 @@ export const SettingsFolders: React.FC = () => {
             className="w-48"
           />
         </div>
+
+
+        {/* Chapter Folder section (same structure as Cover Image settings) */}
+        <div className="flex items-start space-x-2 pt-2">
+          <div className="flex-1">
+            <h3 className="pb-0 mb-0 font-medium">Chapter Folder:</h3>
+            <p className="text-muted-foreground text-sm pt-0 !mt-0">
+              Chapter Folder: This option allows you to select where the series chapters are
+              located. If the chapters are located inside the sub folder (level one), below the
+              Master folder, then leave the default setting which is "Title". If the chapters are
+              located in a sub folder (level two), below a sub folder (level one), then click in
+              the text box and type in the name of the folder. Settings should be identical to the
+              Cover Image text.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Input readOnly value={'Folder Name:'} className="text-muted-foreground text-sm w-40" />
+          <Input
+            value={chapterFolder}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setChapterFolder(e.target.value)}
+            placeholder="Title"
+            className="w-48"
+          />
+        </div>
+
+        {/* Only the Folder Name row is shown for Chapter Folder as requested */}
       </div>
     </div>
     </ScrollArea>

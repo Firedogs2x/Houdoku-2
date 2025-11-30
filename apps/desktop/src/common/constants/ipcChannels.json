@@ -75,5 +75,9 @@
   },
   "INTEGRATION": {
     "DISCORD_SET_ACTIVITY": "integration-discordSetActivity"
+  },
+  "SERIES_AUTO": {
+    "SCAN_AND_ADD_SERIES": "series-auto-scan-and-add",
+    "GET_APP_PATH": "series-auto-get-app-path"
   }
 }

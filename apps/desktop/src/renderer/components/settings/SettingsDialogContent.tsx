@@ -92,7 +92,9 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
             <SidebarGroup>
               <SidebarGroupContent>
                   <SidebarMenu>
-                    {/** Diagnostic logging of pages (will appear in renderer console) */}
+
+                   {/* Diagnostic logging of pages (will appear in renderer console) */}
+                   
                     {console.log(
                       'SettingsDialogContent: pages',
                       Object.entries(PAGES).map(([page, pageProps]) => ({

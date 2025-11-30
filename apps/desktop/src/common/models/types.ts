@@ -102,6 +102,10 @@ export enum GeneralSetting {
   UseFolderAsTitle = 'UseFolderAsTitle',
   CoverImageFolder = 'CoverImageFolder',
   CoverImageName = 'CoverImageName',
+  ChapterFolder = 'ChapterFolder',
+  ChapterName = 'ChapterName',
+  AdditionalFolder1 = 'AdditionalFolder1',
+  AdditionalFolder2 = 'AdditionalFolder2',
 }
 
 export enum ProgressFilter {
@@ -217,6 +221,10 @@ export const SettingTypes = {
   [GeneralSetting.UseFolderAsTitle]: SettingType.BOOLEAN,
   [GeneralSetting.CoverImageFolder]: SettingType.STRING,
   [GeneralSetting.CoverImageName]: SettingType.STRING,
+  [GeneralSetting.ChapterFolder]: SettingType.STRING,
+  [GeneralSetting.ChapterName]: SettingType.STRING,
+  [GeneralSetting.AdditionalFolder1]: SettingType.STRING,
+  [GeneralSetting.AdditionalFolder2]: SettingType.STRING,
 
   [ReaderSetting.FitContainToWidth]: SettingType.BOOLEAN,
   [ReaderSetting.FitContainToHeight]: SettingType.BOOLEAN,
@@ -274,6 +282,10 @@ export const DefaultSettings = {
   [GeneralSetting.UseFolderAsTitle]: false,
   [GeneralSetting.CoverImageFolder]: 'Title',
   [GeneralSetting.CoverImageName]: 'Name',
+  [GeneralSetting.ChapterFolder]: 'Title',
+  [GeneralSetting.ChapterName]: 'Name',
+  [GeneralSetting.AdditionalFolder1]: '',
+  [GeneralSetting.AdditionalFolder2]: '',
 
   [ReaderSetting.ReadingDirection]: ReadingDirection.LeftToRight,
   [ReaderSetting.PageStyle]: PageStyle.Single,

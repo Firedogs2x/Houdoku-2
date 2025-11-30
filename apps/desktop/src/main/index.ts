@@ -22,6 +22,7 @@ import { createDiscordIpcHandlers } from './services/discord';
 import { createUpdaterIpcHandlers } from './services/updater';
 import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, PLUGINS_DIR, THUMBNAILS_DIR } from './util/appdata';
 import { createFilesystemIpcHandlers } from './services/filesystem';
+import { createSeriesAutoIpcHandlers } from './services/seriesAuto';
 
 log.transports.file.resolvePath = () => path.join(LOGS_DIR, 'main.log');
 
@@ -239,3 +240,7 @@ createTrackerIpcHandlers(ipcMain);
 createDiscordIpcHandlers(ipcMain);
 
 createUpdaterIpcHandlers(ipcMain);
+
+const appPath = app.getPath('exe');
+const appDir = path.dirname(appPath);
+createSeriesAutoIpcHandlers(ipcMain, appDir);
