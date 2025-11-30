@@ -7,11 +7,19 @@ import { Button } from '@houdoku/ui/components/Button';
 import { useRecoilState } from 'recoil';
 import { Checkbox } from '@houdoku/ui/components/Checkbox';
 import { Label } from '@houdoku/ui/components/Label';
-import { masterFolderState, useFolderAsTitleState } from '@/renderer/state/settingStates';
+import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
+import {
+  masterFolderState,
+  useFolderAsTitleState,
+  coverImageFolderState,
+  coverImageNameState,
+} from '@/renderer/state/settingStates';
 
 export const SettingsFolders: React.FC = () => {
   const [masterFolder, setMasterFolder] = useRecoilState(masterFolderState);
   const [useFolderAsTitle, setUseFolderAsTitle] = useRecoilState(useFolderAsTitleState);
+  const [coverImageFolder, setCoverImageFolder] = useRecoilState(coverImageFolderState);
+  const [coverImageName, setCoverImageName] = useRecoilState(coverImageNameState);
 
   const handleSelectMasterFolder = () => {
     ipcRenderer
@@ -27,7 +35,8 @@ export const SettingsFolders: React.FC = () => {
   const folderDisplay = masterFolder ? masterFolder.split(/[\\/]/).pop() : 'Set as Master Folder';
 
   return (
-    <div className="flex flex-col space-y-4">
+    <ScrollArea className="h-full w-full">
+      <div className="flex flex-col space-y-4 pr-4">
       <div className="flex items-center space-x-2">
         <h3 className="pb-0 mb-0 font-medium">How to setup folders.</h3>
       </div>
@@ -86,7 +95,43 @@ export const SettingsFolders: React.FC = () => {
           </Label>
         </div>
       </div>
+
+      <div className="flex items-start space-x-2">
+        <div className="flex-1">
+          <h3 className="pb-0 mb-0 font-medium">Cover Image:</h3>
+          <p className="text-muted-foreground text-sm pt-0 !mt-0">
+            Where is your cover image located? Type the folder where it is located. If the
+            cover image is to be located inside the folder selected to be used as the title
+            leave the default setting which is "Title". Otherwise click in the text box and
+            type in the name of the folder. Next type in the cover image name. (To use this
+            option the name of all of the cover images must be the same)
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col space-y-2">
+        <div className="flex items-center space-x-2">
+          <Input readOnly value={'Folder Name:'} className="text-muted-foreground text-sm w-40" />
+          <Input
+            value={coverImageFolder}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoverImageFolder(e.target.value)}
+            placeholder="Title"
+            className="w-48"
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Input readOnly value={'Cover Image Name:'} className="text-muted-foreground text-sm w-40" />
+          <Input
+            value={coverImageName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoverImageName(e.target.value)}
+            placeholder="Name"
+            className="w-48"
+          />
+        </div>
+      </div>
     </div>
+    </ScrollArea>
   );
 };
 

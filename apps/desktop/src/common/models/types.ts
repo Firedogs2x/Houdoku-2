@@ -100,6 +100,8 @@ export enum GeneralSetting {
   ChapterListPageSize = 'ChapterListPageSize',
   MasterFolder = 'MasterFolder',
   UseFolderAsTitle = 'UseFolderAsTitle',
+  CoverImageFolder = 'CoverImageFolder',
+  CoverImageName = 'CoverImageName',
 }
 
 export enum ProgressFilter {
@@ -213,6 +215,8 @@ export const SettingTypes = {
   [GeneralSetting.ChapterListPageSize]: SettingType.NUMBER,
   [GeneralSetting.MasterFolder]: SettingType.STRING,
   [GeneralSetting.UseFolderAsTitle]: SettingType.BOOLEAN,
+  [GeneralSetting.CoverImageFolder]: SettingType.STRING,
+  [GeneralSetting.CoverImageName]: SettingType.STRING,
 
   [ReaderSetting.FitContainToWidth]: SettingType.BOOLEAN,
   [ReaderSetting.FitContainToHeight]: SettingType.BOOLEAN,
@@ -268,6 +272,8 @@ export const DefaultSettings = {
   [GeneralSetting.ChapterListPageSize]: 10,
   [GeneralSetting.MasterFolder]: '',
   [GeneralSetting.UseFolderAsTitle]: false,
+  [GeneralSetting.CoverImageFolder]: 'Title',
+  [GeneralSetting.CoverImageName]: 'Name',
 
   [ReaderSetting.ReadingDirection]: ReadingDirection.LeftToRight,
   [ReaderSetting.PageStyle]: PageStyle.Single,
