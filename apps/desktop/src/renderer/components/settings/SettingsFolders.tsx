@@ -37,8 +37,8 @@ export const SettingsFolders: React.FC = () => {
           <div>
             <h3 className="pb-0 mb-0 font-medium">Set Master Folder:</h3>
             <p className="text-muted-foreground text-sm pt-0 !mt-0">
-              Here you will click the folder icon to open file explorer. Then you will select the
-              folder where all of your mangas will be located in.
+              Here you will click the folder icon to open the file explorer. You will select the
+              folder where all of your mangas files will be located.
             </p>
           </div>
         </div>
@@ -55,16 +55,16 @@ export const SettingsFolders: React.FC = () => {
         <div className="flex-1">
           <h3 className="pb-0 mb-0 font-medium">Set Folder Functions:</h3>
           <p className="text-muted-foreground text-sm pt-0 !mt-0">
-            This next option will allow you to select if you want the name of the folders inside
-            the Master folder to be used as titles to the manga saved in that folder. If “No” is
+            This option will allow you to select if you want the name of the folders inside
+            the Master folder to be used as titles when adding the manga to the reader. If “No” is
             selected this option will be ignored. If “Yes” is selected then the folder names will
-            be used to obtain the manga name.
+            be used as the manga's title.
           </p>
         </div>
       </div>
 
       <div className="flex flex-col space-y-2">
-        <span className="font-medium">Use folder as manga title?</span>
+        <span className="font-medium">Use folder as manga's title?</span>
         <div className="flex items-center space-x-2">
           <Checkbox
             id="useFolderAsTitleNo"

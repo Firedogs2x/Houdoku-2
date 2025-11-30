@@ -91,6 +91,7 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+        <Button onClick={handleSelectDirectory}>Series Auto</Button>
       </div>
     );
   };
