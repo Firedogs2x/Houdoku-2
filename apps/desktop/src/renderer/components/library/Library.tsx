@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import LibraryControlBar from './LibraryControlBar';
@@ -7,6 +7,7 @@ import {
   activeSeriesListState,
   chapterListState,
   filterState,
+  libraryScrollPositionState,
   multiSelectEnabledState,
   seriesListState,
   seriesState,
@@ -41,12 +42,61 @@ const Library: React.FC<Props> = () => {
   const setSeries = useSetRecoilState(seriesState);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setChapterList = useSetRecoilState(chapterListState);
+  const [scrollPosition, setScrollPosition] = useRecoilState(libraryScrollPositionState);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSeries(undefined);
     setChapterList([]);
     setMultiSelectEnabled(false);
   }, []);
+
+  // Restore scroll position when component mounts
+  useEffect(() => {
+    const restoreScroll = () => {
+      if (scrollAreaRef.current) {
+        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          setTimeout(() => {
+            viewport.scrollTop = scrollPosition;
+          }, 0);
+        }
+      }
+    };
+
+    // Use a small timeout to ensure the DOM is fully rendered
+    restoreScroll();
+  }, [scrollPosition]);
+
+  // Save scroll position when component unmounts or when navigating away
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollAreaRef.current) {
+        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          setScrollPosition(viewport.scrollTop);
+        }
+      }
+    };
+
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    if (viewport) {
+      viewport.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (viewport) {
+        viewport.removeEventListener('scroll', handleScroll);
+      }
+      // Also save on unmount
+      if (scrollAreaRef.current) {
+        const currentViewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (currentViewport) {
+          setScrollPosition(currentViewport.scrollTop);
+        }
+      }
+    };
+  }, [setScrollPosition]);
 
   /**
    * Get a filtered (and sorted) list of series after applying the specified filters.
@@ -165,7 +215,7 @@ const Library: React.FC<Props> = () => {
       ) : (
         <LibraryControlBar getFilteredList={getFilteredList} />
       )}
-      <ScrollArea className="h-[calc(100vh-20px-64px)] w-full pr-4 -mr-2">
+      <ScrollArea ref={scrollAreaRef} className="h-[calc(100vh-20px-64px)] w-full pr-4 -mr-2">
         {activeSeriesList.length === 0 && renderEmptyMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}

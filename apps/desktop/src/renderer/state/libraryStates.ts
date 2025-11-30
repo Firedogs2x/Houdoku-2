@@ -87,6 +87,11 @@ export const categoryListState = atom<Category[]>({
   default: [],
 });
 
+export const libraryScrollPositionState = atom<number>({
+  key: 'libraryScrollPositionState',
+  default: 0,
+});
+
 export const activeSeriesListState = selector({
   key: 'activeLibrarySeriesList',
   get: ({ get }) => {
