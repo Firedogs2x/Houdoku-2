@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExtensionMetadata } from '@tiyo/common';
+import { ExtensionMetadata, Series } from '@tiyo/common';
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 const { ipcRenderer } = require('electron');
 import { useNavigate } from 'react-router-dom';
@@ -44,9 +44,11 @@ import {
   useFolderAsTitleState,
   coverImageFolderState,
   coverImageNameState,
+  chapterFolderState,
+  chapterNameState,
 } from '@/renderer/state/settingStates';
 import { seriesListState, reloadingSeriesListState } from '@/renderer/state/libraryStates';
-import { reloadSeriesList } from '@/renderer/features/library/utils';
+import { reloadSeriesList, updateSeries } from '@/renderer/features/library/utils';
 import { chapterLanguagesState } from '@/renderer/state/settingStates';
 import library from '@/renderer/services/library';
 
@@ -71,6 +73,8 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
   const useFolderAsTitle = useRecoilValue(useFolderAsTitleState);
   const coverImageFolder = useRecoilValue(coverImageFolderState);
   const coverImageName = useRecoilValue(coverImageNameState);
+  const chapterFolder = useRecoilValue(chapterFolderState);
+  const chapterName = useRecoilValue(chapterNameState);
   const seriesList = useRecoilValue(seriesListState);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setReloadingSeriesList = useSetRecoilState(reloadingSeriesListState);
@@ -132,6 +136,8 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
         masterFolder,
         coverImageFolder,
         coverImageName,
+        chapterFolder,
+        chapterName,
         currentSeriesList: seriesList,
       });
 
@@ -142,17 +148,67 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
       // Update the series list with the newly added series from the handler
       if (response.updatedSeriesList && response.updatedSeriesList.length > 0) {
         console.debug('[Series Auto] Updating series list with', response.updatedSeriesList.length, 'total series');
-        
+
         // Save the updated series list to persistent storage
         persistantStore.write(
           `${storeKeys.LIBRARY.SERIES_LIST}`,
           JSON.stringify(response.updatedSeriesList),
         );
         console.debug('[Series Auto] Series list saved to storage');
-        
+
         // Update the Recoil state
         setSeriesList(response.updatedSeriesList);
         console.debug('[Series Auto] Recoil state updated');
+
+        // Determine which series were newly added by comparing IDs
+        const newlyAdded: Series[] = response.updatedSeriesList.filter((s: Series) =>
+          !seriesList.some((existing) => existing.id === s.id),
+        );
+
+        if (newlyAdded.length > 0) {
+          console.debug('[Series Auto] Newly added series count:', newlyAdded.length);
+
+          // For each newly added series, ensure it's persisted via library, download cover, and upsert chapters
+          const upsertPromises = newlyAdded.map(async (s: Series) => {
+            try {
+              // Ensure series saved in library storage and get canonical object
+              const saved = library.upsertSeries(s);
+              console.debug('[Series Auto] saved.series.remoteCoverUrl =', saved.remoteCoverUrl, 'for', saved.title);
+
+              // Download/update cover thumbnail if available
+              try {
+                await updateSeries(saved);
+              } catch (err) {
+                console.error('[Series Auto] Failed to update/download cover for', saved.title, err);
+              }
+
+              // Fetch chapters via extension and persist them
+              try {
+                const chapters = await ipcRenderer.invoke(
+                  ipcChannels.EXTENSION.GET_CHAPTERS,
+                  saved.extensionId,
+                  saved.sourceId,
+                );
+                if (Array.isArray(chapters) && chapters.length > 0) {
+                  library.upsertChapters(chapters, saved);
+                  console.debug('[Series Auto] Upserted', chapters.length, 'chapters for', saved.title);
+                } else {
+                  console.debug('[Series Auto] No chapters found for', saved.title);
+                }
+              } catch (err) {
+                console.error('[Series Auto] Failed to fetch chapters for', saved.title, err);
+              }
+            } catch (err) {
+              console.error('[Series Auto] Error processing newly added series', s, err);
+            }
+          });
+
+          await Promise.all(upsertPromises);
+
+          // Refresh the Recoil series list from library storage to ensure canonical ordering
+          setSeriesList(library.fetchSeriesList());
+          console.debug('[Series Auto] Series list refreshed from library storage');
+        }
       } else {
         console.warn('[Series Auto] No updated series list returned from handler');
       }

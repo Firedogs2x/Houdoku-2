@@ -11,6 +11,8 @@ interface SeriesAutoOptions {
   masterFolder: string;
   coverImageFolder: string;
   coverImageName: string;
+  chapterFolder?: string;
+  chapterName?: string;
   currentSeriesList: Series[];
 }
 
@@ -54,12 +56,31 @@ const findCoverImage = (
       return null;
     }
 
-    const files = fs.readdirSync(coverPath);
-    const coverFile = files.find((file) => file === coverImageName);
+      const files = fs.readdirSync(coverPath);
 
-    if (coverFile) {
-      return path.join(coverPath, coverFile);
-    }
+      // If user provided a cover image name, try to match it.
+      if (coverImageName && coverImageName.trim() !== '') {
+        const target = coverImageName.toLowerCase();
+
+        // 1) Exact filename match (case-insensitive)
+        let coverFile = files.find((file) => file.toLowerCase() === target);
+        if (coverFile) return path.join(coverPath, coverFile);
+
+        // 2) Match basename without extension (case-insensitive), e.g. 'Cover' -> 'Cover.jpg'
+        coverFile = files.find((file) => {
+          const base = path.basename(file, path.extname(file)).toLowerCase();
+          return base === target;
+        });
+        if (coverFile) return path.join(coverPath, coverFile);
+      }
+
+      // 3) Fallback: find the first image file in the folder (by extension list)
+      const imageExts: string[] = constants.IMAGE_EXTENSIONS || ['png', 'jpg', 'jpeg', 'webp'];
+      const imageFile = files.find((file) => {
+        const ext = path.extname(file).replace('.', '').toLowerCase();
+        return imageExts.includes(ext);
+      });
+      if (imageFile) return path.join(coverPath, imageFile);
 
     return null;
   } catch (error) {
@@ -97,7 +118,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
     async (_event, options: SeriesAutoOptions) => {
       console.info('Starting Series Auto scan...');
 
-      const { masterFolder, coverImageFolder, coverImageName, currentSeriesList } = options;
+      const { masterFolder, coverImageFolder, coverImageName, chapterFolder, chapterName, currentSeriesList } = options;
 
       if (!fs.existsSync(masterFolder)) {
         throw new Error(`Master folder does not exist: ${masterFolder}`);
@@ -145,13 +166,24 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
           // Find cover image
           const coverImagePath = findCoverImage(masterFolder, item, coverImageFolder, coverImageName);
 
+          // Determine the correct sourceId depending on chapterFolder setting
+          const seriesFolderPath = itemPath;
+          const actualChapterFolder = chapterFolder || 'Title';
+          let seriesSourceId = seriesFolderPath;
+          if (actualChapterFolder !== 'Title') {
+            const candidateChapterPath = path.join(seriesFolderPath, actualChapterFolder);
+            if (fs.existsSync(candidateChapterPath)) {
+              seriesSourceId = candidateChapterPath;
+            }
+          }
+
           // Create and save new series
           const newSeries: Series = {
             id: uuidv4(),
             title: item,
             status: SeriesStatus.ONGOING,
             extensionId: FS_METADATA.id,
-            sourceId: itemPath,
+            sourceId: seriesSourceId,
             preview: false,
             originalLanguageKey: LanguageKey.ENGLISH,
             altTitles: [],
@@ -167,6 +199,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
           if (coverImagePath) {
             // Use pathToFileURL to create a proper file:// URL for the cover
             newSeries.remoteCoverUrl = pathToFileURL(coverImagePath).toString();
+            console.info(`Series Auto: found cover for ${item} at ${coverImagePath} -> ${newSeries.remoteCoverUrl}`);
           }
 
           currentSeriesList.push(newSeries);

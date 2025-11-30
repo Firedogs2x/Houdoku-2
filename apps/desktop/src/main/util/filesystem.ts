@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { rimraf } from 'rimraf';
 import { Chapter, Series } from '@tiyo/common';
 
@@ -183,18 +184,63 @@ export async function getThumbnailPath(
 }
 
 export async function downloadThumbnail(thumbnailPath: string, data: string | BlobPart) {
-  const url = typeof data === 'string' ? data : URL.createObjectURL(new Blob([data]));
+  if (typeof data === 'string') {
+    const url = data;
 
-  fetch(url)
-    .then((response) => response.arrayBuffer())
-    .then((buffer) => {
-      fs.writeFile(thumbnailPath, new Uint8Array(buffer), (err: Error | null) => {
-        if (err) {
-          console.error(err);
+    try {
+      // Handle local file:// URLs or bare filesystem paths directly to avoid using fetch
+      if (url.startsWith('file://')) {
+        const localPath = fileURLToPath(url);
+        console.debug(`downloadThumbnail: handling file URL ${url} -> ${localPath}`);
+        if (fs.existsSync(localPath)) {
+          const buffer = fs.readFileSync(localPath);
+          fs.writeFileSync(thumbnailPath, buffer);
+          console.debug(`downloadThumbnail: wrote thumbnail to ${thumbnailPath}`);
+          return;
+        } else {
+          console.debug(`downloadThumbnail: local file not found at ${localPath}`);
         }
-      });
-    })
-    .catch((e: Error) => console.error(e));
+      }
+
+      // If it's a local path without protocol (Windows absolute path), try that too
+      if (fs.existsSync(url)) {
+        console.debug(`downloadThumbnail: handling local path ${url}`);
+        const buffer = fs.readFileSync(url);
+        fs.writeFileSync(thumbnailPath, buffer);
+        console.debug(`downloadThumbnail: wrote thumbnail to ${thumbnailPath}`);
+        return;
+      }
+
+      // Fallback: treat as a remote URL and fetch
+      const fetchUrl = url;
+      console.debug(`downloadThumbnail: fetching remote url ${fetchUrl}`);
+      fetch(fetchUrl)
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => {
+          fs.writeFile(thumbnailPath, new Uint8Array(buffer), (err: Error | null) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+        })
+        .catch((e: Error) => console.error(e));
+    } catch (err) {
+      console.error('Failed to download thumbnail from', url, err);
+    }
+  } else {
+    // data is a BlobPart/ArrayBuffer-like
+    const blobUrl = URL.createObjectURL(new Blob([data]));
+    fetch(blobUrl)
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => {
+        fs.writeFile(thumbnailPath, new Uint8Array(buffer), (err: Error | null) => {
+          if (err) {
+            console.error(err);
+          }
+        });
+      })
+      .catch((e: Error) => console.error(e));
+  }
 }
 
 /**
