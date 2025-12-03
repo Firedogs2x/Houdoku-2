@@ -1,4 +1,6 @@
-[![houdoku screenshot](assets/houdoku_screenshot.webp)](https://houdoku.org)
+
+![Houdoku Screenshot 2025-11-17 052256](https://github.com/user-attachments/assets/d0b1c25b-ffb6-46a4-a72b-f941fb874bc7)
+
 
 [![houdoku.org]](https://houdoku.org)
 [![GitHub release]](https://github.com/Firedogs2x/houdoku/releases)
