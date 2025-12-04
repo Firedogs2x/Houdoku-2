@@ -2,8 +2,7 @@
 
 <!-- vscode Session f55359ce-971b-45da-90d8-6065d0ed75b5 (2025-11-20 13:57Z) -->
 
-# I want to edit the Settings page (see Settings Main Page Screenshot 2025-11-20 111013.jpg for reference):
- (2025-11-20 13:57Z)
+# I want to edit the Settings page (see Settings Main Page Screenshot 2025-11-20 111013.jpg for reference): (2025-11-20 13:57Z)
 
 _**User (2025-11-22 02:46Z)**_
 
@@ -268,7 +267,7 @@ export const SettingsFolders: React.FC = () => {
       {/* Row 1: Master Folder */}
       <div
         className={rowCommonClass}
-        style={{ borderColor: 'rgba(255, 90, 0, 0.4)' }} // as requested; note this is an 8-hex value (may be transparent; see notes)
+        style={{ borderColor: '#FF5A0000' }} // as requested; note this is an 8-hex value (may be transparent; see notes)
       >
         <button
           aria-label="Select master folder"
@@ -299,7 +298,7 @@ export const SettingsFolders: React.FC = () => {
       {/* Row 2: Chapters Folder */}
       <div
         className={rowCommonClass}
-        style={{ borderColor: 'rgba(255, 90, 0, 0.4)' }}
+        style={{ borderColor: '#FF5A0000' }}
       >
         <button
           aria-label="Select chapters folder"
@@ -327,7 +326,7 @@ export const SettingsFolders: React.FC = () => {
       {/* Row 3: Cover Photo Folder */}
       <div
         className={rowCommonClass}
-        style={{ borderColor: 'rgba(255, 90, 0, 0.4)' }}
+        style={{ borderColor: '#FF5A0000' }}
       >
         <button
           aria-label="Select cover photo folder"
@@ -353,7 +352,7 @@ export const SettingsFolders: React.FC = () => {
       </div>
 
       {/* Row 4: Radio group - Use Folder Name as Title */}
-      <div className={rowCommonClass} style={{ borderColor: 'rgba(150, 55, 5, 0)' }}>
+      <div className={rowCommonClass} style={{ borderColor: '#FF5A0000' }}>
         <div className="flex-1">
           <div className="text-xs text-muted">Use Folder Name as Title</div>
           <div className="flex items-center gap-4 mt-2">

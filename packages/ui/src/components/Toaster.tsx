@@ -1,4 +1,4 @@
-'use client';
+
 
 import { useToast } from '@houdoku/ui/hooks/use-toast';
 import {

@@ -118,7 +118,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
     async (_event, options: SeriesAutoOptions) => {
       console.info('Starting Series Auto scan...');
 
-      const { masterFolder, coverImageFolder, coverImageName, chapterFolder, chapterName, currentSeriesList } = options;
+      const { masterFolder, coverImageFolder, coverImageName, chapterFolder, /* chapterName */ currentSeriesList } = options;
 
       if (!fs.existsSync(masterFolder)) {
         throw new Error(`Master folder does not exist: ${masterFolder}`);

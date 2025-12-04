@@ -1,4 +1,4 @@
-'use client';
+
 
 import * as React from 'react';
 import { Badge } from '@houdoku/ui/components/Badge';

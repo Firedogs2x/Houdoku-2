@@ -2,7 +2,7 @@
 // Run with: node .\apps\desktop\scripts\test-chapter-parser.js
 
 function parseChapterMetadata(text) {
-  let base = text.replace(/\.[^/.]+$/, '').trim();
+  const base = text.replace(/\.[^/.]+$/, '').trim();
   const matchGroup = base.match(/\[([^\]]+)\]/g);
   const group = matchGroup === null ? '' : (matchGroup[0].replace('[', '').replace(']', '').trim());
   let working = base.replace(/\[[^\]]+\]/g, '').trim();
