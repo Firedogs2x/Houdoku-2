@@ -17,48 +17,52 @@ export { data };
 
 export default {
   async load(): Promise<Release> {
-    const release = await fetch('https://api.github.com/repos/Firedogs2x/Houdoku-2/releases/latest').then(
-      (response) => response.json(),
-    );
+    // Fetch latest release info from GitHub. This can fail during CI (no network or rate limits),
+    // so handle missing or malformed responses gracefully.
+    const response = await fetch('https://api.github.com/repos/Firedogs2x/Houdoku-2/releases/latest');
 
-    const date = new Date(release.published_at);
-    const assets = {
-      windows: release.assets.find((asset) => /Houdoku-Setup-.*\.exe$/.test(asset.name)),
-      windowsportable: release.assets.find((asset) => /Houdoku-\d.*exe$/.test(asset.name)),
-      mac: release.assets.find((asset) => asset.name.endsWith('.dmg')),
-      linux: release.assets.find((asset) => asset.name.endsWith('.AppImage')),
+    if (!response.ok) {
+      // Return a sensible fallback when the API can't be reached.
+      const now = new Date();
+      return {
+        version: 'unknown',
+        releaseDateStr: now.toLocaleDateString(),
+        releaseDaysAgo: 0,
+        assets: [],
+      };
+    }
+
+    const release = await response.json();
+
+    const publishedAt = release?.published_at ? new Date(release.published_at) : new Date();
+
+    const assetsArray: any[] = Array.isArray(release?.assets) ? release.assets : [];
+
+    const found = {
+      windows: assetsArray.find((asset) => /Houdoku-Setup-.*\.exe$/.test(asset?.name)) || null,
+      windowsportable: assetsArray.find((asset) => /Houdoku-\d.*exe$/.test(asset?.name)) || null,
+      mac: assetsArray.find((asset) => asset?.name?.endsWith('.dmg')) || null,
+      linux: assetsArray.find((asset) => asset?.name?.endsWith('.AppImage')) || null,
     };
 
+    const makeAsset = (platform: string, asset: any): ReleaseAsset => ({
+      platform,
+      name: asset?.name ?? 'N/A',
+      browser_download_url: asset?.browser_download_url ?? '',
+      buildTimeStr: asset?.updated_at ? new Date(asset.updated_at).toISOString() : 'N/A',
+    });
+
+    const assets: ReleaseAsset[] = [];
+    if (found.windows) assets.push(makeAsset('Windows', found.windows));
+    if (found.windowsportable) assets.push(makeAsset('Windows Portable', found.windowsportable));
+    if (found.mac) assets.push(makeAsset('macOS', found.mac));
+    if (found.linux) assets.push(makeAsset('Linux', found.linux));
+
     return {
-      version: release.tag_name.replace('v', ''),
-      releaseDateStr: date.toLocaleDateString(),
-      releaseDaysAgo: Math.round((new Date().getTime() - date.getTime()) / (1000 * 3600 * 24)),
-      assets: [
-        {
-          platform: 'Windows',
-          name: assets.windows.name,
-          browser_download_url: assets.windows.browser_download_url,
-          buildTimeStr: new Date(assets.windows.updated_at).toISOString(),
-        },
-        {
-          platform: 'Windows Portable',
-          name: assets.windowsportable.name,
-          browser_download_url: assets.windowsportable.browser_download_url,
-          buildTimeStr: new Date(assets.windowsportable.updated_at).toISOString(),
-        },
-        {
-          platform: 'macOS',
-          name: assets.mac.name,
-          browser_download_url: assets.mac.browser_download_url,
-          buildTimeStr: new Date(assets.mac.updated_at).toISOString(),
-        },
-        {
-          platform: 'Linux',
-          name: assets.linux.name,
-          browser_download_url: assets.linux.browser_download_url,
-          buildTimeStr: new Date(assets.linux.updated_at).toISOString(),
-        },
-      ],
+      version: (release?.tag_name ?? 'v0.0.0').replace(/^v/, ''),
+      releaseDateStr: publishedAt.toLocaleDateString(),
+      releaseDaysAgo: Math.round((Date.now() - publishedAt.getTime()) / (1000 * 3600 * 24)),
+      assets,
     };
   },
 };

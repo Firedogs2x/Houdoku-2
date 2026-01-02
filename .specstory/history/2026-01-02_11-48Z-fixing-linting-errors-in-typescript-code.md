@@ -855,3 +855,403 @@ Your lint check should now pass! Run `pnpm lint` to verify.
 
 ---
 
+_**User (2026-01-02 14:43Z)**_
+
+New errors:
+2026-01-02T12:14:09.6623550Z Current runner version: '2.330.0'
+2026-01-02T12:14:09.6639610Z ##[group]Runner Image Provisioner
+2026-01-02T12:14:09.6640220Z Hosted Compute Agent
+2026-01-02T12:14:09.6640540Z Version: 20251211.462
+2026-01-02T12:14:09.6640910Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+2026-01-02T12:14:09.6641320Z Build Date: 2025-12-11T16:28:49Z
+2026-01-02T12:14:09.6641720Z Worker ID: {2a61735b-4662-42d4-8d77-527b13f78d97}
+2026-01-02T12:14:09.6642120Z ##[endgroup]
+2026-01-02T12:14:09.6642440Z ##[group]Operating System
+2026-01-02T12:14:09.6642780Z macOS
+2026-01-02T12:14:09.6643070Z 15.7.2
+2026-01-02T12:14:09.6643330Z 24G325
+2026-01-02T12:14:09.6643600Z ##[endgroup]
+2026-01-02T12:14:09.6643880Z ##[group]Runner Image
+2026-01-02T12:14:09.6644190Z Image: macos-15-arm64
+2026-01-02T12:14:09.6644510Z Version: 20251215.0075.1
+2026-01-02T12:14:09.6645170Z Included Software: https://github.com/actions/runner-images/blob/macos-15-arm64/20251215.0075/images/macos/macos-15-arm64-Readme.md
+2026-01-02T12:14:09.6646140Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-15-arm64%2F20251215.0075
+2026-01-02T12:14:09.6646810Z ##[endgroup]
+2026-01-02T12:14:09.6647440Z ##[group]GITHUB_TOKEN Permissions
+2026-01-02T12:14:09.6648370Z Contents: read
+2026-01-02T12:14:09.6648660Z Metadata: read
+2026-01-02T12:14:09.6648980Z Packages: read
+2026-01-02T12:14:09.6649280Z ##[endgroup]
+2026-01-02T12:14:09.6650640Z Secret source: Actions
+2026-01-02T12:14:09.6651050Z Prepare workflow directory
+2026-01-02T12:14:09.6865720Z Prepare all required actions
+2026-01-02T12:14:09.6894400Z Getting action download info
+2026-01-02T12:14:10.0488320Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-01-02T12:14:10.2897550Z Download action repository 'pnpm/action-setup@v4' (SHA:41ff72655975bd51cab0327fa583b6e92b6d3061)
+2026-01-02T12:14:11.4342500Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-01-02T12:14:11.6003020Z Complete job name: build (22, macos-latest)
+2026-01-02T12:14:11.6415230Z ##[group]Run actions/checkout@v4
+2026-01-02T12:14:11.6415770Z with:
+2026-01-02T12:14:11.6416080Z   repository: Firedogs2x/Houdoku-2
+2026-01-02T12:14:11.6416580Z   token: ***
+2026-01-02T12:14:11.6416860Z   ssh-strict: true
+2026-01-02T12:14:11.6417160Z   ssh-user: git
+2026-01-02T12:14:11.6417470Z   persist-credentials: true
+2026-01-02T12:14:11.6417810Z   clean: true
+2026-01-02T12:14:11.6418110Z   sparse-checkout-cone-mode: true
+2026-01-02T12:14:11.6418460Z   fetch-depth: 1
+2026-01-02T12:14:11.6418760Z   fetch-tags: false
+2026-01-02T12:14:11.6419050Z   show-progress: true
+2026-01-02T12:14:11.6419360Z   lfs: false
+2026-01-02T12:14:11.6419660Z   submodules: false
+2026-01-02T12:14:11.6419960Z   set-safe-directory: true
+2026-01-02T12:14:11.6420410Z ##[endgroup]
+2026-01-02T12:14:11.9151020Z Syncing repository: Firedogs2x/Houdoku-2
+2026-01-02T12:14:11.9152670Z ##[group]Getting Git version info
+2026-01-02T12:14:11.9153210Z Working directory is '/Users/runner/work/Houdoku-2/Houdoku-2'
+2026-01-02T12:14:11.9154260Z [command]/opt/homebrew/bin/git version
+2026-01-02T12:14:12.0739850Z git version 2.50.1
+2026-01-02T12:14:12.0844080Z ##[endgroup]
+2026-01-02T12:14:12.0852950Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/8568411f-88e0-4614-bc8a-2d274670f9a1/.gitconfig'
+2026-01-02T12:14:12.0957270Z Temporarily overriding HOME='/Users/runner/work/_temp/8568411f-88e0-4614-bc8a-2d274670f9a1' before making global git config changes
+2026-01-02T12:14:12.1061050Z Adding repository directory to the temporary git global config as a safe directory
+2026-01-02T12:14:12.1116060Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Houdoku-2/Houdoku-2
+2026-01-02T12:14:12.1118180Z Deleting the contents of '/Users/runner/work/Houdoku-2/Houdoku-2'
+2026-01-02T12:14:12.1119080Z ##[group]Initializing the repository
+2026-01-02T12:14:12.1119760Z [command]/opt/homebrew/bin/git init /Users/runner/work/Houdoku-2/Houdoku-2
+2026-01-02T12:14:12.1131860Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-01-02T12:14:12.1147930Z hint: is subject to change. To configure the initial branch name to use in all
+2026-01-02T12:14:12.1166190Z hint: of your new repositories, which will suppress this warning, call:
+2026-01-02T12:14:12.1166970Z hint:
+2026-01-02T12:14:12.1167490Z hint: 	git config --global init.defaultBranch <name>
+2026-01-02T12:14:12.1168030Z hint:
+2026-01-02T12:14:12.1168840Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-01-02T12:14:12.1171400Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-01-02T12:14:12.1172050Z hint:
+2026-01-02T12:14:12.1172520Z hint: 	git branch -m <name>
+2026-01-02T12:14:12.1172950Z hint:
+2026-01-02T12:14:12.1173490Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-01-02T12:14:12.1174630Z Initialized empty Git repository in /Users/runner/work/Houdoku-2/Houdoku-2/.git/
+2026-01-02T12:14:12.1176320Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Firedogs2x/Houdoku-2
+2026-01-02T12:14:12.1217170Z ##[endgroup]
+2026-01-02T12:14:12.1218730Z ##[group]Disabling automatic garbage collection
+2026-01-02T12:14:12.1228490Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-01-02T12:14:12.1280880Z ##[endgroup]
+2026-01-02T12:14:12.1281440Z ##[group]Setting up auth
+2026-01-02T12:14:12.1285550Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-01-02T12:14:12.1342900Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-01-02T12:14:12.2288730Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-01-02T12:14:12.2367840Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-01-02T12:14:12.3129600Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-01-02T12:14:12.3189110Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-01-02T12:14:12.4016430Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-01-02T12:14:12.4147550Z ##[endgroup]
+2026-01-02T12:14:12.4148300Z ##[group]Fetching the repository
+2026-01-02T12:14:12.4153070Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ee197feca4467dfd646655413c39825b48303531:refs/remotes/origin/Dev
+2026-01-02T12:14:13.3594440Z From https://github.com/Firedogs2x/Houdoku-2
+2026-01-02T12:14:13.3595300Z  * [new ref]         ee197feca4467dfd646655413c39825b48303531 -> origin/Dev
+2026-01-02T12:14:13.3661640Z ##[endgroup]
+2026-01-02T12:14:13.3662210Z ##[group]Determining the checkout info
+2026-01-02T12:14:13.3662690Z ##[endgroup]
+2026-01-02T12:14:13.3665930Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-01-02T12:14:13.3735510Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-01-02T12:14:13.3809630Z ##[group]Checking out the ref
+2026-01-02T12:14:13.3811930Z [command]/opt/homebrew/bin/git checkout --progress --force -B Dev refs/remotes/origin/Dev
+2026-01-02T12:14:13.4343330Z Switched to a new branch 'Dev'
+2026-01-02T12:14:13.4443640Z branch 'Dev' set up to track 'origin/Dev'.
+2026-01-02T12:14:13.4514910Z ##[endgroup]
+2026-01-02T12:14:13.4516150Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-01-02T12:14:13.4516500Z ee197feca4467dfd646655413c39825b48303531
+2026-01-02T12:14:13.4654200Z ##[group]Run pnpm/action-setup@v4
+2026-01-02T12:14:13.4654490Z with:
+2026-01-02T12:14:13.4654640Z   version: 9.0.0
+2026-01-02T12:14:13.4654850Z   dest: ~/setup-pnpm
+2026-01-02T12:14:13.4655270Z   run_install: null
+2026-01-02T12:14:13.4655510Z   package_json_file: package.json
+2026-01-02T12:14:13.4655730Z   standalone: false
+2026-01-02T12:14:13.4655940Z ##[endgroup]
+2026-01-02T12:14:13.5378050Z ##[group]Running self-installer...
+2026-01-02T12:14:14.0148940Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-01-02T12:14:14.0250190Z Packages: +1
+2026-01-02T12:14:14.0371000Z +
+2026-01-02T12:14:14.8111310Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2026-01-02T12:14:14.8512180Z 
+2026-01-02T12:14:14.8618520Z dependencies:
+2026-01-02T12:14:14.8708800Z + pnpm 9.0.0 (10.27.0 is available)
+2026-01-02T12:14:14.8810150Z 
+2026-01-02T12:14:14.8911710Z Done in 1.1s
+2026-01-02T12:14:14.9013700Z ##[endgroup]
+2026-01-02T12:14:14.9115120Z Installation Completed!
+2026-01-02T12:14:14.9232190Z ##[group]Run actions/setup-node@v4
+2026-01-02T12:14:14.9232450Z with:
+2026-01-02T12:14:14.9232620Z   node-version: 22
+2026-01-02T12:14:14.9232770Z   always-auth: false
+2026-01-02T12:14:14.9233000Z   check-latest: false
+2026-01-02T12:14:14.9233330Z   token: ***
+2026-01-02T12:14:14.9233480Z env:
+2026-01-02T12:14:14.9233660Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-01-02T12:14:14.9233890Z ##[endgroup]
+2026-01-02T12:14:15.0935300Z Found in cache @ /Users/runner/hostedtoolcache/node/22.21.1/arm64
+2026-01-02T12:14:15.0936140Z ##[group]Environment details
+2026-01-02T12:14:15.6232350Z node: v22.21.1
+2026-01-02T12:14:15.6329760Z npm: 10.9.4
+2026-01-02T12:14:15.6335410Z yarn: 1.22.22
+2026-01-02T12:14:15.6336320Z ##[endgroup]
+2026-01-02T12:14:15.6500490Z ##[group]Run pnpm install
+2026-01-02T12:14:15.6500760Z  [36;1mpnpm install [0m
+2026-01-02T12:14:15.6561200Z shell: /bin/bash -e {0}
+2026-01-02T12:14:15.6561550Z env:
+2026-01-02T12:14:15.6561730Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-01-02T12:14:15.6561950Z ##[endgroup]
+2026-01-02T12:14:15.9920130Z apps/desktop                             |  WARN  The field "pnpm" was found in /Users/runner/work/Houdoku-2/Houdoku-2/apps/desktop/package.json. This will not take effect. You should configure "pnpm" at the root of the workspace instead.
+2026-01-02T12:14:15.9997750Z Scope: all 4 workspace projects
+2026-01-02T12:14:16.0567870Z Lockfile is up to date, resolution step is skipped
+2026-01-02T12:14:16.0830630Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-01-02T12:14:16.1537380Z Packages: +855
+2026-01-02T12:14:16.1639000Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-01-02T12:14:17.1081450Z Progress: resolved 855, reused 0, downloaded 24, added 12
+2026-01-02T12:14:18.0945810Z Progress: resolved 855, reused 0, downloaded 110, added 105
+2026-01-02T12:14:19.0954400Z Progress: resolved 855, reused 0, downloaded 245, added 232
+2026-01-02T12:14:20.1014250Z Progress: resolved 855, reused 0, downloaded 308, added 294
+2026-01-02T12:14:21.0990150Z Progress: resolved 855, reused 0, downloaded 449, added 440
+2026-01-02T12:14:22.1069480Z Progress: resolved 855, reused 0, downloaded 590, added 581
+2026-01-02T12:14:23.1085430Z Progress: resolved 855, reused 0, downloaded 651, added 639
+2026-01-02T12:14:24.1106340Z Progress: resolved 855, reused 0, downloaded 737, added 726
+2026-01-02T12:14:25.1012930Z Progress: resolved 855, reused 0, downloaded 855, added 855, done
+2026-01-02T12:14:25.2857050Z .../core-js@3.46.0/node_modules/core-js postinstall$ node -e "try{require('./postinstall')}catch(e){}"
+2026-01-02T12:14:25.2916370Z .../node_modules/electron postinstall$ node install.js
+2026-01-02T12:14:25.2946620Z .../esbuild@0.21.5/node_modules/esbuild postinstall$ node install.js
+2026-01-02T12:14:25.2973720Z .../node_modules/@biomejs/biome postinstall$ node scripts/postinstall.js
+2026-01-02T12:14:25.3628620Z .../core-js@3.46.0/node_modules/core-js postinstall: Done
+2026-01-02T12:14:25.3748810Z .../node_modules/@biomejs/biome postinstall: Done
+2026-01-02T12:14:25.3926350Z .../esbuild@0.21.5/node_modules/esbuild postinstall: Done
+2026-01-02T12:14:27.7160430Z .../node_modules/electron postinstall: Done
+2026-01-02T12:14:28.8432700Z 
+2026-01-02T12:14:28.8433550Z devDependencies:
+2026-01-02T12:14:28.8434450Z + @biomejs/biome 1.9.4
+2026-01-02T12:14:28.8434780Z + prettier 3.6.2
+2026-01-02T12:14:28.8437110Z + turbo 2.6.1
+2026-01-02T12:14:28.8439520Z + typescript 5.5.4
+2026-01-02T12:14:28.8459390Z 
+2026-01-02T12:14:28.8663090Z Done in 13.1s
+2026-01-02T12:14:28.9163010Z ##[group]Run pnpm build
+2026-01-02T12:14:28.9163350Z  [36;1mpnpm build [0m
+2026-01-02T12:14:28.9207810Z shell: /bin/bash -e {0}
+2026-01-02T12:14:28.9208060Z env:
+2026-01-02T12:14:28.9208320Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-01-02T12:14:28.9208600Z ##[endgroup]
+2026-01-02T12:14:29.3000670Z 
+2026-01-02T12:14:29.3012200Z > houdoku-mono@ build /Users/runner/work/Houdoku-2/Houdoku-2
+2026-01-02T12:14:29.3014060Z > turbo build
+2026-01-02T12:14:29.3015020Z 
+2026-01-02T12:14:29.6068560Z 
+2026-01-02T12:14:29.6069030Z Attention:
+2026-01-02T12:14:29.6069640Z Turborepo now collects completely anonymous telemetry regarding usage.
+2026-01-02T12:14:29.6070540Z This information is used to shape the Turborepo roadmap and prioritize features.
+2026-01-02T12:14:29.6071470Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+2026-01-02T12:14:29.6072170Z https://turborepo.com/docs/telemetry
+2026-01-02T12:14:29.6072480Z 
+2026-01-02T12:14:29.9236130Z • Packages in scope: @houdoku/desktop, @houdoku/docs, @houdoku/ui
+2026-01-02T12:14:29.9246250Z • Running build in 3 packages
+2026-01-02T12:14:29.9250410Z • Remote caching disabled
+2026-01-02T12:14:31.9079030Z  [;31m@houdoku/docs:build [;0m
+2026-01-02T12:14:31.9110500Z cache miss, executing e9bf6d354518d9ec
+2026-01-02T12:14:31.9112720Z 
+2026-01-02T12:14:31.9123330Z > @houdoku/docs@1.0.0 build /Users/runner/work/Houdoku-2/Houdoku-2/apps/docs
+2026-01-02T12:14:31.9126200Z > vitepress build src
+2026-01-02T12:14:31.9128150Z 
+2026-01-02T12:14:31.9128400Z 
+2026-01-02T12:14:31.9129750Z    [32m [1mvitepress [22m v1.6.4 [39m
+2026-01-02T12:14:31.9130630Z 
+2026-01-02T12:14:31.9133620Z - building client + server bundles...
+2026-01-02T12:14:31.9152940Z  [31mx [39m Build failed in 824ms
+2026-01-02T12:14:31.9158930Z  [31m✖ [0m building client + server bundles...
+2026-01-02T12:14:31.9159500Z  [31mbuild error: [39m
+2026-01-02T12:14:31.9161270Z  [31m[vitepress:data] Could not load /Users/runner/work/Houdoku-2/Houdoku-2/apps/docs/src/.vitepress/theme/data/release.data.ts (imported by src/download.md): Cannot read properties of undefined (reading 'find') [39m
+2026-01-02T12:14:31.9190710Z ##[error]@houdoku/docs#build: command (/Users/runner/work/Houdoku-2/Houdoku-2/apps/docs) /Users/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (1)
+2026-01-02T12:14:31.9203680Z  [31m[vitepress:data] Could not load /Users/runner/work/Houdoku-2/Houdoku-2/apps/docs/src/.vitepress/theme/data/release.data.ts (imported by src/download.md): Cannot read properties of undefined (reading 'find') [39m
+2026-01-02T12:14:31.9220530Z  ERROR  run failed: command  exited (1)
+2026-01-02T12:14:31.9221400Z     at load (/Users/runner/work/Houdoku-2/Houdoku-2/apps/docs/src/.vitepress/theme/data/release.data.ts:32:31)
+2026-01-02T12:14:31.9244780Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-01-02T12:14:31.9246530Z     at async Object.load (file:///Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/vitepress@1.6.4_@algolia+client-search@5.44.0_@types+node@22.8.6_@types+react@18.3.26_postcss_le2rboplepo3tv5byrgdve4j2y/node_modules/vitepress/dist/node/chunk-D3CUZ4fa.js:44805:20)
+2026-01-02T12:14:31.9248210Z     at async PluginDriver.hookFirstAndGetPlugin (file:///Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/rollup@4.53.2/node_modules/rollup/dist/es/shared/node-entry.js:22319:28)
+2026-01-02T12:14:31.9249410Z     at async file:///Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/rollup@4.53.2/node_modules/rollup/dist/es/shared/node-entry.js:21319:33
+2026-01-02T12:14:31.9250580Z     at async Queue.work (file:///Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/rollup@4.53.2/node_modules/rollup/dist/es/shared/node-entry.js:22547:32)
+2026-01-02T12:14:31.9254350Z  ELIFECYCLE  Command failed with exit code 1.
+2026-01-02T12:14:31.9255770Z [ERROR] command finished with error: command (/Users/runner/work/Houdoku-2/Houdoku-2/apps/docs) /Users/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (1)
+2026-01-02T12:14:31.9256860Z ##[group]@houdoku/desktop:build
+2026-01-02T12:14:31.9257180Z cache miss, executing 84ed35ede2ff4590
+2026-01-02T12:14:31.9257400Z 
+2026-01-02T12:14:31.9257680Z > @houdoku/desktop@2.17.0 build /Users/runner/work/Houdoku-2/Houdoku-2/apps/desktop
+2026-01-02T12:14:31.9258110Z > electron-vite build
+2026-01-02T12:14:31.9258210Z 
+2026-01-02T12:14:31.9258580Z  [36mvite v5.4.21  [32mbuilding SSR bundle for production... [36m [39m
+2026-01-02T12:14:31.9258890Z transforming...
+2026-01-02T12:14:31.9259250Z  [32m✓ [39m 23 modules transformed.
+2026-01-02T12:14:31.9260230Z src/main/services/extension.ts (49:8): Use of eval in "src/main/services/extension.ts" is strongly discouraged as it poses security risks and may cause issues with minification.
+2026-01-02T12:14:31.9260830Z rendering chunks...
+2026-01-02T12:14:31.9261450Z  [2mout/main/ [22m [36mindex.js   [39m [1m [2m85.55 kB [22m [1m [22m
+2026-01-02T12:14:31.9261890Z  [32m✓ built in 606ms [39m
+2026-01-02T12:14:31.9262320Z  [36mvite v5.4.21  [32mbuilding SSR bundle for production... [36m [39m
+2026-01-02T12:14:31.9263230Z transforming...
+2026-01-02T12:14:31.9263670Z  [32m✓ [39m 1 modules transformed.
+2026-01-02T12:14:31.9264020Z Generated an empty chunk: "index".
+2026-01-02T12:14:31.9264360Z rendering chunks...
+2026-01-02T12:14:31.9264840Z  [2mout/preload/ [22m [36mindex.js   [39m [1m [2m0.01 kB [22m [1m [22m
+2026-01-02T12:14:31.9265260Z  [32m✓ built in 5ms [39m
+2026-01-02T12:14:31.9267090Z  [36mvite v5.4.21  [32mbuilding for production... [36m [39m
+2026-01-02T12:14:31.9267420Z transforming...
+2026-01-02T12:14:31.9267940Z ##[endgroup]
+2026-01-02T12:14:31.9268120Z 
+2026-01-02T12:14:31.9268220Z  Tasks:    0 successful, 2 total
+2026-01-02T12:14:31.9268510Z Cached:    0 cached, 2 total
+2026-01-02T12:14:31.9268990Z   Time:    2.031s 
+2026-01-02T12:14:31.9269450Z Failed:    @houdoku/docs#build
+2026-01-02T12:14:31.9269590Z 
+2026-01-02T12:14:31.9269950Z  ELIFECYCLE  Command failed with exit code 1.
+2026-01-02T12:14:31.9431800Z ##[error]Process completed with exit code 1.
+2026-01-02T12:14:31.9602180Z Post job cleanup.
+2026-01-02T12:14:32.1647690Z Pruning is unnecessary.
+2026-01-02T12:14:32.1749000Z Post job cleanup.
+2026-01-02T12:14:32.2760700Z [command]/opt/homebrew/bin/git version
+2026-01-02T12:14:32.2841280Z git version 2.50.1
+2026-01-02T12:14:32.2874680Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/02aa16d0-fc20-430a-a788-9c0326efa0a8/.gitconfig'
+2026-01-02T12:14:32.2881300Z Temporarily overriding HOME='/Users/runner/work/_temp/02aa16d0-fc20-430a-a788-9c0326efa0a8' before making global git config changes
+2026-01-02T12:14:32.2882030Z Adding repository directory to the temporary git global config as a safe directory
+2026-01-02T12:14:32.2889370Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Houdoku-2/Houdoku-2
+2026-01-02T12:14:32.2960900Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-01-02T12:14:32.3019120Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-01-02T12:14:32.3719600Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-01-02T12:14:32.3769100Z http.https://github.com/.extraheader
+2026-01-02T12:14:32.3777880Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-01-02T12:14:32.3840930Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-01-02T12:14:32.4554140Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-01-02T12:14:32.4612090Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-01-02T12:14:32.5476020Z Cleaning up orphan processes
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Created 3 todos**
+
+- [-] Inspect failing docs build
+  > Open `apps/docs/src/.vitepress/theme/data/release.data.ts` and related files to find the undefined 'find' usage
+- [ ] Propose and apply fix
+  > Fix the code so it safely handles undefined and returns correct data for vitepress
+- [ ] Run lint/build locally guidance
+  > Give commands for user to run `pnpm build` and `pnpm lint` and what to expect
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/docs/src/.vitepress/theme/data/release.data.ts)</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/docs/src/.vitepress/theme/data/release.data.ts)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="write" data-tool-name="copilot_applyPatch">
+<details>
+<summary>Tool use: **copilot_applyPatch** • Using "Apply Patch"</summary>
+
+```typescript
+interface ReleaseAsset {
+  platform: string;
+  name: string;
+  browser_download_url: string;
+  buildTimeStr: string;
+}
+
+export interface Release {
+  version: string;
+  releaseDateStr: string;
+  releaseDaysAgo: number;
+  assets: ReleaseAsset[];
+}
+
+declare const data: Release;
+export { data };
+
+export default {
+  async load(): Promise<Release> {
+    // Fetch latest release info from GitHub. This can fail during CI (no network or rate limits),
+    // so handle missing or malformed responses gracefully.
+    const response = await fetch('https://api.github.com/repos/Firedogs2x/Houdoku-2/releases/latest');
+
+    if (!response.ok) {
+      // Return a sensible fallback when the API can't be reached.
+      const now = new Date();
+      return {
+        version: 'unknown',
+        releaseDateStr: now.toLocaleDateString(),
+        releaseDaysAgo: 0,
+        assets: [],
+      };
+    }
+
+    const release = await response.json();
+
+    const publishedAt = release?.published_at ? new Date(release.published_at) : new Date();
+
+    const assetsArray: any[] = Array.isArray(release?.assets) ? release.assets : [];
+
+    const found = {
+      windows: assetsArray.find((asset) => /Houdoku-Setup-.*\.exe$/.test(asset?.name)) || null,
+      windowsportable: assetsArray.find((asset) => /Houdoku-\d.*exe$/.test(asset?.name)) || null,
+      mac: assetsArray.find((asset) => asset?.name?.endsWith('.dmg')) || null,
+      linux: assetsArray.find((asset) => asset?.name?.endsWith('.AppImage')) || null,
+    };
+
+    const makeAsset = (platform: string, asset: any): ReleaseAsset => ({
+      platform,
+      name: asset?.name ?? 'N/A',
+      browser_download_url: asset?.browser_download_url ?? '',
+      buildTimeStr: asset?.updated_at ? new Date(asset.updated_at).toISOString() : 'N/A',
+    });
+
+    const assets: ReleaseAsset[] = [];
+    if (found.windows) assets.push(makeAsset('Windows', found.windows));
+    if (found.windowsportable) assets.push(makeAsset('Windows Portable', found.windowsportable));
+    if (found.mac) assets.push(makeAsset('macOS', found.mac));
+    if (found.linux) assets.push(makeAsset('Linux', found.linux));
+
+    return {
+      version: (release?.tag_name ?? 'v0.0.0').replace(/^v/, ''),
+      releaseDateStr: publishedAt.toLocaleDateString(),
+      releaseDaysAgo: Math.round((Date.now() - publishedAt.getTime()) / (1000 * 3600 * 24)),
+      assets,
+    };
+  },
+};
+
+```
+
+
+</details>
+</tool-use>
+
+---
+
+**Organizing tasks for Vitepress errors**
+
+I need to start by creating a to-do list to track my steps. First, I'll analyze the Vitepress build failure and inspect the file located at apps/docs/src/.vitepress/theme/data/release.data.ts. After that, I should read the file to check for issues. I need to remember to provide updates after several tool calls, and I might need to check other files like src/download.md and package.json as well. Let's get started!I'll create a short plan, then inspect the docs theme data file that caused the build error to find the undefined 'find' call. I'll open `release.data.ts` and `src/download.md` to see how it's imported.Now I'll open the file that caused the error. I'll read `release.data.ts`.**Addressing code issues**
+
+I’m encountering an error that indicates `release.assets` might be undefined. It looks like the code is making some assumptions about the fetch function working during the CI build, but that can fail if GitHub API rate-limits or if there's a network issue. I need to ensure that we check for both `response.ok` and the existence of `release.assets`. I should implement defensive coding strategies, providing a fallback release or local file if necessary and using optional chaining for safer access.**Updating code with patches**
+
+I need to preface the batch process based on reminders and use the `apply_patch` tool to update the file with new code content. In the `load` function, I’ll implement a fetch that checks `response.ok`, throwing an error if it fails. I should parse the release data and ensure it handles the assets array properly, with fallback options like 'N/A' or empty strings for the asset properties. Finally, I’ll wrap the `release.tag_name` safely and replace the entire file content as needed, then proceed with applying the patch.I'm going to patch `release.data.ts` to safely handle network or API failures and avoid reading `.find` on undefined. I'll add defensive checks and sensible fallbacks.I see that applying the patch failed because I didn't include the explanation parameter. I need to make sure I call the function properly with both the input and the explanation to get it to work. It's pretty simple, really, but I can see how overlooking that detail caused the issue. I’ll adjust my call to include everything necessary. Let’s get this right!Patching `release.data.ts` to add defensive checks and fallbacks (safe fetch, validate assets array, build assets list conditionally). I'll apply the change now.
+
+---
+
