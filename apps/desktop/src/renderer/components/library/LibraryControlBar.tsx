@@ -57,7 +57,7 @@ type Props = {
   getFilteredList: () => Series[];
 };
 
-const LibraryControlBar: React.FC<Props> = (_props: Props) => {
+const LibraryControlBar: React.FC<Props> = () => {
   const setSeriesList = useSetRecoilState(seriesListState);
   const [reloadingSeriesList, setReloadingSeriesList] = useRecoilState(reloadingSeriesListState);
   const setFilter = useSetRecoilState(filterState);

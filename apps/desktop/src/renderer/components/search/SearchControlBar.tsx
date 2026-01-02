@@ -77,8 +77,8 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
   const chapterName = useRecoilValue(chapterNameState);
   const seriesList = useRecoilValue(seriesListState);
   const setSeriesList = useSetRecoilState(seriesListState);
-  const setReloadingSeriesList = useSetRecoilState(reloadingSeriesListState);
-  const chapterLanguages = useRecoilValue(chapterLanguagesState);
+  const _setReloadingSeriesList = useSetRecoilState(reloadingSeriesListState);
+  const _chapterLanguages = useRecoilValue(chapterLanguagesState);
 
   const handleSelectDirectory = async () => {
     const fileList = await ipcRenderer.invoke(

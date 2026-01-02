@@ -17,7 +17,7 @@ export { data };
 
 export default {
   async load(): Promise<Release> {
-    const release = await fetch('https://api.github.com/repos/xgi/houdoku/releases/latest').then(
+    const release = await fetch('https://api.github.com/repos/Firedogs2x/Houdoku-2/releases/latest').then(
       (response) => response.json(),
     );
 
@@ -40,12 +40,12 @@ export default {
           browser_download_url: assets.windows.browser_download_url,
           buildTimeStr: new Date(assets.windows.updated_at).toISOString(),
         },
-        // {
-        //   platform: 'Windows Portable',
-        //   name: assets.windowsportable.name,
-        //   browser_download_url: assets.windowsportable.browser_download_url,
-        //   buildTimeStr: new Date(assets.windowsportable.updated_at).toISOString(),
-        // },
+        {
+          platform: 'Windows Portable',
+          name: assets.windowsportable.name,
+          browser_download_url: assets.windowsportable.browser_download_url,
+          buildTimeStr: new Date(assets.windowsportable.updated_at).toISOString(),
+        },
         {
           platform: 'macOS',
           name: assets.mac.name,

@@ -7,7 +7,7 @@ export const parseChapterMetadata = (
   group: string;
 } => {
   // Start with the basename (text is typically a filename or directory basename)
-  let base = text.replace(/\.[^/.]+$/, '').trim();
+  const base = text.replace(/\.[^/.]+$/, '').trim();
 
   // Extract group tags like [Group]
   const matchGroup: RegExpMatchArray | null = base.match(/\[([^\]]+)\]/g);

@@ -50,7 +50,7 @@ export enum SettingsPage {
 type SettingsPageProps = {
   name: string;
   // accept lucide or react-icons style components
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<Record<string, unknown>>;
   component: React.FC;
 };
 
@@ -60,21 +60,11 @@ const PAGES: { [key in SettingsPage]: SettingsPageProps } = {
   [SettingsPage.Library]: { name: 'Library', icon: LibraryBigIcon, component: SettingsLibrary },
   [SettingsPage.Reader]: { name: 'Reader', icon: BookOpenIcon, component: SettingsReader },
   [SettingsPage.Keybinds]: { name: 'Keybinds', icon: KeyboardIcon, component: SettingsKeybinds },
-  [SettingsPage.Trackers]: {
-    name: 'Trackers',
-    icon: NotebookTextIcon,
-    component: SettingsTrackers,
-  },
-  [SettingsPage.Integrations]: {
-    name: 'Integrations',
-    icon: ToyBrickIcon,
-    component: SettingsIntegrations,
-  },
+  [SettingsPage.Trackers]: { name: 'Trackers', icon: NotebookTextIcon, component: SettingsTrackers,},
+  [SettingsPage.Integrations]: { name: 'Integrations', icon: ToyBrickIcon, component: SettingsIntegrations, },
 };
 
-type SettingsDialogContentProps = {
-  defaultPage?: SettingsPage;
-};
+type SettingsDialogContentProps = { defaultPage?: SettingsPage;};
 
 export function SettingsDialogContent(props: SettingsDialogContentProps) {
   const [activePage, setActivePage] = useState<SettingsPage>(
@@ -113,7 +103,7 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
                       if (React.isValidElement(Icon)) {
                         iconElement = Icon;
                       } else if (typeof Icon === 'function') {
-                        const IconComp = Icon as React.ComponentType<any>;
+                        const IconComp = Icon as React.ComponentType<Record<string, unknown>>;
                         iconElement = <IconComp />;
                       }
 
@@ -152,7 +142,7 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
           </header>
           <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4 pt-0 space-y-2">
             {(() => {
-              const compOrElement: any = PAGES[activePage].component;
+              const compOrElement: React.ComponentType | React.ReactElement = PAGES[activePage].component;
               // Debugging guard: log unexpected types to help trace rendering issues
               if (React.isValidElement(compOrElement)) {
                 console.error('SettingsDialogContent: component is a React element instead of a component for page', activePage, compOrElement);
@@ -164,7 +154,7 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
                 return null;
               }
 
-              const ActiveComp = compOrElement as React.ComponentType<any>;
+              const ActiveComp = compOrElement as React.ComponentType<Record<string, unknown>>;
               return <ActiveComp />;
             })()}
           </div>

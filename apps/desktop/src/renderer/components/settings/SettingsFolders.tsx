@@ -23,7 +23,7 @@ export const SettingsFolders: React.FC = () => {
   const [coverImageFolder, setCoverImageFolder] = useRecoilState(coverImageFolderState);
   const [coverImageName, setCoverImageName] = useRecoilState(coverImageNameState);
   const [chapterFolder, setChapterFolder] = useRecoilState(chapterFolderState);
-  const [chapterName, setChapterName] = useRecoilState(chapterNameState);
+  const [_chapterName, _setChapterName] = useRecoilState(chapterNameState);
 
   const handleSelectMasterFolder = () => {
     ipcRenderer
