@@ -94,6 +94,7 @@ export const libraryCropCoversState = atm<boolean>(GeneralSetting.LibraryCropCov
 // biome-ignore format: TODO ignore block
 export const chapterListVolOrderState = atm<TableColumnSortOrder>(GeneralSetting.ChapterListVolOrder);
 export const chapterListChOrderState = atm<TableColumnSortOrder>(GeneralSetting.ChapterListChOrder);
+export const chapterListDateOrderState = atm<TableColumnSortOrder>(GeneralSetting.ChapterListDateOrder);
 export const chapterListPageSizeState = atm<number>(GeneralSetting.ChapterListPageSize);
 export const themeState = atm<ApplicationTheme>(GeneralSetting.ApplicationTheme);
 

@@ -16,7 +16,26 @@ const fetchSeries = (seriesId: string): Series | null => {
 
 const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
-  return val === null ? [] : JSON.parse(val);
+  const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
+
+  // Backfill missing dateAdded with 12/31/2025 (ISO)
+  const BACKFILL_DATE = '2025-12-31T00:00:00Z';
+  let changed = false;
+  chapters.forEach((c) => {
+    if (!(c as any).dateAdded) {
+      (c as any).dateAdded = BACKFILL_DATE;
+      changed = true;
+    }
+  });
+
+  if (changed && seriesId) {
+    persistantStore.write(
+      `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
+      JSON.stringify(chapters),
+    );
+  }
+
+  return chapters;
 };
 
 const fetchChapter = (seriesId: string, chapterId: string): Chapter | null => {
@@ -53,7 +72,9 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
   // add/replace chapters in this map from param
   chapters.forEach((chapter) => {
     const chapterId: string = chapter.id ? chapter.id : uuidv4();
-    chapterMap[chapterId] = { ...chapter, id: chapterId };
+    // ensure dateAdded exists for new/upserted chapters
+    const dateAdded = (chapter as any).dateAdded ? (chapter as any).dateAdded : new Date().toISOString();
+    chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded } as any;
   });
 
   persistantStore.write(

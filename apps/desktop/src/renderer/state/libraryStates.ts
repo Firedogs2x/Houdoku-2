@@ -5,6 +5,7 @@ import {
   chapterLanguagesState,
   chapterListChOrderState,
   chapterListVolOrderState,
+  chapterListDateOrderState,
 } from './settingStates';
 
 export const titlebarTextState = atom<string | undefined>({
@@ -108,6 +109,7 @@ export const sortedFilteredChapterListState = selector<Chapter[]>({
     const chapterFilterGroupNames = get(chapterFilterGroupNamesState);
     const chapterListVolOrder = get(chapterListVolOrderState);
     const chapterListChOrder = get(chapterListChOrderState);
+    const chapterListDateOrder = get(chapterListDateOrderState);
 
     const uniqueChapters = new Map();
 
@@ -152,7 +154,15 @@ export const sortedFilteredChapterListState = selector<Chapter[]>({
           [TableColumnSortOrder.None]: 0,
         }[chapterListChOrder];
 
-        return volumeComp || chapterComp;
+        // If a date sort is active, sort by dateAdded
+        const dateComp = {
+          [TableColumnSortOrder.Ascending]:
+            new Date((a as any).dateAdded || 0).getTime() - new Date((b as any).dateAdded || 0).getTime(),
+          [TableColumnSortOrder.Descending]:
+            new Date((b as any).dateAdded || 0).getTime() - new Date((a as any).dateAdded || 0).getTime(),
+          [TableColumnSortOrder.None]: 0,
+        }[chapterListDateOrder];
+        return dateComp || volumeComp || chapterComp;
       });
   },
 });

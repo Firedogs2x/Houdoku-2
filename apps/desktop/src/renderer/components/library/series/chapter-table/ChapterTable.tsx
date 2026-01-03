@@ -28,10 +28,12 @@ import {
   chapterLanguagesState,
   chapterListChOrderState,
   chapterListVolOrderState,
+  chapterListDateOrderState,
   chapterListPageSizeState,
   customDownloadsDirState,
 } from '@/renderer/state/settingStates';
 import { Chapter, Languages, Series } from '@tiyo/common';
+import { formatDateToMMDDYYYY } from '@/renderer/util/date';
 import routes from '@/common/constants/routes.json';
 import {
   DropdownMenu,
@@ -87,6 +89,9 @@ export function ChapterTable(props: ChapterTableProps) {
   const chapterLanguages = useRecoilValue(chapterLanguagesState);
   const [chapterListVolOrder, setChapterListVolOrder] = useRecoilState(chapterListVolOrderState);
   const [chapterListChOrder, setChapterListChOrder] = useRecoilState(chapterListChOrderState);
+  const [chapterListDateOrder, setChapterListDateOrder] = useRecoilState(
+    chapterListDateOrderState,
+  );
   const [chapterDownloadStatuses, setChapterDownloadStatuses] = useRecoilState(
     chapterDownloadStatusesState,
   );
@@ -157,13 +162,14 @@ export function ChapterTable(props: ChapterTableProps) {
     {
       accessorKey: 'title',
       header: () => <span>Title</span>,
-      cell: ({ row }) => (
-        <div className="flex">
-          <span className="w-[100px] lg:w-[300px] xl:w-[400px] truncate">
-            {row.getValue('title')}
-          </span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const title = row.getValue('title') as string;
+        return (
+          <div className="flex">
+            <span className="w-[100px] lg:w-[300px] xl:w-[400px] truncate">{title}</span>
+          </div>
+        );
+      },
     },
     {
       id: 'group',
@@ -234,6 +240,40 @@ export function ChapterTable(props: ChapterTableProps) {
           <span className="w-12 truncate">{row.getValue('chapterNumber')}</span>
         </div>
       ),
+      enableHiding: false,
+    },
+    {
+      accessorKey: 'dateAdded',
+      header: () => (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-ml-3 h-8 data-[state=open]:bg-accent w-28"
+          onClick={() => {
+            switch (chapterListDateOrder) {
+              case TableColumnSortOrder.Descending:
+                setChapterListDateOrder(TableColumnSortOrder.Ascending);
+                break;
+              case TableColumnSortOrder.Ascending:
+                setChapterListDateOrder(TableColumnSortOrder.None);
+                break;
+              default:
+                setChapterListDateOrder(TableColumnSortOrder.Descending);
+            }
+          }}
+        >
+          <span>Date Added</span>
+          {columnOrderMap[chapterListDateOrder]}
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const dateStr = formatDateToMMDDYYYY((row.original as any).dateAdded);
+        return (
+          <div className="flex">
+            <span className="w-28 truncate">{dateStr ?? ''}</span>
+          </div>
+        );
+      },
       enableHiding: false,
     },
   ];

@@ -235,3 +235,93 @@ The badge in the upper right-hand corner of the series card will now display the
 
 ---
 
+_**User (2026-01-03 01:52Z)**_
+
+I want to add date (month/day/year) tracking to each chapter in a series. I want to track the date that a chapter was added to a series in the program.
+Do not change anything that will cause issue with current required information. Only change what is required to add the date information to each chapter.
+
+For example:
+Series name: Dancing
+Chapters:
+CH. 1 “Name” Date added: 12/09/2025
+Ch. 2 “Name” Date added: 01/02/2026
+
+Please explain how you plan to implement this change.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Created 6 todos**
+
+- [ ] Add `dateAdded` to Chapter model
+  > Update the Chapter interface/type in the shared common package to include an optional `dateAdded?: string` field (ISO 8601). Keep it optional for backward compatibility.
+- [ ] Persist `dateAdded` in storage
+  > Modify the renderer `library` service to read/write the `dateAdded` field when upserting/fetching chapters so it is persisted to disk like other chapter fields.
+- [ ] Set `dateAdded` when creating or importing chapters
+  > Where chapters are created/updated (reloadSeries, import, manual add), set `dateAdded` to current date-time if the field is missing. Use ISO 8601 string internally.
+- [ ] Display date in UI (mm/dd/yyyy)
+  > Add a small formatted `Date added: MM/DD/YYYY` label next to chapter titles in the chapter list UI (`ChapterTable.tsx` / `SeriesDetails.tsx`), using a formatting helper.
+- [ ] Backfill missing values for existing chapters
+  > On app start or first library load, walk existing chapters and set `dateAdded` to current date (or best-guess) when missing to avoid UI gaps. Keep this idempotent.
+- [ ] Tests & manual verification
+  > Run the app, verify new chapters get `dateAdded`, display in UI formatted as MM/DD/YYYY, and ensure no existing flows are broken.
+
+</details>
+</tool-use>
+
+---
+
+**Creating a concise todo list**
+
+I'm outlining a todo list with tasks like updating the Chapter model in the common package, adjusting database and storage serialization, and modifying UI components for displaying the chapter list. I'll also look into updating chapter creation paths, particularly for adding dates. Migrations should have existing chapters default to a created date, with new chapters set to the current date. I'll ensure to keep the current required information unchanged while adding an optional field. Finally, I’ll craft 5-6 clear steps for implementation details.**Updating display formats and functions**
+
+I need to convert the display format to mm/dd/yyyy in the UI. For persistence, it seems the library uses local SQLite, so I should look into the library service, even if the user didn't want to search. I found earlier that the library service is listed in the features. I’ll keep my explanation generic. Steps include updating the data model, storage serialization code, and ensuring the dateAdded is set where it’s missing. I'll also need to adjust the UI components to display the date added and consider migration plans for existing chapters.**Planning the todo list update**
+
+First, I need to include a short preamble before making any tool calls. Then, I'll use the manage_todo_list tool to create todo items. For these tasks, I’m assigning IDs 1 through 6 with a status of "not started." Each item will include a title and detailed description, referencing files like `packages/...`, but I’ll ensure the final formatting uses link references. The first item is updating the Chapter type to include `dateAdded?: string` in the '@tiyo/common' package. The second task involves modifying the library service to persist the dateAdded when chapters are inserted or updated.**Detailing the planned updates**
+
+Earlier, I noticed the usage of library functions like `library.fetchChapters` and `library.upsertChapters`, which are located at '@/renderer/services/library'. For my todo list, the third item involves setting the `dateAdded` to the current date during chapter imports or reloads if it's missing. Next, I’ll modify UI components like `ChapterTable.tsx` and `SeriesDetails.tsx` to display the date added next to each chapter title in a formatted way. I also need to create a formatting helper in the utilities file for date formatting. Lastly, for migration, I should ensure existing chapters have the `dateAdded` filled in at app startup if missing. I’ll set statuses to "not started" and call `manage_todo_list` to write this out.**Creating the todo plan for date tracking**
+
+I need to highlight that we'll store the date in ISO 8601 format when adding the new field. In the UI, it should display as "Date added: mm/dd/yyyy." The goal is to minimize changes to existing required fields while ensuring backward compatibility with an optional property and defaulting logic. Once the user approves, I can implement these changes and edit the relevant files. First, I’ll add a concise preamble before calling `manage_todo_list`: "I'll create a small TODO plan for adding chapter date tracking, then call manage_todo_list." Let’s proceed!I'll create a concise, actionable plan (TODO list) for adding date tracking to chapters.Progress update: TODO plan created. Next I'll describe the implementation details and decisions for each step and propose how to proceed if you want me to implement it. 
+
+Implementation plan (concise)
+
+- Data model
+  - Add an optional `dateAdded?: string` field to the `Chapter` interface in the shared package (store ISO 8601 strings, e.g. `"2026-01-02T08:00:00Z"`). This is non-breaking because it's optional.
+
+- Persistence
+  - Update the `library` service (renderer side) where chapters are upserted/fetched to include `dateAdded` in saved JSON/DB rows. No removal of existing fields.
+
+- Creation / import flows
+  - Wherever new chapters are created or imported (e.g., `reloadSeries`, importers, manual add), set `dateAdded = new Date().toISOString()` if the incoming chapter lacks the field.
+
+- Backfill / migration
+  - Add an idempotent backfill step when loading chapters from storage: if a chapter has no `dateAdded`, set it to `new Date().toISOString()` (or, optionally, derive from file metadata if available). This ensures existing chapters show a date without breaking anything.
+
+- UI display
+  - Add a helper `formatDateToMMDDYYYY(dateStr?: string): string | undefined` in the renderer utils.
+  - In the chapter list UI (`ChapterTable.tsx`) and any other displays (e.g., `SeriesDetails`), show a small label after the chapter title: `Date added: MM/DD/YYYY`. Use a subtle text style so layout doesn't break.
+  - Do not alter required fields or existing layout beyond adding the label.
+
+- Testing & verification
+  - Manual verification: add/import a chapter, confirm `dateAdded` present in storage and displayed correctly. Check existing chapters are backfilled and display a date.
+  - Optional: add unit tests around formatting helper.
+
+Compatibility and constraints
+- Storage format: ISO 8601 string chosen for human-readability and cross-platform compatibility.
+- Backwards compatibility: field is optional; older app versions will ignore it safely.
+- Minimal code changes: only adjust the shared type, storage upsert/load, creation flows, and UI where chapter lines are rendered.
+
+If you'd like, I can now:
+- Implement these changes step-by-step (I will update `Chapter` model, `library` persistence, set `dateAdded` on new chapters, add the UI label and formatting helper, and add the backfill logic), or
+- Implement a subset first (e.g., only UI + formatting and set `dateAdded` when upserting), then proceed.
+
+Which option do you want me to proceed with?
+
+---
+
