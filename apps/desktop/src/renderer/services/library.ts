@@ -22,8 +22,8 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const BACKFILL_DATE = '2025-12-31T00:00:00Z';
   let changed = false;
   chapters.forEach((c) => {
-    if (!(c as any).dateAdded) {
-      (c as any).dateAdded = BACKFILL_DATE;
+    if (!c.dateAdded) {
+      c.dateAdded = BACKFILL_DATE;
       changed = true;
     }
   });
@@ -73,8 +73,8 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
   chapters.forEach((chapter) => {
     const chapterId: string = chapter.id ? chapter.id : uuidv4();
     // ensure dateAdded exists for new/upserted chapters
-    const dateAdded = (chapter as any).dateAdded ? (chapter as any).dateAdded : new Date().toISOString();
-    chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded } as any;
+    const dateAdded = chapter.dateAdded ? chapter.dateAdded : new Date().toISOString();
+    chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 
   persistantStore.write(

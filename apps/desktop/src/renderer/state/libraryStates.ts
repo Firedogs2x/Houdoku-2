@@ -157,9 +157,9 @@ export const sortedFilteredChapterListState = selector<Chapter[]>({
         // If a date sort is active, sort by dateAdded
         const dateComp = {
           [TableColumnSortOrder.Ascending]:
-            new Date((a as any).dateAdded || 0).getTime() - new Date((b as any).dateAdded || 0).getTime(),
+            new Date(a.dateAdded || 0).getTime() - new Date(b.dateAdded || 0).getTime(),
           [TableColumnSortOrder.Descending]:
-            new Date((b as any).dateAdded || 0).getTime() - new Date((a as any).dateAdded || 0).getTime(),
+            new Date(b.dateAdded || 0).getTime() - new Date(a.dateAdded || 0).getTime(),
           [TableColumnSortOrder.None]: 0,
         }[chapterListDateOrder];
         return dateComp || volumeComp || chapterComp;

@@ -2,6 +2,7 @@ const fs = require('fs');
 import path from 'path';
 import React, { useEffect } from 'react';
 const { ipcRenderer } = require('electron');
+import { Series } from '@tiyo/common';
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
@@ -31,8 +32,8 @@ if (!fs.existsSync(thumbnailsDir)) {
 }
 
 type Props = {
-  getFilteredList: () => any[];
-  showRemoveModal: (series: any) => void;
+  getFilteredList: () => Series[];
+  showRemoveModal: (series: Series) => void;
 };
 
 const LibraryGrid: React.FC<Props> = (props: Props) => {
@@ -45,7 +46,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
     multiSelectSeriesListState,
   );
 
-  const viewFunc = (series: any) => {
+  const viewFunc = (series: Series) => {
     goToSeries(series, navigate);
   };
 
@@ -56,7 +57,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
    * @param series
    * @returns the cover image for a series, which can be put in an <img> tag
    */
-  const getImageSource = (series: any) => {
+  const getImageSource = (series: Series) => {
     const fileExtensions = constants.IMAGE_EXTENSIONS;
     for (let i = 0; i < fileExtensions.length; i += 1) {
       const thumbnailPath = path.join(thumbnailsDir, `${series.id}.${fileExtensions[i]}`);
@@ -85,7 +86,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         `grid gap-2`,
       )}
     >
-      {props.getFilteredList().map((series: any) => {
+      {props.getFilteredList().map((series: Series) => {
         const coverSource = getImageSource(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
 

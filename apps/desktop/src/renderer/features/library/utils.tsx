@@ -167,7 +167,7 @@ async function reloadSeries(
       chapter.id = matchingChapter.id;
       chapter.read = matchingChapter.read;
       // preserve existing dateAdded if present
-      if ((matchingChapter as any).dateAdded) (chapter as any).dateAdded = (matchingChapter as any).dateAdded;
+      if (matchingChapter.dateAdded) chapter.dateAdded = matchingChapter.dateAdded;
 
       orphanedChapterIds.splice(orphanedChapterIds.indexOf(matchingChapter.id), 1);
     }

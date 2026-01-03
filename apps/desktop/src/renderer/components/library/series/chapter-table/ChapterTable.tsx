@@ -267,7 +267,7 @@ export function ChapterTable(props: ChapterTableProps) {
         </Button>
       ),
       cell: ({ row }) => {
-        const dateStr = formatDateToMMDDYYYY((row.original as any).dateAdded);
+        const dateStr = formatDateToMMDDYYYY(row.original.dateAdded);
         return (
           <div className="flex">
             <span className="w-28 truncate">{dateStr ?? ''}</span>
