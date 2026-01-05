@@ -23,6 +23,7 @@ import ExtensionImage from '../general/ExtensionImage';
 import { LibraryView } from '@/common/models/types';
 import LibraryGridContextMenu from './LibraryGridContextMenu';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
+import library from '@/renderer/services/library';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
 
@@ -89,6 +90,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
       {props.getFilteredList().map((series: Series) => {
         const coverSource = getImageSource(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
+        const totalChapters = series.id ? library.fetchChapters(series.id).length : 0;
 
         return (
           <div key={`${series.id}-${series.title}`} className="space-y-2">
@@ -122,7 +124,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
 
                   {series.numberUnread > 0 && (
                     <div className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-white text-center" style={{ backgroundColor: '#fc5603' }}>
-                      {series.numberUnread}
+                      {`${series.numberUnread} : ${totalChapters}`}
                     </div>
                   )}
 
