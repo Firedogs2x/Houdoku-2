@@ -88,13 +88,13 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "xgi",
-      "repo": "houdoku"
+      "owner": "Firedogs2x",
+      "repo": "Houdoku-2"
     }
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xgi/houdoku"
+    "url": "https://github.com/Firedogs2x/Houdoku-2"
   },
   "author": {
     "name": "xgi",
@@ -103,7 +103,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xgi/houdoku/issues"
+    "url": "https://github.com/Firedogs2x/Houdoku-2/issues"
   },
   "keywords": [
     "manga",
