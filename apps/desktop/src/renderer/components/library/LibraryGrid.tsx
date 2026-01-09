@@ -26,6 +26,7 @@ import { FS_METADATA } from '@/common/temp_fs_metadata';
 import library from '@/renderer/services/library';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
+import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
 
 const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
 if (!fs.existsSync(thumbnailsDir)) {
@@ -91,6 +92,11 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const coverSource = getImageSource(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
         const totalChapters = series.id ? library.fetchChapters(series.id).length : 0;
+        const chapters = series.id ? library.fetchChapters(series.id) : [];
+        const hasUnreadFlag = series.unread === true;
+        const hasNewDate =
+          series.lastReadDate && chapters.some((c: any) => new Date(c.dateAdded) > new Date(series.lastReadDate));
+        const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
 
         return (
           <div key={`${series.id}-${series.title}`} className="space-y-2">
@@ -128,6 +134,15 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     </div>
                   )}
 
+                  {showNewIndicator && (
+                    <div className="absolute flex items-center" style={{ top: 25, right: 6, width: 20, height: 20 }}>
+                      <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="10" fill="#000000" />
+                        <circle cx="10" cy="10" r="5" fill="rgb(0,255,0)" />
+                      </svg>
+                    </div>
+                  )}
+
                   {libraryView === LibraryView.GridCompact && (
                     <div
                       className="absolute bottom-0 left-0 right-0 p-2 flex items-end"
@@ -148,6 +163,11 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
             {libraryView === LibraryView.GridComfortable && (
               <div className="space-y-1 text-sm pb-3">
                 <h3 className="font-medium leading-none line-clamp-3">{series.title}</h3>
+                {series.lastReadDate && (
+                  <p className="text-xs text-muted-foreground">
+                    Last read: {formatDateMMDDYYYY(series.lastReadDate)}
+                  </p>
+                )}
               </div>
             )}
           </div>

@@ -4,9 +4,26 @@ import persistantStore from '../util/persistantStore';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { Category } from '@/common/models/types';
 
+const BACKFILL_DATE = '2026-01-09T00:00:00Z';
+
 const fetchSeriesList = (): Series[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
-  return val === null ? [] : JSON.parse(val);
+  let series: Series[] = val === null ? [] : JSON.parse(val);
+
+  let changed = false;
+  series = series.map((s) => {
+    if (!s.lastReadDate) {
+      changed = true;
+      return { ...s, lastReadDate: BACKFILL_DATE };
+    }
+    return s;
+  });
+
+  if (changed) {
+    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+  }
+
+  return series;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {
@@ -18,12 +35,12 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
   const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
 
-  // Backfill missing dateAdded with 12/31/2025 (ISO)
-  const BACKFILL_DATE = '2025-12-31T00:00:00Z';
+  // Backfill missing dateAdded with 01/09/2026 (ISO)
+  const CHAPTER_BACKFILL_DATE = '2026-01-09T00:00:00Z';
   let changed = false;
   chapters.forEach((c) => {
     if (!c.dateAdded) {
-      c.dateAdded = BACKFILL_DATE;
+      c.dateAdded = CHAPTER_BACKFILL_DATE;
       changed = true;
     }
   });
@@ -45,13 +62,32 @@ const fetchChapter = (seriesId: string, chapterId: string): Chapter | null => {
 
 const upsertSeries = (series: Series): Series => {
   const seriesId = series.id ? series.id : uuidv4();
-  const newSeries: Series = { ...series, id: seriesId };
+  let newSeries: Series = { ...series, id: seriesId };
 
-  const existingList = fetchSeriesList().filter((s: Series) => s.id !== newSeries.id);
+  // Preserve existing lastReadDate if not provided
+  const existingList = fetchSeriesList();
+  const existing = existingList.find((s: Series) => s.id === seriesId);
+  if (existing && existing.lastReadDate && !series.lastReadDate) {
+    newSeries = { ...newSeries, lastReadDate: existing.lastReadDate };
+  }
+
+  // Set lastReadDate to backfill date if still missing
+  if (!newSeries.lastReadDate) {
+    newSeries = { ...newSeries, lastReadDate: BACKFILL_DATE };
+  }
+
+  // Calculate unread status based on chapters (if seriesId exists and unread not explicitly set)
+  if (seriesId && series.unread === undefined) {
+    const chapters = fetchChapters(seriesId);
+    const unread = !chapters.some((c: Chapter) => c.read);
+    newSeries = { ...newSeries, unread };
+  }
+
+  const filteredList = existingList.filter((s: Series) => s.id !== newSeries.id);
 
   persistantStore.write(
     `${storeKeys.LIBRARY.SERIES_LIST}`,
-    JSON.stringify([...existingList, newSeries]),
+    JSON.stringify([...filteredList, newSeries]),
   );
   return newSeries;
 };
@@ -81,6 +117,14 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${series.id}`,
     JSON.stringify(Object.values(chapterMap)),
   );
+
+  // Update the series unread status after upserting chapters
+  const updatedSeries = fetchSeries(series.id);
+  if (updatedSeries) {
+    const unread = !Object.values(chapterMap).some((c: Chapter) => c.read);
+    const seriesWithUnread = { ...updatedSeries, unread };
+    upsertSeries(seriesWithUnread);
+  }
 };
 
 const removeSeries = (seriesId: string, preserveChapters = false): void => {
@@ -104,6 +148,13 @@ const removeChapters = (chapterIds: string[], seriesId: string): void => {
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
     JSON.stringify(Object.values(filteredChapters)),
   );
+
+  // Update the series unread status after removing chapters
+  const series = fetchSeries(seriesId);
+  if (series) {
+    const unread = !filteredChapters.some((c: Chapter) => c.read);
+    upsertSeries({ ...series, unread });
+  }
 };
 
 const fetchCategoryList = (): Category[] => {

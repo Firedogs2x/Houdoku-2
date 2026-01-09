@@ -525,6 +525,17 @@ const ReaderPage: React.FC = () => {
           chapterLanguages,
         );
         setReaderChapter({ ...readerChapter, read: true });
+
+        // Update series lastReadDate and unread status when chapter is read to completion
+        const nowIso = new Date().toISOString();
+        const updatedSeries = {
+          ...readerSeries,
+          lastReadDate: nowIso,
+          unread: false,
+        };
+        library.upsertSeries(updatedSeries);
+        setLibrarySeries(library.fetchSeries(readerSeries.id!));
+
         if (trackerAutoUpdate) sendProgressToTrackers(readerChapter, readerSeries);
       }
     }

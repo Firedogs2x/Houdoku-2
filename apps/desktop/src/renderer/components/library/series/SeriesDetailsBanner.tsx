@@ -12,6 +12,7 @@ import { Button } from '@houdoku/ui/components/Button';
 import { SeriesDetailsBannerBackground } from './SeriesDetailsBannerBackground';
 import { Loader2, MenuIcon } from 'lucide-react';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
+import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,7 +74,13 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
                 </DropdownMenu>
               )}
             </div>
-            <div className="flex m-2 space-x-2">
+            <div className="flex flex-col m-2 space-y-1">
+              {props.series.lastReadDate && (
+                <p className="text-xs text-neutral-50">
+                  Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}
+                </p>
+              )}
+              <div className="flex space-x-2">
               {props.series.extensionId === FS_METADATA.id && (
                 <Button
                   className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
@@ -96,6 +103,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
                 {reloadingSeriesList && <Loader2 className="animate-spin" />}
                 {reloadingSeriesList ? 'Refreshing...' : 'Refresh'}{' '}
               </Button>
+              </div>
             </div>
           </div>
         </div>
