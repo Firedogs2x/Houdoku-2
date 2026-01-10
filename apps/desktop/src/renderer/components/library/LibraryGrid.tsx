@@ -2,8 +2,9 @@ const fs = require('fs');
 import path from 'path';
 import React, { useEffect } from 'react';
 const { ipcRenderer } = require('electron');
-import { Series, Chapter } from '@tiyo/common';
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
+type Series = any;
+type Chapter = any;
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import blankCover from '@/renderer/img/blank_cover.png';
@@ -95,7 +96,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const chapters = series.id ? library.fetchChapters(series.id) : [];
         const hasUnreadFlag = series.unread === true;
         const hasNewDate =
-          series.lastReadDate && chapters.some((c: Chapter) => new Date(c.dateAdded) > new Date(series.lastReadDate));
+          series.lastReadDate && chapters.some((c: Chapter) => c.dateAdded && new Date(c.dateAdded) > new Date(series.lastReadDate));
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
 
         return (

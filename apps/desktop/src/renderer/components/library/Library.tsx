@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useLocation } from 'react-router-dom';
 import LibraryControlBar from './LibraryControlBar';
 import { LibrarySort, LibraryView, ProgressFilter } from '@/common/models/types';
 import {
@@ -29,6 +30,7 @@ import { RemoveSeriesDialog } from './RemoveSeriesDialog';
 type Props = unknown;
 
 const Library: React.FC<Props> = () => {
+  const location = useLocation();
   const [removeModalShowing, setRemoveModalShowing] = useState(false);
   const [removeModalSeries, setRemoveModalSeries] = useState<Series | null>(null);
   const activeSeriesList = useRecoilValue(activeSeriesListState);
@@ -204,7 +206,20 @@ const Library: React.FC<Props> = () => {
     );
   };
 
-  useEffect(() => setSeriesList(library.fetchSeriesList()), [setSeriesList]);
+  // Fetch fresh series list whenever we navigate to/from the series details page
+  // This ensures that any chapter read/unread status changes are reflected
+  useEffect(() => {
+    console.log(`[Library] Navigation detected: pathname=${location.pathname}`);
+    
+    // Only refresh if we're viewing the library (not on a series page)
+    if (!location.pathname.includes('/series/')) {
+      console.log(`[Library] Not on series page. Fetching fresh series list from storage...`);
+      const freshList = library.fetchSeriesList();
+      console.log(`[Library] Fetched ${freshList.length} series. Updating seriesListState...`);
+      console.log(`[Library] Sample series: title="${freshList[0]?.title}", numberUnread=${freshList[0]?.numberUnread}`);
+      setSeriesList(freshList);
+    }
+  }, [location.pathname, setSeriesList]);
 
   return (
     <div>

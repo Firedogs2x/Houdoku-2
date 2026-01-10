@@ -55,8 +55,7 @@ const LibraryControlBarMultiSelect: React.FC<Props> = () => {
     multiSelectSeriesList.forEach((series) => {
       if (series.id) {
         const chapters = library.fetchChapters(series.id!);
-        markChapters(chapters, series, true, setChapterList, setSeries, chapterLanguages);
-        setSeriesList(library.fetchSeriesList());
+        markChapters(chapters, series, true, setChapterList, setSeries, chapterLanguages, setSeriesList);
       }
     });
   };

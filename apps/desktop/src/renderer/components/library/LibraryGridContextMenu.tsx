@@ -48,8 +48,7 @@ const LibraryGridContextMenu: React.FC<Props> = (props: Props) => {
   const markAllReadFunc = () => {
     if (props.series?.id) {
       const chapters = library.fetchChapters(props.series.id);
-      markChapters(chapters, props.series, true, setChapterList, setSeries, chapterLanguages);
-      setSeriesList(library.fetchSeriesList());
+      markChapters(chapters, props.series, true, setChapterList, setSeries, chapterLanguages, setSeriesList);
     }
   };
 

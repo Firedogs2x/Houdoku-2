@@ -19,6 +19,7 @@ import { ChapterTablePagination } from './ChapterTablePagination';
 import {
   chapterDownloadStatusesState,
   chapterListState,
+  seriesListState,
   seriesState,
   sortedFilteredChapterListState,
 } from '@/renderer/state/libraryStates';
@@ -84,6 +85,7 @@ interface ChapterTableProps {
 export function ChapterTable(props: ChapterTableProps) {
   const navigate = useNavigate();
   const setSeries = useSetRecoilState(seriesState);
+  const setSeriesList = useSetRecoilState(seriesListState);
   const [chapterList, setChapterList] = useRecoilState(chapterListState);
   const sortedFilteredChapterList = useRecoilValue(sortedFilteredChapterListState);
   const chapterLanguages = useRecoilValue(chapterLanguagesState);
@@ -344,6 +346,7 @@ export function ChapterTable(props: ChapterTableProps) {
       setChapterList,
       setSeries,
       chapterLanguages,
+      setSeriesList,
     );
   };
 

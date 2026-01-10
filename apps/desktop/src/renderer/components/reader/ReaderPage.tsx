@@ -41,6 +41,7 @@ const ReaderPage: React.FC = () => {
   const setTitlebarText = useSetRecoilState(libraryStates.titlebarTextState);
   const setChapterList = useSetRecoilState(libraryStates.chapterListState);
   const setLibrarySeries = useSetRecoilState(libraryStates.seriesState);
+  const setSeriesList = useSetRecoilState(libraryStates.seriesListState);
   const [readerSeries, setReaderSeries] = useRecoilState(readerStates.seriesState);
   const [readerChapter, setReaderChapter] = useRecoilState(readerStates.chapterState);
 
@@ -523,18 +524,32 @@ const ReaderPage: React.FC = () => {
           setChapterList,
           setLibrarySeries,
           chapterLanguages,
+          setSeriesList,
         );
         setReaderChapter({ ...readerChapter, read: true });
 
         // Update series lastReadDate and unread status when chapter is read to completion
         const nowIso = new Date().toISOString();
-        const updatedSeries = {
-          ...readerSeries,
-          lastReadDate: nowIso,
-          unread: false,
-        };
-        library.upsertSeries(updatedSeries);
-        setLibrarySeries(library.fetchSeries(readerSeries.id!));
+        
+        // Fetch the fresh series data from storage (which has the updated numberUnread from markChapters)
+        // and add the lastReadDate update
+        const freshSeries = library.fetchSeries(readerSeries.id!);
+        if (freshSeries) {
+          const updatedSeries = {
+            ...freshSeries,
+            lastReadDate: nowIso,
+            unread: false,
+          };
+          library.upsertSeries(updatedSeries);
+          setLibrarySeries(library.fetchSeries(readerSeries.id!));
+        }
+
+        // Ensure the global series list state is refreshed after the final
+        // upsert so the Library view reflects the newest `numberUnread`/`unread`.
+        const finalSeriesList = library.fetchSeriesList();
+        const thisSeriesInFinal = finalSeriesList.find(s => s.id === readerSeries.id);
+        console.log(`[ReaderPage] After final upsertSeries, refreshing seriesListState. This series: title="${thisSeriesInFinal?.title}", numberUnread=${thisSeriesInFinal?.numberUnread}, unread=${thisSeriesInFinal?.unread}`);
+        setSeriesList(finalSeriesList);
 
         if (trackerAutoUpdate) sendProgressToTrackers(readerChapter, readerSeries);
       }

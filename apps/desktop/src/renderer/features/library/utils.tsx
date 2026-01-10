@@ -109,13 +109,28 @@ export function markChapters(
   setChapterList: (chapterList: Chapter[]) => void,
   setSeries: (series: Series) => void,
   chapterLanguages: LanguageKey[],
+  setSeriesList?: (seriesList: Series[]) => void,
 ) {
   if (series.id !== undefined) {
+    console.log(`[markChapters] START: Marking ${chapters.length} chapter(s) as ${read ? 'read' : 'unread'} for series "${series.title}" (id: ${series.id})`);
+    
     const newChapters = chapters.map((chapter) => ({ ...chapter, read }));
     library.upsertChapters(newChapters, series);
+    console.log(`[markChapters] After upsertChapters - calling updateSeriesNumberUnread`);
+    
     updateSeriesNumberUnread(series, chapterLanguages);
     loadChapterList(series.id, setChapterList);
     loadSeries(series.id, setSeries);
+    
+    // Refresh the series list state to ensure UI reflects updated unread counts
+    if (setSeriesList) {
+      const freshList = library.fetchSeriesList();
+      const thisSeriesInList = freshList.find(s => s.id === series.id);
+      console.log(`[markChapters] Calling setSeriesList with fresh data. This series: title="${thisSeriesInList?.title}", numberUnread=${thisSeriesInList?.numberUnread}, unread=${thisSeriesInList?.unread}`);
+      setSeriesList(freshList);
+    } else {
+      console.warn(`[markChapters] setSeriesList callback not provided! Series list may not update in UI.`);
+    }
   }
 }
 

@@ -9,6 +9,7 @@ import routes from '@/common/constants/routes.json';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import {
   chapterListState,
+  seriesListState,
   seriesState,
   sortedFilteredChapterListState,
 } from '@/renderer/state/libraryStates';
@@ -28,6 +29,7 @@ export const ChapterTableContextMenu: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
   const setChapterList = useSetRecoilState(chapterListState);
   const setSeries = useSetRecoilState(seriesState);
+  const setSeriesList = useSetRecoilState(seriesListState);
   const customDownloadsDir = useRecoilValue(customDownloadsDirState);
   const chapterLanguages = useRecoilValue(chapterLanguagesState);
   const sortedFilteredChapterList = useRecoilValue(sortedFilteredChapterListState);
@@ -37,7 +39,7 @@ export const ChapterTableContextMenu: React.FC<Props> = (props: Props) => {
   };
 
   const handleMarkRead = (read: boolean) => {
-    markChapters([props.chapter], props.series, read, setChapterList, setSeries, chapterLanguages);
+    markChapters([props.chapter], props.series, read, setChapterList, setSeries, chapterLanguages, setSeriesList);
   };
 
   const handleSelectPrevious = () => {

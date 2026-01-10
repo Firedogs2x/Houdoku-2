@@ -62,33 +62,40 @@ const fetchChapter = (seriesId: string, chapterId: string): Chapter | null => {
 
 const upsertSeries = (series: Series): Series => {
   const seriesId = series.id ? series.id : uuidv4();
-  let newSeries: Series = { ...series, id: seriesId };
-
-  // Preserve existing lastReadDate if not provided
   const existingList = fetchSeriesList();
   const existing = existingList.find((s: Series) => s.id === seriesId);
-  if (existing && existing.lastReadDate && !series.lastReadDate) {
-    newSeries = { ...newSeries, lastReadDate: existing.lastReadDate };
-  }
+
+  // Merge existing series with incoming values so fields not supplied by the
+  // caller (e.g. numberUnread) are preserved instead of being dropped.
+  let newSeries: Series = { ...(existing || {}), ...series, id: seriesId };
 
   // Set lastReadDate to backfill date if still missing
   if (!newSeries.lastReadDate) {
-    newSeries = { ...newSeries, lastReadDate: BACKFILL_DATE };
+    newSeries.lastReadDate = BACKFILL_DATE;
   }
 
-  // Calculate unread status based on chapters (if seriesId exists and unread not explicitly set)
+  // Calculate unread status based on chapters if the caller didn't explicitly
+  // provide an `unread` value.
   if (seriesId && series.unread === undefined) {
     const chapters = fetchChapters(seriesId);
     const unread = !chapters.some((c: Chapter) => c.read);
-    newSeries = { ...newSeries, unread };
+    newSeries.unread = unread;
   }
 
   const filteredList = existingList.filter((s: Series) => s.id !== newSeries.id);
+
+  console.log(`[library.upsertSeries] Writing series to storage: title="${newSeries.title}", id=${seriesId}, numberUnread=${newSeries.numberUnread}, unread=${newSeries.unread}`);
 
   persistantStore.write(
     `${storeKeys.LIBRARY.SERIES_LIST}`,
     JSON.stringify([...filteredList, newSeries]),
   );
+  
+  console.log(`[library.upsertSeries] Successfully persisted. Verify by reading back...`);
+  const verifyList = fetchSeriesList();
+  const verifyThis = verifyList.find(s => s.id === seriesId);
+  console.log(`[library.upsertSeries] Verified persisted data: title="${verifyThis?.title}", numberUnread=${verifyThis?.numberUnread}, unread=${verifyThis?.unread}`);
+  
   return newSeries;
 };
 
