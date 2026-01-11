@@ -23,26 +23,22 @@ jobs:
     name: Build Windows Installer + Portable
     runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: npx pnpm install
 
       - name: Build app
-        run: pnpm build
+        run: npx pnpm build
 
       - name: Create Windows builds
-        run: pnpm dist:win
+        run: npx pnpm dist:win
 
       - name: Sign Windows binaries
         run: |
@@ -52,8 +48,7 @@ jobs:
             echo "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
           fi
 
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-builds
           path: release/*.exe
@@ -62,26 +57,22 @@ jobs:
     name: Build macOS Intel + ARM
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: npx pnpm install
 
       - name: Build app
-        run: pnpm build
+        run: npx pnpm build
 
       - name: Create macOS builds
-        run: pnpm dist:mac
+        run: npx pnpm dist:mac
 
       - name: Sign macOS binaries
         run: |
@@ -91,8 +82,7 @@ jobs:
             echo "Skipping macOS signing (SIGN_MAC_CERT secret not set)"
           fi
 
-      - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
           path: release/*.dmg
@@ -101,29 +91,24 @@ jobs:
     name: Build Linux AppImage
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
 
-      - name: Install pnpm
-        run: npm install -g pnpm
+      - run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install
+        run: npx pnpm install
 
       - name: Build app
-        run: pnpm build
+        run: npx pnpm build
 
       - name: Create Linux builds
-        run: pnpm dist:linux
+        run: npx pnpm dist:linux
 
-      - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-builds
           path: release/*.AppImage
@@ -133,10 +118,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [windows, macos, linux]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Optional version bump with selectable type
+      # Optional version bump
       - name: Bump version
         if: ${{ github.event.inputs.bump_version == 'true' }}
         run: |
@@ -150,12 +134,12 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git push origin HEAD:main --tags
 
-      # Get current version
-      - name: Get version from package.json
+      # Get version
+      - name: Get version
         id: version
         run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
 
-      # Generate release notes from commits
+      # Generate release notes
       - name: Generate release notes
         id: release_notes
         uses: actions/github-script@v7
@@ -167,7 +151,6 @@ jobs:
               repo: context.repo.repo,
               per_page: 100
             });
-
             let previousTag = tags.find(t => t.name !== tag)?.name || '';
             const compare = previousTag
               ? await github.rest.repos.compareCommits({
@@ -177,7 +160,6 @@ jobs:
                   head: tag
                 })
               : { data: { commits: [] } };
-
             let notes = compare.data.commits.map(c => `- ${c.commit.message.split("\\n")[0]} (${c.sha.slice(0,7)})`).join("\n");
             if(!notes) notes = "Initial release or no new commits";
             return notes;
@@ -185,28 +167,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Download artifacts from previous jobs
-      - name: Download Windows builds
-        uses: actions/download-artifact@v4
+      # Download artifacts
+      - uses: actions/download-artifact@v4
         with:
           name: windows-builds
           path: release/
-
-      - name: Download macOS builds
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: macos-builds
           path: release/
-
-      - name: Download Linux builds
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: linux-builds
           path: release/
 
-      # Create GitHub release with auto release notes
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      # Create GitHub Release
+      - uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.VERSION }}
           name: "Houdoku v${{ env.VERSION }}"
