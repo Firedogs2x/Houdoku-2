@@ -39,6 +39,8 @@ jobs:
 
       - name: Create Windows builds
         run: npx pnpm dist:win -- --publish never
+        env:
+          GH_TOKEN: ""
 
       - name: Sign Windows binaries
         run: |
@@ -79,6 +81,8 @@ jobs:
           npx pnpm dist:mac -- --arch x64 --publish never &
           wait
           echo "Both ARM64 and x64 builds completed"
+        env:
+          GH_TOKEN: ""
 
       - name: Sign macOS binaries (optional)
         run: |
@@ -115,6 +119,8 @@ jobs:
 
       - name: Create Linux builds
         run: npx pnpm dist:linux -- --publish never
+        env:
+          GH_TOKEN: ""
 
       - uses: actions/upload-artifact@v4
         with:
