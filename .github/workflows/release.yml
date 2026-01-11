@@ -66,10 +66,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: |
-            apps/desktop/release/**/*.dmg
-            apps/desktop/release/**/*.zip
-            apps/desktop/release/**/*.pkg
+          path: apps/desktop/release/**
           if-no-files-found: error
 
   linux:
