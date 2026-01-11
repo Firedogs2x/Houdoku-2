@@ -38,17 +38,24 @@ jobs:
         run: npx pnpm build
 
       - name: Create Windows builds
-        run: npx pnpm dist:win -- --publish never
+        run: npx pnpm dist:win
         env:
-          GH_TOKEN: ""
+          ELECTRON_BUILDER_PUBLISH: never
 
-      - name: Sign Windows binaries
+      - name: Sign Windows binaries (optional)
+        shell: pwsh
         run: |
-          if [ -n "${{ secrets.SIGN_WINDOWS_CERT }}" ]; then
-            signtool sign /f ${{ secrets.SIGN_WINDOWS_CERT }} /p ${{ secrets.SIGN_WINDOWS_PWD }} /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
-          else
-            echo "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
-          fi
+          if ($env:SIGN_WINDOWS_CERT) {
+            signtool sign `
+              /f $env:SIGN_WINDOWS_CERT `
+              /p $env:SIGN_WINDOWS_PWD `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              release\*.exe
+          } else {
+            Write-Host "Skipping Windows signing (SIGN_WINDOWS_CERT not set)"
+          }
 
       - uses: actions/upload-artifact@v4
         with:
@@ -56,7 +63,7 @@ jobs:
           path: release/*.exe
 
   macos:
-    name: Build macOS Universal (ARM + Intel)
+    name: Build macOS ARM + Intel
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,25 +80,23 @@ jobs:
       - name: Build app
         run: npx pnpm build
 
-      - name: Create macOS ARM64 + x64 builds in parallel
+      - name: Create macOS builds
         run: |
-          # ARM64 build
-          npx pnpm dist:mac -- --arch arm64 --publish never &
-          # x64 build
-          npx pnpm dist:mac -- --arch x64 --publish never &
+          npx pnpm dist:mac -- --arch arm64 &
+          npx pnpm dist:mac -- --arch x64 &
           wait
-          echo "Both ARM64 and x64 builds completed"
         env:
-          GH_TOKEN: ""
+          ELECTRON_BUILDER_PUBLISH: never
 
       - name: Sign macOS binaries (optional)
+        shell: bash
         run: |
-          if [ -n "${{ secrets.SIGN_MAC_CERT }}" ]; then
+          if [[ -n "${SIGN_MAC_CERT}" && -f release/*.dmg ]]; then
             for dmg in release/*.dmg; do
-              codesign --sign "${{ secrets.SIGN_MAC_CERT }}" --timestamp --options runtime "$dmg"
+              codesign --sign "$SIGN_MAC_CERT" --timestamp --options runtime "$dmg"
             done
           else
-            echo "Skipping macOS signing (SIGN_MAC_CERT secret not set)"
+            echo "Skipping macOS signing"
           fi
 
       - uses: actions/upload-artifact@v4
@@ -117,10 +122,10 @@ jobs:
       - name: Build app
         run: npx pnpm build
 
-      - name: Create Linux builds
-        run: npx pnpm dist:linux -- --publish never
+      - name: Create Linux build
+        run: npx pnpm dist:linux
         env:
-          GH_TOKEN: ""
+          ELECTRON_BUILDER_PUBLISH: never
 
       - uses: actions/upload-artifact@v4
         with:
@@ -134,73 +139,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Optional version bump
       - name: Bump version
-        if: ${{ github.event.inputs.bump_version == 'true' }}
+        if: ${{ github.event.inputs.bump_version == true }}
         run: |
-          BUMP_TYPE=${{ github.event.inputs.version_bump_type }}
-          echo "Selected version bump type: $BUMP_TYPE"
-          npm config set init-author-name "Houdoku CI"
-          npm config set init-author-email "ci@houdoku.org"
-          npm config set init-license MIT
-          npm version $BUMP_TYPE -m "Bump version to %s [ci skip]"
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          npm version ${{ github.event.inputs.version_bump_type }}
           git push origin HEAD:main --tags
 
-      # Get version
       - name: Get version
-        id: version
-        run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
-      # Generate release notes
-      - name: Generate release notes
-        id: release_notes
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const tag = `v${process.env.VERSION}`;
-            const { data: tags } = await github.rest.repos.listTags({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100
-            });
-            let previousTag = tags.find(t => t.name !== tag)?.name || '';
-            const compare = previousTag
-              ? await github.rest.repos.compareCommits({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  base: previousTag,
-                  head: tag
-                })
-              : { data: { commits: [] } };
-            let notes = compare.data.commits.map(c => `- ${c.commit.message.split("\\n")[0]} (${c.sha.slice(0,7)})`).join("\n");
-            if(!notes) notes = "Initial release or no new commits";
-            return notes;
-          result-encoding: string
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Download artifacts
       - uses: actions/download-artifact@v4
         with:
-          name: windows-builds
-          path: release/
-      - uses: actions/download-artifact@v4
-        with:
-          name: macos-builds
-          path: release/
-      - uses: actions/download-artifact@v4
-        with:
-          name: linux-builds
           path: release/
 
-      # Create GitHub Release
       - uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.VERSION }}
-          name: "Houdoku v${{ env.VERSION }}"
-          body: ${{ steps.release_notes.outputs.result }}
-          files: release/*
+          name: Houdoku v${{ env.VERSION }}
+          generate_release_notes: true
+          files: release/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
