@@ -41,12 +41,14 @@ jobs:
         run: npx pnpm dist:win
 
       - name: Sign Windows binaries
+        shell: pwsh
         run: |
-          if [ -n "${{ secrets.SIGN_WINDOWS_CERT }}" ]; then
-            signtool sign /f ${{ secrets.SIGN_WINDOWS_CERT }} /p ${{ secrets.SIGN_WINDOWS_PWD }} /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
-          else
-            echo "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
-          fi
+          if ($Env:SIGN_WINDOWS_CERT) {
+            Write-Host "Signing Windows binaries..."
+            signtool sign /f $Env:SIGN_WINDOWS_CERT /p $Env:SIGN_WINDOWS_PWD /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
+          } else {
+            Write-Host "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
+          }
 
       - uses: actions/upload-artifact@v4
         with:
