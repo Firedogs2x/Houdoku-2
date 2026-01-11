@@ -45,7 +45,7 @@ jobs:
         run: pnpm dist:win
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-builds
           path: release/*.exe
@@ -55,10 +55,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
@@ -76,7 +76,7 @@ jobs:
         run: pnpm dist:mac
 
       - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-builds
           path: release/*.dmg
@@ -87,7 +87,7 @@ jobs:
     needs: [windows, macos]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Optional version bump with selectable type
       - name: Bump version
@@ -140,13 +140,13 @@ jobs:
 
       # Download built artifacts
       - name: Download Windows builds
-        uses: actions/download-artifact@v3.1.3
+        uses: actions/download-artifact@v4
         with:
           name: windows-builds
           path: release/
 
       - name: Download macOS builds
-        uses: actions/download-artifact@v3.1.3
+        uses: actions/download-artifact@v4
         with:
           name: macos-builds
           path: release/
