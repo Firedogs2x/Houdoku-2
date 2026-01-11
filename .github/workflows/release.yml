@@ -38,17 +38,15 @@ jobs:
         run: npx pnpm build
 
       - name: Create Windows builds
-        run: npx pnpm dist:win
+        run: npx pnpm dist:win -- --publish never
 
       - name: Sign Windows binaries
-        shell: pwsh
         run: |
-          if ($Env:SIGN_WINDOWS_CERT) {
-            Write-Host "Signing Windows binaries..."
-            signtool sign /f $Env:SIGN_WINDOWS_CERT /p $Env:SIGN_WINDOWS_PWD /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
-          } else {
-            Write-Host "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
-          }
+          if [ -n "${{ secrets.SIGN_WINDOWS_CERT }}" ]; then
+            signtool sign /f ${{ secrets.SIGN_WINDOWS_CERT }} /p ${{ secrets.SIGN_WINDOWS_PWD }} /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
+          else
+            echo "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -56,7 +54,7 @@ jobs:
           path: release/*.exe
 
   macos:
-    name: Build macOS Intel + ARM
+    name: Build macOS Universal (ARM + Intel)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -73,13 +71,21 @@ jobs:
       - name: Build app
         run: npx pnpm build
 
-      - name: Create macOS builds
-        run: npx pnpm dist:mac
+      - name: Create macOS ARM64 + x64 builds in parallel
+        run: |
+          # ARM64 build
+          npx pnpm dist:mac -- --arch arm64 --publish never &
+          # x64 build
+          npx pnpm dist:mac -- --arch x64 --publish never &
+          wait
+          echo "Both ARM64 and x64 builds completed"
 
-      - name: Sign macOS binaries
+      - name: Sign macOS binaries (optional)
         run: |
           if [ -n "${{ secrets.SIGN_MAC_CERT }}" ]; then
-            codesign --sign "${{ secrets.SIGN_MAC_CERT }}" --timestamp --options runtime release/*.dmg
+            for dmg in release/*.dmg; do
+              codesign --sign "${{ secrets.SIGN_MAC_CERT }}" --timestamp --options runtime "$dmg"
+            done
           else
             echo "Skipping macOS signing (SIGN_MAC_CERT secret not set)"
           fi
@@ -108,7 +114,7 @@ jobs:
         run: npx pnpm build
 
       - name: Create Linux builds
-        run: npx pnpm dist:linux
+        run: npx pnpm dist:linux -- --publish never
 
       - uses: actions/upload-artifact@v4
         with:
