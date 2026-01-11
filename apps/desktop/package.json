@@ -17,12 +17,13 @@
   "build": {
     "productName": "Houdoku",
     "appId": "com.faltro.Houdoku",
-    "files": [
-      "out/**/*"
-    ],
+    "files": ["out/**/*"],
     "mac": {
       "target": [
-        "dmg"
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        }
       ],
       "type": "development",
       "hardenedRuntime": false,
@@ -32,60 +33,38 @@
       "gatekeeperAssess": false
     },
     "dmg": {
+      "artifactName": "Houdoku-macOS-${arch}-${version}.dmg",
       "sign": false,
       "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
       ]
     },
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64"
-          ]
-        }
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] },
+        { "target": "zip", "arch": ["x64"] }
       ],
       "signDlls": false
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Houdoku-Win64-Setup-${version}.exe"
+    },
+    "portable": {
+      "artifactName": "Houdoku-Portable-Win64-${version}.exe"
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
+      "target": ["AppImage"],
       "category": "Development"
     },
     "directories": {
       "buildResources": "assets",
       "output": "release"
     },
-    "extraResources": [
-      "./assets/**"
-    ],
+    "extraResources": ["./assets/**"],
     "publish": {
       "provider": "github",
       "owner": "Firedogs2x",
