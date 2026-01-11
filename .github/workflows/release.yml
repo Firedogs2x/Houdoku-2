@@ -22,6 +22,8 @@ jobs:
   windows:
     name: Build Windows Installer + Portable
     runs-on: windows-latest
+    env:
+      ELECTRON_BUILDER_PUBLISH: never
     steps:
       - uses: actions/checkout@v4
 
@@ -39,8 +41,6 @@ jobs:
 
       - name: Create Windows builds
         run: npx pnpm dist:win
-        env:
-          ELECTRON_BUILDER_PUBLISH: never
 
       - name: Sign Windows binaries (optional)
         shell: pwsh
@@ -65,6 +65,8 @@ jobs:
   macos:
     name: Build macOS ARM + Intel
     runs-on: macos-latest
+    env:
+      ELECTRON_BUILDER_PUBLISH: never
     steps:
       - uses: actions/checkout@v4
 
@@ -85,13 +87,11 @@ jobs:
           npx pnpm dist:mac -- --arch arm64 &
           npx pnpm dist:mac -- --arch x64 &
           wait
-        env:
-          ELECTRON_BUILDER_PUBLISH: never
 
       - name: Sign macOS binaries (optional)
         shell: bash
         run: |
-          if [[ -n "${SIGN_MAC_CERT}" && -f release/*.dmg ]]; then
+          if [[ -n "${SIGN_MAC_CERT}" ]]; then
             for dmg in release/*.dmg; do
               codesign --sign "$SIGN_MAC_CERT" --timestamp --options runtime "$dmg"
             done
@@ -107,6 +107,8 @@ jobs:
   linux:
     name: Build Linux AppImage
     runs-on: ubuntu-latest
+    env:
+      ELECTRON_BUILDER_PUBLISH: never
     steps:
       - uses: actions/checkout@v4
 
@@ -124,8 +126,6 @@ jobs:
 
       - name: Create Linux build
         run: npx pnpm dist:linux
-        env:
-          ELECTRON_BUILDER_PUBLISH: never
 
       - uses: actions/upload-artifact@v4
         with:
@@ -148,7 +148,7 @@ jobs:
           git push origin HEAD:main --tags
 
       - name: Get version
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+        run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
 
       - uses: actions/download-artifact@v4
         with:
