@@ -1,5 +1,8 @@
 name: Build and Release Houdoku
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -129,6 +132,9 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: release/
+
+      - name: Verify release files
+        run: ls -R release
 
       - uses: softprops/action-gh-release@v1
         with:
