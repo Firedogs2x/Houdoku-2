@@ -24,6 +24,7 @@ jobs:
     runs-on: windows-latest
     env:
       ELECTRON_BUILDER_PUBLISH: never
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,14 +34,9 @@ jobs:
 
       - run: npm install -g pnpm
 
-      - name: Install dependencies
-        run: npx pnpm install
-
-      - name: Build app
-        run: npx pnpm build
-
-      - name: Create Windows builds
-        run: npx pnpm dist:win
+      - run: npx pnpm install
+      - run: npx pnpm build
+      - run: npx pnpm dist:win
 
       - name: Sign Windows binaries (optional)
         shell: pwsh
@@ -54,7 +50,7 @@ jobs:
               /fd sha256 `
               release\*.exe
           } else {
-            Write-Host "Skipping Windows signing (SIGN_WINDOWS_CERT not set)"
+            Write-Host "Skipping Windows signing"
           }
 
       - uses: actions/upload-artifact@v4
@@ -67,36 +63,27 @@ jobs:
     runs-on: macos-latest
     env:
       ELECTRON_BUILDER_PUBLISH: never
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - run: npm install -g pnpm
+      - run: npx pnpm install
+      - run: npx pnpm build
 
-      - name: Install dependencies
-        run: npx pnpm install
-
-      - name: Build app
-        run: npx pnpm build
-
-      - name: Create macOS builds
-        run: |
+      - run: |
           npx pnpm dist:mac -- --arch arm64 &
           npx pnpm dist:mac -- --arch x64 &
           wait
 
       - name: Sign macOS binaries (optional)
-        shell: bash
         run: |
-          if [[ -n "${SIGN_MAC_CERT}" ]]; then
+          if [[ -n "$SIGN_MAC_CERT" ]]; then
             for dmg in release/*.dmg; do
               codesign --sign "$SIGN_MAC_CERT" --timestamp --options runtime "$dmg"
             done
-          else
-            echo "Skipping macOS signing"
           fi
 
       - uses: actions/upload-artifact@v4
@@ -109,23 +96,16 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ELECTRON_BUILDER_PUBLISH: never
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
       - run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: npx pnpm install
-
-      - name: Build app
-        run: npx pnpm build
-
-      - name: Create Linux build
-        run: npx pnpm dist:linux
+      - run: npx pnpm install
+      - run: npx pnpm build
+      - run: npx pnpm dist:linux
 
       - uses: actions/upload-artifact@v4
         with:
