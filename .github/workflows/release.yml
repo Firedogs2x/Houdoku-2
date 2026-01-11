@@ -41,7 +41,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-builds
-          path: release/*.exe
+          path: apps/desktop/release/*.exe
+          if-no-files-found: error
 
   macos:
     name: Build macOS ARM + Intel
@@ -65,7 +66,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: release/*.dmg
+          path: apps/desktop/release/*.dmg
+          if-no-files-found: error
 
   linux:
     name: Build Linux AppImage
@@ -86,7 +88,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: linux-builds
-          path: release/*.AppImage
+          path: apps/desktop/release/*.AppImage
+          if-no-files-found: error
 
   release:
     name: Create GitHub Release
@@ -108,7 +111,6 @@ jobs:
         run: echo "VERSION=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_ENV
 
       - name: Prepare release directory
-        shell: bash
         run: mkdir -p release
 
       - name: Download Windows artifacts
@@ -130,7 +132,6 @@ jobs:
           path: release
 
       - name: Verify release files
-        shell: bash
         run: ls -R release
 
       - uses: softprops/action-gh-release@v1
