@@ -24,13 +24,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -43,6 +43,14 @@ jobs:
 
       - name: Create Windows builds
         run: pnpm dist:win
+
+      - name: Sign Windows binaries
+        run: |
+          if [ -n "${{ secrets.SIGN_WINDOWS_CERT }}" ]; then
+            signtool sign /f ${{ secrets.SIGN_WINDOWS_CERT }} /p ${{ secrets.SIGN_WINDOWS_PWD }} /tr http://timestamp.digicert.com /td sha256 /fd sha256 release/*.exe
+          else
+            echo "Skipping Windows signing (SIGN_WINDOWS_CERT secret not set)"
+          fi
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -61,7 +69,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -75,16 +83,55 @@ jobs:
       - name: Create macOS builds
         run: pnpm dist:mac
 
+      - name: Sign macOS binaries
+        run: |
+          if [ -n "${{ secrets.SIGN_MAC_CERT }}" ]; then
+            codesign --sign "${{ secrets.SIGN_MAC_CERT }}" --timestamp --options runtime release/*.dmg
+          else
+            echo "Skipping macOS signing (SIGN_MAC_CERT secret not set)"
+          fi
+
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: macos-builds
           path: release/*.dmg
 
+  linux:
+    name: Build Linux AppImage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build app
+        run: pnpm build
+
+      - name: Create Linux builds
+        run: pnpm dist:linux
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-builds
+          path: release/*.AppImage
+
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [windows, macos]
+    needs: [windows, macos, linux]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -138,7 +185,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Download built artifacts
+      # Download artifacts from previous jobs
       - name: Download Windows builds
         uses: actions/download-artifact@v4
         with:
@@ -149,6 +196,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: macos-builds
+          path: release/
+
+      - name: Download Linux builds
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-builds
           path: release/
 
       # Create GitHub release with auto release notes
