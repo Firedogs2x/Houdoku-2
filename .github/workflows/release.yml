@@ -4,54 +4,15 @@ permissions:
   contents: write
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: Version bump type
-        type: choice
-        default: patch
-        options: [patch, minor, major]
-
   push:
     tags:
       - "v*"
 
 jobs:
-# ----------------------------------------
-# 1️⃣ VERSION BUMP (manual only)
-# ----------------------------------------
-  version:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm install -g pnpm
-
-      - name: Bump version and tag
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          npm version ${{ inputs.bump }} -m "chore(release): %s"
-          git push --follow-tags
-
-# ----------------------------------------
-# 2️⃣ WINDOWS BUILD (tag push)
-# ----------------------------------------
   windows:
-    if: github.event_name == 'push'
     runs-on: windows-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ELECTRON_BUILDER_PUBLISH: onTagOrDraft
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,18 +25,12 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm electron-builder --win
+      - run: pnpm dist:win
 
-# ----------------------------------------
-# 3️⃣ MACOS BUILD
-# ----------------------------------------
   macos:
-    if: github.event_name == 'push'
     runs-on: macos-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ELECTRON_BUILDER_PUBLISH: onTagOrDraft
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -88,18 +43,12 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm electron-builder --mac
+      - run: pnpm dist:mac
 
-# ----------------------------------------
-# 4️⃣ LINUX BUILD
-# ----------------------------------------
   linux:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ELECTRON_BUILDER_PUBLISH: onTagOrDraft
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -112,4 +61,4 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm electron-builder --linux
+      - run: pnpm dist:linux
