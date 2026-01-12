@@ -22,30 +22,31 @@ on:
 
 
 jobs:
-  tag:
-    name: Create Release Tag
+  bump:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.bump_version }}
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: v${{ needs.tag.outputs.version }}
-            fetch-depth: 0
+          fetch-depth: 0
 
-      - name: Bump version
-        if: ${{ inputs.bump_version }}
-        run: |
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install -g pnpm
+
+      - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           npm version ${{ inputs.version_bump_type }}
           git push --follow-tags
 
+
       - id: version
         run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
 
   windows:
-    needs: tag
     runs-on: windows-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,10 +54,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: v${{ needs.tag.outputs.version }}
             fetch-depth: 0
 
-      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -66,7 +65,6 @@ jobs:
       - run: pnpm dist:win
 
   macos:
-    needs: tag
     runs-on: macos-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -74,10 +72,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: v${{ needs.tag.outputs.version }}
             fetch-depth: 0
 
-      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -87,7 +83,6 @@ jobs:
       - run: pnpm dist:mac
 
   linux:
-    needs: tag
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,10 +90,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            ref: v${{ needs.tag.outputs.version }}
             fetch-depth: 0
             
-      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
