@@ -27,6 +27,9 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: v${{ needs.tag.outputs.version }}
+            fetch-depth: 0
 
       - name: Bump version
         if: ${{ inputs.bump_version }}
@@ -56,6 +59,10 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: v${{ needs.tag.outputs.version }}
+            fetch-depth: 0
+
       - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
@@ -73,6 +80,10 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: v${{ needs.tag.outputs.version }}
+            fetch-depth: 0
+
       - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
@@ -90,6 +101,10 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+        with:
+            ref: v${{ needs.tag.outputs.version }}
+            fetch-depth: 0
+            
       - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
