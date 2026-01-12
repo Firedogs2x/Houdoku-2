@@ -41,7 +41,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-builds
-          path: apps/desktop/dist/**
+          path: apps/desktop/**
           if-no-files-found: error
 
   macos:
@@ -58,15 +58,12 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-
-      # electron-builder requires --arm64 / --x64 (NOT --arch)
-      - run: pnpm dist:mac -- --arm64
-      - run: pnpm dist:mac -- --x64
+      - run: pnpm dist:mac
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: apps/desktop/dist/**
+          path: apps/desktop/**
           if-no-files-found: error
 
   linux:
@@ -88,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: linux-builds
-          path: apps/desktop/dist/**
+          path: apps/desktop/**
           if-no-files-found: error
 
   release:
