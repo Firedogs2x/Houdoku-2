@@ -56,6 +56,7 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -72,6 +73,7 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -88,6 +90,7 @@ jobs:
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
     steps:
       - uses: actions/checkout@v4
+      - run: git fetch --tags
       - uses: actions/setup-node@v4
         with:
           node-version: 20
