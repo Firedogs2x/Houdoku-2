@@ -41,7 +41,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-builds
-          path: apps/desktop/**/dist/**
+          path: |
+            apps/desktop/dist/*.exe
+            apps/desktop/dist/*.msi
+            apps/desktop/dist/*.zip
           if-no-files-found: error
 
   macos:
@@ -63,7 +66,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: apps/desktop/**/dist/**
+          path: |
+            apps/desktop/dist/*.dmg
+            apps/desktop/dist/*.zip
           if-no-files-found: error
 
   linux:
@@ -85,7 +90,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: linux-builds
-          path: apps/desktop/**/dist/**
+          path: |
+            apps/desktop/dist/*.AppImage
+            apps/desktop/dist/*.deb
+            apps/desktop/dist/*.rpm
           if-no-files-found: error
 
   release:
@@ -126,9 +134,6 @@ jobs:
         with:
           name: linux-builds
           path: release/linux
-
-      - name: Verify release files
-        run: ls -R release
 
       - uses: softprops/action-gh-release@v1
         with:
