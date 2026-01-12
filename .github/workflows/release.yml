@@ -41,7 +41,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-builds
-          path: apps/desktop/**
+          path: apps/desktop/**/dist/**
           if-no-files-found: error
 
   macos:
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: apps/desktop/**
+          path: apps/desktop/**/dist/**
           if-no-files-found: error
 
   linux:
@@ -85,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: linux-builds
-          path: apps/desktop/**
+          path: apps/desktop/**/dist/**
           if-no-files-found: error
 
   release:
@@ -135,6 +135,13 @@ jobs:
           tag_name: v${{ env.VERSION }}
           name: Houdoku v${{ env.VERSION }}
           generate_release_notes: true
-          files: release/**/*
+          files: |
+            release/**/*.exe
+            release/**/*.msi
+            release/**/*.zip
+            release/**/*.dmg
+            release/**/*.AppImage
+            release/**/*.deb
+            release/**/*.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
