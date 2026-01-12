@@ -14,10 +14,12 @@ on:
         description: "Version bump type"
         type: choice
         default: patch
-        options:
-          - patch
-          - minor
-          - major
+        options: [patch, minor, major]
+
+  push:
+    tags:
+      - "v*"
+
 
 jobs:
   tag:
@@ -41,15 +43,6 @@ jobs:
 
       - id: version
         run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Houdoku v${{ steps.version.outputs.version }}
-          draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   windows:
     needs: tag
