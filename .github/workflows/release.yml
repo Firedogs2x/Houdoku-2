@@ -18,13 +18,11 @@ on:
 
 jobs:
 # ----------------------------------------
-# 1️⃣ VERSION + TAG (manual trigger only)
+# 1️⃣ VERSION BUMP (manual only)
 # ----------------------------------------
   version:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
 
     steps:
       - uses: actions/checkout@v4
@@ -37,21 +35,19 @@ jobs:
 
       - run: npm install -g pnpm
 
-      - name: Bump version and create tag
-        id: version
+      - name: Bump version and tag
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           npm version ${{ inputs.bump }} -m "chore(release): %s"
-          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           git push --follow-tags
 
 # ----------------------------------------
-# 2️⃣ WINDOWS BUILD
+# 2️⃣ WINDOWS BUILD (tag push)
 # ----------------------------------------
   windows:
+    if: github.event_name == 'push'
     runs-on: windows-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
@@ -74,8 +70,8 @@ jobs:
 # 3️⃣ MACOS BUILD
 # ----------------------------------------
   macos:
+    if: github.event_name == 'push'
     runs-on: macos-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
@@ -98,8 +94,8 @@ jobs:
 # 4️⃣ LINUX BUILD
 # ----------------------------------------
   linux:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
