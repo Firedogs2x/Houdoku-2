@@ -6,12 +6,8 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      bump_version:
-        description: "Bump version?"
-        type: boolean
-        default: false
-      version_bump_type:
-        description: "Version bump type"
+      bump:
+        description: Version bump type
         type: choice
         default: patch
         options: [patch, minor, major]
@@ -20,11 +16,16 @@ on:
     tags:
       - "v*"
 
-
 jobs:
-  bump:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.bump_version }}
+# ----------------------------------------
+# 1️⃣ VERSION + TAG (manual trigger only)
+# ----------------------------------------
+  version:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,66 +37,83 @@ jobs:
 
       - run: npm install -g pnpm
 
-      - run: |
+      - name: Bump version and create tag
+        id: version
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          npm version ${{ inputs.version_bump_type }}
+          npm version ${{ inputs.bump }} -m "chore(release): %s"
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
           git push --follow-tags
 
-
-      - id: version
-        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
-
+# ----------------------------------------
+# 2️⃣ WINDOWS BUILD
+# ----------------------------------------
   windows:
     runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
+
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm dist:win
+      - run: pnpm electron-builder --win
 
+# ----------------------------------------
+# 3️⃣ MACOS BUILD
+# ----------------------------------------
   macos:
     runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
+
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm dist:mac
+      - run: pnpm electron-builder --mac
 
+# ----------------------------------------
+# 4️⃣ LINUX BUILD
+# ----------------------------------------
   linux:
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ELECTRON_BUILDER_PUBLISH: onTagOrDraft
+
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            
+          fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm dist:linux
+      - run: pnpm electron-builder --linux
