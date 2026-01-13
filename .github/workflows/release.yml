@@ -1,30 +1,33 @@
+# ──────────────────────────────────────────────────────────────────────
+# Build & Release Houdoku
+# ──────────────────────────────────────────────────────────────────────
 name: Build & Release Houdoku
 
-# -----------------------------------------------------------------
-# 1️⃣ Triggers
-# -----------------------------------------------------------------
+# ----------------------------------------------------------------------
+# 1️⃣  Triggers – manual UI only (drop‑down for bump type)
+# ----------------------------------------------------------------------
 on:
-  # Manual start from the Actions UI
   workflow_dispatch:
     inputs:
-      version:
-        description: "Release version (e.g. 2.18.0)"
+      bump:
+        description: "Semver bump type – choose the version change you want"
         required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
-  # OPTIONAL: automatic run when a tag like v2.18.0 is pushed
-  # push:
-  #   tags:
-  #     - 'v*'
-
-# -----------------------------------------------------------------
-# 2️⃣ Permissions – needed to create a GitHub Release and upload assets
-# -----------------------------------------------------------------
+# ----------------------------------------------------------------------
+# 2️⃣  Permissions – needed to create a Release and upload assets
+# ----------------------------------------------------------------------
 permissions:
-  contents: write   # for releases (upload, create tag, etc.)
+  contents: write   # allows creating a GitHub Release + uploading artefacts
 
-# -----------------------------------------------------------------
-# 3️⃣ Job – matrix runs on Windows, macOS and Linux
-# -----------------------------------------------------------------
+# ----------------------------------------------------------------------
+# 3️⃣  Job – matrix runs on the three supported OSes
+# ----------------------------------------------------------------------
 jobs:
   build-and-release:
     runs-on: ${{ matrix.os }}
@@ -33,77 +36,78 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # provided automatically by GitHub
 
     steps:
-      # -------------------------------------------------------------
-      # 0️⃣ Checkout the repo
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 0️⃣  Checkout the repository
+      # ------------------------------------------------------------------
       - uses: actions/checkout@v4
 
-      # -------------------------------------------------------------
-      # 1️⃣ Install Node (20) and enable pnpm
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 1️⃣  Install Node (v20) and make pnpm available
+      # ------------------------------------------------------------------
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm               # caches ~/.pnpm-store between runs
+          cache: pnpm               # caches the pnpm store after pnpm exists
 
-      # Corepack ships with Node 20; this makes pnpm available in $PATH.
+      # Corepack ships with Node ≥ 16 – this makes pnpm available in $PATH
       - name: Enable pnpm via Corepack
         run: corepack enable
 
-      # (If you prefer the npm‑global way, replace the two lines above with:)
-      # - name: Install pnpm globally
-      #   run: npm install -g pnpm
+      # (If you prefer the npm‑global approach, replace the two lines above
+      # with:  run: npm install -g pnpm)
 
-      # -------------------------------------------------------------
-      # 2️⃣ Install workspace dependencies
-      # -------------------------------------------------------------
-      - name: Install deps
+      # ------------------------------------------------------------------
+      # 2️⃣  Install workspace dependencies
+      # ------------------------------------------------------------------
+      - name: Install dependencies
         run: pnpm install
 
-      # -------------------------------------------------------------
-      # 3️⃣ Bump the version (must happen **before** any build)
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 3️⃣  Bump the version (must happen before any build)
+      # ------------------------------------------------------------------
       - name: Bump version
         run: |
-          pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
+          # The UI gave us a bump type (patch / minor / major)
+          pnpm version ${{ github.event.inputs.bump }} --no-git-tag-version
 
-          # OPTIONAL: if you ever want to use the `onTagOrDraft` mode,
-          # you can create a tag here so that electron‑builder sees it.
-          # git config user.name "github-actions[bot]"
+          # OPTIONAL: create & push a matching Git tag.
+          # This is handy if you ever switch the electron‑builder scripts
+          # to use "--publish onTagOrDraft".
+          # ---------------------------------------------------------
+          # git config user.name  "github-actions[bot]"
           # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # git add .
-          # git commit -m "chore: release v${{ github.event.inputs.version }}" || echo "nothing to commit"
-          # git tag v${{ github.event.inputs.version }}
-          # git push origin HEAD:${{ github.ref }} --tags
+          # NEW_TAG="v$(node -p "require('./package.json').version")"
+          # git tag "$NEW_TAG"
+          # git push origin "$NEW_TAG"
+          # ---------------------------------------------------------
 
-      # -------------------------------------------------------------
-      # 4️⃣ Build the renderer & main process (Turbo)
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 4️⃣  Build the renderer & main process (Turbo)
+      # ------------------------------------------------------------------
       - name: Build (Turbo)
         run: pnpm build
 
-      # -------------------------------------------------------------
-      # 5️⃣ Platform‑specific packaging (electron‑builder)
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 5️⃣  Platform‑specific packaging (electron‑builder)
+      # ------------------------------------------------------------------
       - name: Package Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm run dist:win   # script contains: electron-builder --win --publish always
+        run: pnpm run dist:win   # → "electron-builder --win --publish always"
 
       - name: Package macOS
         if: matrix.os == 'macos-latest'
-        run: pnpm run dist:mac
+        run: pnpm run dist:mac   # → "electron-builder --mac --publish always"
 
       - name: Package Linux
         if: matrix.os == 'ubuntu-latest'
-        run: pnpm run dist:linux
+        run: pnpm run dist:linux # → "electron-builder --linux --publish always"
 
-      # -------------------------------------------------------------
-      # 6️⃣ (Optional) Upload the artefacts as CI artefacts
-      #    – useful for debugging if the GitHub Release upload fails.
-      # -------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # 6️⃣  (Optional) Upload the artefacts as CI artefacts
+      # ------------------------------------------------------------------
       - name: Upload Windows artefacts
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
