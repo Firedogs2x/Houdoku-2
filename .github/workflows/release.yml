@@ -51,7 +51,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm          # caches the pnpm store after pnpm is installed
 
       # ------------------------------------------------------------------
       # 2️⃣  Enable Corepack and install pnpm (works on all OSes)
