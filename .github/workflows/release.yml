@@ -3,9 +3,9 @@
 # ──────────────────────────────────────────────────────────────────────
 name: Build & Release Houdoku
 
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 # 1️⃣  Trigger – manual UI only, with a drop‑down for the semver bump
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 on:
   workflow_dispatch:
     inputs:
@@ -19,15 +19,15 @@ on:
           - minor
           - major
 
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 # 2️⃣  Permissions – needed to create a GitHub Release and upload assets
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 permissions:
   contents: write   # allow creating a Release + uploading artefacts
 
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 # 3️⃣  Job – matrix runs on the three supported OSes
-# ----------------------------------------------------------------------
+# --------------------------------------------------------------
 jobs:
   build-and-release:
     runs-on: ${{ matrix.os }}
@@ -36,63 +36,61 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # automatically provided by GitHub
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # automatically provided
 
     steps:
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 0️⃣  Checkout the repository
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - uses: actions/checkout@v4
 
-      # ------------------------------------------------------------------
-      # 1️⃣  Install Node (v20) – we also ask it to cache pnpm later
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
+      # 1️⃣  Install Node (v20) – we also ask the action to cache pnpm
+      # --------------------------------------------------------
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm               # caches the pnpm store after pnpm is installed
+          cache: pnpm               # caches pnpm's store after we install it
 
-      # ------------------------------------------------------------------
-      # 2️⃣  Make pnpm available (the step that was missing before)
-      # ------------------------------------------------------------------
-      - name: Install pnpm globally
-        run: |
-          npm install -g pnpm@latest
-          pnpm --version   # print version – useful for debugging
+      # --------------------------------------------------------
+      # 2️⃣  Make pnpm available (Corepack – built‑in to Node ≥ 16)
+      # --------------------------------------------------------
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
 
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 3️⃣  Install workspace dependencies
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - name: Install dependencies
         run: pnpm install
 
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 4️⃣  Bump the version (must happen before any build)
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - name: Bump version
         run: |
           # The UI supplied a bump type (patch / minor / major)
           pnpm version ${{ github.event.inputs.bump }} --no-git-tag-version
 
-          # --------------------------------------------------------------
+          # -----------------------------------------------------------------
           # OPTIONAL: create a matching Git tag (useful if you later switch
           # the dist scripts to "--publish onTagOrDraft").
-          # --------------------------------------------------------------
+          # -----------------------------------------------------------------
           # git config user.name  "github-actions[bot]"
           # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # NEW_TAG="v$(node -p "require('./package.json').version")"
           # git tag "$NEW_TAG"
           # git push origin "$NEW_TAG"
 
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 5️⃣  Build the renderer & main process (Turbo)
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - name: Build (Turbo)
         run: pnpm build
 
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 6️⃣  Platform‑specific packaging (electron‑builder)
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - name: Package Windows
         if: matrix.os == 'windows-latest'
         run: pnpm run dist:win   # → "electron-builder --win --publish always"
@@ -105,9 +103,9 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: pnpm run dist:linux # → "electron-builder --linux --publish always"
 
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       # 7️⃣  (Optional) Upload the artefacts as CI artefacts
-      # ------------------------------------------------------------------
+      # --------------------------------------------------------
       - name: Upload Windows artefacts
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
