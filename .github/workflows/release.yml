@@ -32,6 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true   # ✅ IMPORTANT
 
       - uses: actions/setup-node@v4
         with:
@@ -46,7 +47,7 @@ jobs:
         run: pnpm install
 
       # ─────────────────────────────────────────────
-      # VERSION + TAG (CAPITAL V, RUNS ONCE)
+      # VERSION + TAG (UBUNTU ONLY)
       # ─────────────────────────────────────────────
       - name: Bump version and create V tag
         if: matrix.os == 'ubuntu-latest'
@@ -61,10 +62,19 @@ jobs:
 
           git add package.json
           git commit -m "Release V$VERSION"
-
           git tag "V$VERSION"
+
           git push origin main
           git push origin "V$VERSION"
+
+      # ─────────────────────────────────────────────
+      # LOAD VERSION ON OTHER RUNNERS
+      # ─────────────────────────────────────────────
+      - name: Load version from tag
+        if: matrix.os != 'ubuntu-latest'
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/^V//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build
         run: pnpm build
@@ -85,7 +95,7 @@ jobs:
         run: pnpm run dist:linux
 
       # ─────────────────────────────────────────────
-      # CREATE RELEASE (CAPITAL V)
+      # CREATE RELEASE (ONCE)
       # ─────────────────────────────────────────────
       - name: Create GitHub Release
         if: matrix.os == 'ubuntu-latest'
@@ -97,7 +107,7 @@ jobs:
           prerelease: false
 
       # ─────────────────────────────────────────────
-      # UPLOAD ASSETS
+      # UPLOAD ASSETS (ALL RUNNERS)
       # ─────────────────────────────────────────────
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
