@@ -4,27 +4,26 @@ name: Build & Release Houdoku
 # 1️⃣ Triggers
 # -----------------------------------------------------------------
 on:
-  # Manual start from the UI – you supply the version string.
+  # Manual start from the Actions UI
   workflow_dispatch:
     inputs:
       version:
         description: "Release version (e.g. 2.18.0)"
         required: true
 
-  # OPTIONAL: uncomment the block below if you also want automatic runs on tags.
+  # OPTIONAL: automatic run when a tag like v2.18.0 is pushed
   # push:
   #   tags:
-  #     - 'v*'   # any tag that starts with "v"
+  #     - 'v*'
 
 # -----------------------------------------------------------------
-# 2️⃣ Permissions – needed for creating a Release + uploading assets
+# 2️⃣ Permissions – needed to create a GitHub Release and upload assets
 # -----------------------------------------------------------------
 permissions:
-  contents: write   # for releases
-  # (metadata is read‑only by default – no need to change)
+  contents: write   # for releases (upload, create tag, etc.)
 
 # -----------------------------------------------------------------
-# 3️⃣ The job – runs on a matrix of OSes
+# 3️⃣ Job – matrix runs on Windows, macOS and Linux
 # -----------------------------------------------------------------
 jobs:
   build-and-release:
@@ -34,57 +33,64 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # automatically provided
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       # -------------------------------------------------------------
-      # 0️⃣ Checkout + Node / pnpm setup (cached for speed)
+      # 0️⃣ Checkout the repo
       # -------------------------------------------------------------
       - uses: actions/checkout@v4
 
+      # -------------------------------------------------------------
+      # 1️⃣ Install Node (20) and enable pnpm
+      # -------------------------------------------------------------
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm          # enables pnpm cache across runs
+          cache: pnpm               # caches ~/.pnpm-store between runs
 
-      # Corepack ships with Node ≥ 16 and gives us pnpm without a separate install
-      - run: corepack enable
+      # Corepack ships with Node 20; this makes pnpm available in $PATH.
+      - name: Enable pnpm via Corepack
+        run: corepack enable
+
+      # (If you prefer the npm‑global way, replace the two lines above with:)
+      # - name: Install pnpm globally
+      #   run: npm install -g pnpm
 
       # -------------------------------------------------------------
-      # 1️⃣ Install all deps (workspace aware)
+      # 2️⃣ Install workspace dependencies
       # -------------------------------------------------------------
-      - run: pnpm install
+      - name: Install deps
+        run: pnpm install
 
       # -------------------------------------------------------------
-      # 2️⃣ Bump the version **before** any compilation
+      # 3️⃣ Bump the version (must happen **before** any build)
       # -------------------------------------------------------------
       - name: Bump version
         run: |
-          # Use the exact version the user typed in the UI.
           pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
 
-          # OPTIONAL – if you want the tag to exist on GitHub (required for
-          # onTagOrDraft mode).  Remove this block if you keep `--publish always`.
-          # ---------------------------------------------------------
+          # OPTIONAL: if you ever want to use the `onTagOrDraft` mode,
+          # you can create a tag here so that electron‑builder sees it.
           # git config user.name "github-actions[bot]"
           # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # git add .
           # git commit -m "chore: release v${{ github.event.inputs.version }}" || echo "nothing to commit"
           # git tag v${{ github.event.inputs.version }}
           # git push origin HEAD:${{ github.ref }} --tags
-          # ---------------------------------------------------------
 
       # -------------------------------------------------------------
-      # 3️⃣ Build the renderer / main bundles (Turbo)
+      # 4️⃣ Build the renderer & main process (Turbo)
       # -------------------------------------------------------------
-      - run: pnpm build   # runs `turbo build` under the hood
+      - name: Build (Turbo)
+        run: pnpm build
 
       # -------------------------------------------------------------
-      # 4️⃣ Platform‑specific packaging (electron‑builder)
+      # 5️⃣ Platform‑specific packaging (electron‑builder)
       # -------------------------------------------------------------
       - name: Package Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm run dist:win   # script already contains "--publish always"
+        run: pnpm run dist:win   # script contains: electron-builder --win --publish always
 
       - name: Package macOS
         if: matrix.os == 'macos-latest'
@@ -95,7 +101,8 @@ jobs:
         run: pnpm run dist:linux
 
       # -------------------------------------------------------------
-      # 5️⃣ (Optional) Upload artefacts as CI artefacts – handy for debugging
+      # 6️⃣ (Optional) Upload the artefacts as CI artefacts
+      #    – useful for debugging if the GitHub Release upload fails.
       # -------------------------------------------------------------
       - name: Upload Windows artefacts
         if: matrix.os == 'windows-latest'
