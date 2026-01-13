@@ -1,11 +1,5 @@
-# ──────────────────────────────────────────────────────────────────────
-# Build & Release Houdoku – drop‑down (patch / minor / major) UI
-# ──────────────────────────────────────────────────────────────────────
 name: Build & Release Houdoku
 
-# ----------------------------------------------------------------------
-# 1️⃣  Manual trigger – a drop‑down to choose the semver bump
-# ----------------------------------------------------------------------
 on:
   workflow_dispatch:
     inputs:
@@ -19,112 +13,94 @@ on:
           - minor
           - major
 
-# ----------------------------------------------------------------------
-# 2️⃣  Permissions – needed to create a GitHub Release and upload assets
-# ----------------------------------------------------------------------
 permissions:
-  contents: write   # allow creating a Release + uploading artefacts
+  contents: write
 
-# ----------------------------------------------------------------------
-# 3️⃣  Job – matrix runs on the three supported OSes
-# ----------------------------------------------------------------------
 jobs:
   build-and-release:
     runs-on: ${{ matrix.os }}
+
     strategy:
+      max-parallel: 1
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
-    # The token the runner uses to talk to the GitHub API
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      # ------------------------------------------------------------------
-      # 0️⃣  Checkout the repository
-      # ------------------------------------------------------------------
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # ------------------------------------------------------------------
-      # 1️⃣  Install Node (v20) – we also ask the action to cache pnpm later
-      # ------------------------------------------------------------------
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # ------------------------------------------------------------------
-      # 2️⃣  Enable Corepack and install pnpm (works on all OSes)
-      # ------------------------------------------------------------------
       - name: Enable Corepack & install pnpm
         run: |
           corepack enable
           corepack prepare pnpm@latest --activate
 
-      # ------------------------------------------------------------------
-      # 3️⃣  Install workspace dependencies
-      # ------------------------------------------------------------------
       - name: Install dependencies
         run: pnpm install
 
-      # ------------------------------------------------------------------
-      # 4️⃣  Bump the version (must happen before any build)
-      # ------------------------------------------------------------------
-      - name: Bump version
+      # ─────────────────────────────────────────────
+      # VERSION + TAG (CAPITAL V, RUNS ONCE)
+      # ─────────────────────────────────────────────
+      - name: Bump version and create V tag
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          # The UI supplied a bump type (patch / minor / major)
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           pnpm version ${{ github.event.inputs.bump }} --no-git-tag-version
 
-          # ---------------------------------------------------------------
-          # OPTIONAL: create a matching Git tag (useful if you later switch
-          # the dist scripts to "--publish onTagOrDraft").
-          # ---------------------------------------------------------------
-          # git config user.name  "github-actions[bot]"
-          # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # NEW_TAG="v$(node -p \"require('./package.json').version\")"
-          # git tag "$NEW_TAG"
-          # git push origin "$NEW_TAG"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # ------------------------------------------------------------------
-      # 5️⃣  Build the renderer & main process (Turbo)
-      # ------------------------------------------------------------------
-      - name: Build (Turbo)
+          git add package.json
+          git commit -m "Release V$VERSION"
+
+          git tag "V$VERSION"
+          git push origin main
+          git push origin "V$VERSION"
+
+      - name: Build
         run: pnpm build
 
-      # ------------------------------------------------------------------
-      # 6️⃣  Platform‑specific packaging (electron‑builder)
-      # ------------------------------------------------------------------
+      # ─────────────────────────────────────────────
+      # PACKAGE
+      # ─────────────────────────────────────────────
       - name: Package Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm run dist:win   # → "electron-builder --win --publish always"
+        run: pnpm run dist:win
 
       - name: Package macOS
         if: matrix.os == 'macos-latest'
-        run: pnpm run dist:mac   # → "electron-builder --mac --publish always"
+        run: pnpm run dist:mac
 
       - name: Package Linux
         if: matrix.os == 'ubuntu-latest'
-        run: pnpm run dist:linux # → "electron-builder --linux --publish always"
+        run: pnpm run dist:linux
 
-      # ------------------------------------------------------------------
-      # 7️⃣  (Optional) Upload the artefacts as CI artefacts
-      # ------------------------------------------------------------------
-      - name: Upload Windows artefacts
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: release/*
-
-      - name: Upload macOS artefacts
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-build
-          path: release/*
-
-      - name: Upload Linux artefacts
+      # ─────────────────────────────────────────────
+      # CREATE RELEASE (CAPITAL V)
+      # ─────────────────────────────────────────────
+      - name: Create GitHub Release
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
+        uses: softprops/action-gh-release@v2
         with:
-          name: linux-build
-          path: release/*
+          tag_name: V${{ env.VERSION }}
+          name: Houdoku V${{ env.VERSION }}
+          draft: false
+          prerelease: false
+
+      # ─────────────────────────────────────────────
+      # UPLOAD ASSETS
+      # ─────────────────────────────────────────────
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: V${{ env.VERSION }}
+          files: release/*
