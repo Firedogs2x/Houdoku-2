@@ -1,4 +1,4 @@
-name: Build and Release
+name: Release
 
 on:
   workflow_dispatch:
@@ -16,54 +16,51 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      tag: ${{ steps.version.outputs.tag }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          fetch-tags: true
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-
-      - run: pnpm install
-
-      - name: Bump version & create tag
+      - name: Determine next version
         id: version
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --tags
+          latest=$(git tag -l 'V*' --sort=-v:refname | head -n 1)
+          latest=${latest#V}
+          IFS='.' read -r major minor patch <<< "$latest"
 
-          pnpm version ${{ inputs.bump }} --no-git-tag-version
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="V$VERSION"
+          case "${{ inputs.bump }}" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+          esac
 
-          git add package.json
-          git commit -m "Release $TAG"
-          git tag "$TAG"
-          git push origin main
-          git push origin "$TAG"
+          next="V$major.$minor.$patch"
+          echo "version=$next" >> $GITHUB_OUTPUT
 
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Create tag
+        run: |
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
 
-      - name: Create GitHub Release
+      - name: Create GitHub release
+        id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
 
@@ -78,33 +75,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release.outputs.tag }}
+          ref: ${{ needs.release.outputs.version }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-
+      - run: corepack enable
+      - run: corepack prepare pnpm@latest --activate
       - run: pnpm install
       - run: pnpm build
 
-      - name: Build artifacts
+      - name: Build platform artifact
+        shell: bash
         run: |
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
             pnpm run dist:linux
-          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
             pnpm run dist:win
           else
             pnpm run dist:mac
           fi
-        shell: bash
 
       - name: Upload artifacts
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.release.outputs.tag }}
+          tag_name: ${{ needs.release.outputs.version }}
           files: |
             dist/**
