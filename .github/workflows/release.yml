@@ -72,9 +72,11 @@ jobs:
       # ─────────────────────────────────────────────
       - name: Load version from tag
         if: matrix.os != 'ubuntu-latest'
+        shell: bash
         run: |
-          VERSION=$(git describe --tags --abbrev=0 | sed 's/^V//')
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+            VERSION=$(git describe --tags --abbrev=0 | sed 's/^V//')
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+
 
       - name: Build
         run: pnpm build
