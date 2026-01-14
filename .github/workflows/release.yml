@@ -86,8 +86,12 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.tag.outputs.version }}
-          files: |
-            apps/desktop/dist/**
-            apps/desktop/release/**
-            apps/desktop/out/**
+            tag_name: ${{ github.ref_name }}
+            overwrite_files: true
+            files: |
+                apps/desktop/release/*.AppImage
+                apps/desktop/release/*.exe
+                apps/desktop/release/*.nsis
+                apps/desktop/release/*.dmg
+                apps/desktop/release/*.zip
+
