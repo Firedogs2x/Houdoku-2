@@ -4,36 +4,26 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: "Version bump type"
+        type: choice
         required: true
         default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
+        options: [patch, minor, major]
 
 permissions:
   contents: write
 
-concurrency:
-  group: release
-  cancel-in-progress: false
-
 jobs:
-  release:
+  tag:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Determine next version
-        id: version
+      - id: version
         shell: bash
         run: |
           git fetch --tags
@@ -47,35 +37,28 @@ jobs:
             patch) patch=$((patch+1)) ;;
           esac
 
-          next="V$major.$minor.$patch"
-          echo "version=$next" >> $GITHUB_OUTPUT
+          echo "version=V$major.$minor.$patch" >> $GITHUB_OUTPUT
 
-      - name: Create tag
-        run: |
+      - run: |
           git tag ${{ steps.version.outputs.version }}
           git push origin ${{ steps.version.outputs.version }}
 
-      - name: Create GitHub release
-        id: create_release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
           name: Release ${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
 
   build:
-    needs: release
+    needs: tag
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release.outputs.version }}
+          ref: ${{ needs.tag.outputs.version }}
 
       - uses: actions/setup-node@v4
         with:
@@ -84,22 +67,27 @@ jobs:
       - run: corepack enable
       - run: corepack prepare pnpm@latest --activate
       - run: pnpm install
-      - run: pnpm build
 
-      - name: Build platform artifact
+      # 🔒 build ONLY the desktop app
+      - run: pnpm --filter @houdoku/desktop build
+
+      - name: Package desktop app
         shell: bash
         run: |
+          cd apps/desktop
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            pnpm run dist:linux
+            pnpm dist:linux
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            pnpm run dist:win
+            pnpm dist:win
           else
-            pnpm run dist:mac
+            pnpm dist:mac
           fi
 
-      - name: Upload artifacts
+      - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.release.outputs.version }}
+          tag_name: ${{ needs.tag.outputs.version }}
           files: |
-            dist/**
+            apps/desktop/dist/**
+            apps/desktop/release/**
+            apps/desktop/out/**
