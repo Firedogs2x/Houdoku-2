@@ -1,47 +1,37 @@
+## Houdoku is a free and open source manga reader for the desktop.
 
-![Houdoku Screenshot 2025-11-17 052256](https://github.com/user-attachments/assets/d0b1c25b-ffb6-46a4-a72b-f941fb874bc7)
+## Home Page
+![Home Page 2026-01-14](https://github.com/user-attachments/assets/d8bed88a-8693-4e6c-8f09-ceabe2c1dbc5)
+
+## Series Card Layout
+![Series Card Mod 2026-01-14](https://github.com/user-attachments/assets/4c256cbb-acd2-4453-96b1-b29cd64ebfd2)
+
+The card has been updated to show both the number unread chapters and the total number of chapters (See Note 1).
+Card also now has an indicator, located under the total number of chapters, this indicator has two funtions:
+  1) No chapters in the series have been read.
+  2) A new chapter has been added since the last time you read a chapter in that series.
+At the very bottom this is the date of the last time you read a chapter in the series.
 
 
-[![houdoku.org]](https://houdoku.org)
-[![GitHub release]](https://github.com/Firedogs2x/houdoku/releases)
+## Houdoku Features
 
-
-Houdoku is a free and open source manga reader for the desktop.
-
-## Features
-
+- The ability to semi-auto load series. (Please read the information located on the Settings / Folder tab).
 - Read manga from popular websites or import ones from your filesystem,
   all in one place.
-- Download chapters for offline reading.
+- Download chapters for offline reading (Don't know if works).
 - Customizable reader interface with multiple layouts and settings.
 - Tagging and filtering support to easily browse and manage large libraries.
 - Cross-platform!
 
 ## Download
 
-Download Houdoku from [the official website](https://houdoku.org/download).
-
-Alternatively, you can download manually from the
-[GitHub releases page](https://github.com/Firedogs2x/houdoku/releases).
+Download Houdoku from [GitHub releases page](https://github.com/Firedogs2x/houdoku/releases).
 
 ## Documentation
 
-User guides and documentation are available on
+User guides and documentation are available on: (Covers up to V1.16.0)
 [houdoku.org](https://houdoku.org).
 
-## Development
-
-Install dependencies:
-
-```
-pnpm i
-```
-
-Start the app in the dev environment:
-
-```
-pnpm dev
-```
 
 ## Stack
 
