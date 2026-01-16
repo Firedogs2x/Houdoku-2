@@ -112,7 +112,7 @@ const Search: React.FC = () => {
   if (extensionList.length === 0) return <></>;
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       <AddSeriesModal
         showing={showingAddModal}
         setShowing={(showing) => {
@@ -136,7 +136,7 @@ const Search: React.FC = () => {
       />
 
       <SearchGrid loading={loading} handleSearch={handleSearch} />
-    </>
+    </div>
   );
 };
 

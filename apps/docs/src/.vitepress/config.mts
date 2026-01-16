@@ -22,7 +22,7 @@ export default defineConfig({
       },
       {
         text: 'Repository',
-        link: 'https://github.com/xgi/houdoku',
+        link: 'https://github.com/Firedogs2x/Houdoku-2',
       },
       {
         text: 'Guides',
@@ -43,7 +43,7 @@ export default defineConfig({
       },
     ],
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/xgi/houdoku' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/Firedogs2x/Houdoku-2' }],
 
     search: {
       provider: 'local',

@@ -19,8 +19,6 @@ Houdoku is a free and open source manga reader for the desktop.
 
 ## Download
 
-Download Houdoku from [the official website](https://houdoku.org/download).
-
 Alternatively, you can download manually from the
 [GitHub releases page](https://github.com/Firedogs2x/houdoku/releases).
 

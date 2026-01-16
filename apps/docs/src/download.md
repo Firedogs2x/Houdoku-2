@@ -30,7 +30,7 @@ Houdoku version {{ release.version }} was released on {{ release.releaseDateStr 
 </tbody>
 </table>
 
-> Additional versions are available from the [GitHub releases page](https://github.com/xgi/houdoku/releases).
+> Additional versions are available from the [GitHub releases page](https://github.com/Firedogs2x/Houdoku-2/releases).
 
 ## Updating
 
