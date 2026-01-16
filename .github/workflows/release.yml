@@ -93,7 +93,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      # Sync Electron app version to tag
+      # 🔧 FIX #3 — sync Electron app version to tag
       - name: Sync app version to release tag
         shell: bash
         run: |
@@ -117,7 +117,7 @@ jobs:
             pnpm dist:mac
           fi
 
-      # Enforce tag-based release + proper title
+      # 🔧 FIX #2 — enforce tag-based release + proper title
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
