@@ -222,7 +222,7 @@ const Library: React.FC<Props> = () => {
   }, [location.pathname, setSeriesList]);
 
   return (
-    <div>
+    <div className="flex flex-col h-full overflow-hidden">
       {multiSelectEnabled ? (
         <LibraryControlBarMultiSelect
           showAssignCategoriesModal={() => console.log('TODO placeholder')}
@@ -230,7 +230,7 @@ const Library: React.FC<Props> = () => {
       ) : (
         <LibraryControlBar getFilteredList={getFilteredList} />
       )}
-      <ScrollArea ref={scrollAreaRef} className="h-[calc(100vh-20px-64px)] w-full pr-4 -mr-2">
+      <ScrollArea ref={scrollAreaRef} className="flex-1 w-full pr-4 -mr-2">
         {activeSeriesList.length === 0 && renderEmptyMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}
