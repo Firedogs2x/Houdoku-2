@@ -4,7 +4,11 @@
 
 # Automating version number updates in GitHub Releases (2026-01-26 14:11Z)
 
+<<<<<<< HEAD
 _**User (2026-01-26 14:12Z)**_
+=======
+_**User (2026-01-26 14:11Z)**_
+>>>>>>> Dev
 
 Is there away to have the version number inside the program updated when I run Release in Github so that it matches the version number under Releases? Release version is displayed at the bottom left corner of the program.
 Only edit what is absolutely required
@@ -248,6 +252,7 @@ Searched for text `version` (`**/src/renderer/components/**/*.tsx`), 30 results
 
 ---
 
+<<<<<<< HEAD
 <tool-use data-tool-type="unknown" data-tool-name="copilot_listDirectory">
 <details>
 <summary>Tool use: **copilot_listDirectory**</summary>
@@ -360,6 +365,8 @@ Status: **completed**
 
 ---
 
+=======
+>>>>>>> Dev
 The user is asking about automatically updating the version number in the program when they create a Release on GitHub. They mention that the release version is displayed at the bottom left corner of the program.
 
 Looking at the package.json, I can see:
@@ -391,6 +398,7 @@ Let me first check what files exist in the workspace to understand how versionin
 - How the version is displayed in the app
 - The build configuration
 
+<<<<<<< HEAD
 Let me search for version-related code and see how it's currently implemented.I'll help you set up automatic version synchronization between GitHub Releases and your application. Let me first explore how the version is currently being used in your application. Now let me look at where the version is displayed in the UI (bottom left corner) and check the GitHub workflow: Perfect! I can see there's already a comment about syncing the version in the release workflow. Let me see the rest of that workflow and find where the version is displayed: Great! Now let me find where the version is displayed in the UI (bottom left corner): Let me search more specifically for the status bar or footer where version is displayed: Let me search for where the version is actually displayed in the bottom-left: Let me look at the DashboardPage component where the main UI is: Let me check the DashboardSidebar: Let me look at DashboardSidebar more carefully: Perfect! I found it. The version is displayed in the bottom left corner using `packageJson.version` on line 243. Now I have all the information I need. Let me create a comprehensive solution:
 
 ## Summary
@@ -415,6 +423,9 @@ Let me verify the current state and make the necessary updates: The root `packag
 **The version sync is working!** When you create a release through GitHub Actions with a bump type, the desktop app's `package.json` is automatically updated to match, and the version displayed in your app will reflect the GitHub release version.
 
 No additional changes are needed unless you want to modify the workflow behavior.
+=======
+Let me search for version-related code and see how it's currently implemented.I'll help you set up automatic version synchronization between GitHub Releases and your application. Let me first explore how the version is currently being used in your application. Now let me look at where the version is displayed in the UI (bottom left corner) and check the GitHub workflow: Perfect! I can see there's already a comment about syncing the version in the release workflow. Let me see the rest of that workflow and find where the version is displayed: Great! Now let me find where the version is displayed in the UI (bottom left corner): Let me search more specifically for the status bar or footer where version is displayed: Let me search for where the version is actually displayed in the bottom-left: Let me look at the DashboardPage component where the main UI is: Let me check the DashboardSidebar: 
+>>>>>>> Dev
 
 ---
 

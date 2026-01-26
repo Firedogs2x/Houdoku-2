@@ -110,11 +110,11 @@ jobs:
         run: |
           cd apps/desktop
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            pnpm dist:linux
+            pnpm run dist:linux
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            pnpm dist:win
+            pnpm run dist:win
           else
-            pnpm dist:mac
+            pnpm run dist:mac
           fi
 
       # 🔧 FIX #2 — enforce tag-based release + proper title
