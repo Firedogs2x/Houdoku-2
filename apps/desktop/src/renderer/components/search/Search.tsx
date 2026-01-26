@@ -112,7 +112,7 @@ const Search: React.FC = () => {
   if (extensionList.length === 0) return <></>;
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="px-2 w-full h-full overflow-hidden flex flex-col">
       <AddSeriesModal
         showing={showingAddModal}
         setShowing={(showing) => {

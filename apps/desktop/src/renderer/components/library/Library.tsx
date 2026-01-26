@@ -222,7 +222,7 @@ const Library: React.FC<Props> = () => {
   }, [location.pathname, setSeriesList]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="px-2 w-full h-full overflow-hidden flex flex-col">
       {multiSelectEnabled ? (
         <LibraryControlBarMultiSelect
           showAssignCategoriesModal={() => console.log('TODO placeholder')}

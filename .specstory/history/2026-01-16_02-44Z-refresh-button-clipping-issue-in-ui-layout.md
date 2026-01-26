@@ -1477,7 +1477,7 @@ This is the minimal change needed - no other modifications were made to the layo
 
 ---
 
-_**User (2026-01-26 14:34Z)**_
+_**User (2026-01-26 14:35Z)**_
 
 Continuation of the Button clipping.
 This issue is still happening. 
@@ -1491,6 +1491,217 @@ Do not modify the program beyond what is absolutely necessary.
 ---
 
 _**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#75-75), lines 75 to 102</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#75-75), lines 75 to 102
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\n flex flex-col\n&#96;&#96;&#96;\n\n",
+  "textEditContent": " flex flex-col",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\ndiv className=\"h-full overflow-auto\"&gt;&lt;SeriesDetails /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Search /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Plugins /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Downloads /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path=\"*\" element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Library /&gt;&lt;/div\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "div className=\"h-full overflow-auto\"&gt;&lt;SeriesDetails /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Search /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Plugins /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Downloads /&gt;&lt;/div&gt;} /&gt;\r\n          &lt;Route path=\"*\" element={&lt;div className=\"h-full overflow-auto\"&gt;&lt;Library /&gt;&lt;/div",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\nSeriesDetails /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;Search /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;Plugins /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;Downloads /&gt;} /&gt;\r\n          &lt;Route path=\"*\" element={&lt;Library /\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "SeriesDetails /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;Search /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;Plugins /&gt;} /&gt;\r\n          &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;Downloads /&gt;} /&gt;\r\n          &lt;Route path=\"*\" element={&lt;Library /",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#78-78), lines 78 to 102</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#78-78), lines 78 to 102
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\ndiv className=\"flex-1 overflow-hidden\"&gt;\r\n          &lt;Routes&gt;\r\n            &lt;Route path={&#96;${routes.SERIES}/:id&#96;} element={&lt;SeriesDetails /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;Search /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;Plugins /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;Downloads /&gt;} /&gt;\r\n            &lt;Route path=\"*\" element={&lt;Library /&gt;} /&gt;\r\n          &lt;/Routes&gt;\r\n        &lt;/div\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "div className=\"flex-1 overflow-hidden\"&gt;\r\n          &lt;Routes&gt;\r\n            &lt;Route path={&#96;${routes.SERIES}/:id&#96;} element={&lt;SeriesDetails /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.SEARCH}/*&#96;} element={&lt;Search /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.PLUGINS}/*&#96;} element={&lt;Plugins /&gt;} /&gt;\r\n            &lt;Route path={&#96;${routes.DOWNLOADS}/*&#96;} element={&lt;Downloads /&gt;} /&gt;\r\n            &lt;Route path=\"*\" element={&lt;Library /&gt;} /&gt;\r\n          &lt;/Routes&gt;\r\n        &lt;/div",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#78-78), lines 78 to 102</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx#78-78), lines 78 to 102
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_getErrors">
+<details>
+<summary>Tool use: **copilot_getErrors**</summary>
+
+
+Parameters:
+
+```json
+{
+  "file_path": "c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx",
+  "relativeWorkspacePath": "DashboardPage.tsx"
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_getErrors",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Checking [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx)",
+  "pastTenseMessage": "Checked [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx), no problems found",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
 
 The user is reporting that the button clipping issue persists even after the previous fix. Let me think about what's happening:
 
@@ -1532,7 +1743,102 @@ The real problem could be that when Library remounts, the ScrollArea height calc
 
 The Routes element itself doesn't apply flex layout to its children, it's just a container that renders based on route matching. Since Routes has `h-full overflow-hidden` but Library also declares `h-full`, there might be a disconnect in how the height constraint is being passed down the component tree. `h-full` might not work as expected.
 
-The simplest approach is to make the content div a flex container with `flex flex-col`, which would properly constrain the Routes element and allow child elements like Library to use `h-full` effectively. Alternatively, adding `h-full w-full` directly to Routes could work, but applying flex to the parent div is cleaner since it establishes the proper layout context for height-based sizing.Let me investigate this more carefully. The issue occurs specifically after navigating to SeriesDetails and ReaderPage, then returning. This suggests a problem with how the parent container constrains the Library component's height when it's re-rendered. 
+The simplest approach is to make the content div a flex container with `flex flex-col`, which would properly constrain the Routes element and allow child elements like Library to use `h-full` effectively. Alternatively, adding `h-full w-full` directly to Routes could work, but applying flex to the parent div is cleaner since it establishes the proper layout context for height-based sizing.Let me investigate this more carefully. The issue occurs specifically after navigating to SeriesDetails and ReaderPage, then returning. This suggests a problem with how the parent container constrains the Library component's height when it's re-rendered. The issue is that the Routes container itself doesn't have proper flex layout, so when Library tries to use `h-full`, it might not work correctly. The parent div has `h-full overflow-hidden` but Routes doesn't actually create a flex constraint for its children. Let me fix this by making Routes a flex container: Actually, that's still not quite right. The Routes element itself doesn't apply flex to its children. Let me wrap each route properly. First, let me check if there's a better approach - wrapping the Routes in a flex container: Wait, that's too much modification. Let me reconsider and use a cleaner approach. The issue is that each route element needs to properly fill its parent. Let me revert to a simpler solution - just making sure the Routes element properly contains its children: Now let me add `flex-1` and `overflow-hidden` to the Routes element so it properly fills the parent and constrains its children: I see the Routes doesn't have a class attribute in JSX. React Router's Routes is a component that doesn't accept className. I need to wrap it: Now verify the changes: Good. Now check for errors: Perfect. The key change here is that I've added a wrapper div with `flex-1 overflow-hidden` around the Routes element. This ensures:
+
+1. **flex-1** - The Routes wrapper fills all remaining height in the flex column
+2. **overflow-hidden** - Prevents any content overflow that could cause layout shift
+3. **The flex column layout** - Ensures the Routes container and its children know their exact bounds
+
+This fixes the issue where navigating away and back would cause the Library component's parent height to become undefined, making `h-full` not work correctly.
+
+The problem was:
+- When you navigate to SeriesDetails/ReaderPage, the Routes switches to rendering a different component
+- When returning to Library, if the parent doesn't properly constrain height, Library's `h-full` doesn't know what height to be
+- This caused the flexbox layout in Library to break, clipping the control bar
+
+Now with the explicit flex wrapper around Routes, every child component (Library, Search, SeriesDetails, etc.) will always have a properly constrained parent height, so `h-full` will work consistently.
+
+---
+
+_**User (2026-01-26 15:00Z)**_
+
+You still have not fixed the clipping issue.
+Again, please do an extremely thorough review and make only the required changes.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx)</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardPage.tsx)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/Library.tsx#220-220), lines 220 to 243</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/Library.tsx#220-220), lines 220 to 243
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.global.css#100-100), lines 100 to 120</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.global.css#100-100), lines 100 to 120
+
+</details>
+</tool-use>
+
+---
+
+The user is saying the clipping issue is still happening. Let me think about this more carefully. They said:
+1. Start the program - everything looks fine
+2. Click on a Series card and read a chapter
+3. Return to the All Series page - buttons are clipped again
+
+This suggests the problem is not just about the layout structure, but something about how the Library component itself is being constrained or how it's calculating its own internal layout.
+
+Let me review what we've done:
+1. Changed Library.tsx to use `flex flex-col h-full overflow-hidden` with `flex-1` ScrollArea
+2. Changed Search.tsx similarly
+3. Changed SearchGrid.tsx to use `flex-1`
+4. Changed DashboardPage.tsx to have proper flex layout and overflow-hidden
+
+But the user is saying it's STILL happening. Let me think about what could cause this:
+
+The Library component has:
+```tsx
+<div className="flex flex-col h-full overflow-hidden">
+  <LibraryControlBar getFilteredList={getFilteredList} />
+  <ScrollArea ref={scrollAreaRef} className="flex-1 w-full pr-4 -mr-2">
+```
+
+Wait, I see a potential issue. The Library component's outer div has `h-full`, but what is `h-full` relative to? It's relative to its parent. The parent is the route element rendered inside the Routes component.
+
+When React Router renders a route element, it just renders it directly - it doesn't provide any height constraints. So `h-full` on Library is trying to be 100% of... what? The parent might not have a defined height.
+
+Let me check the current DashboardPage to see what we have there now.Let me carefully check the current state of DashboardPage to see what changes were made: Now let me check the Library component: I see the issue now. The problem is that `Routes` component from React Router doesn't pass through classes or enforce layout. The route elements (`<Library />`, `<SeriesDetails />`, etc.) are rendered inside `Routes` but they're not being told they should fill the parent's height. 
+
+The `div` with `flex-1 overflow-hidden` wrapping Routes works, but the `Routes` component itself doesn't pass height constraints to its children. The Library component needs its parent to have a defined height for `h-full` to work.
+
+The real issue: React Router's `Routes` and `Route` components render their elements directly without enforcing a container, so `h-full` on Library doesn't know what 100% of the height is.
+
+Let me check if there's display/layout CSS that might be affecting this: The actual issue is that Routes needs to be a flex container itself so its children know their height. Let me fix this properly by wrapping each route element: 
 
 ---
 

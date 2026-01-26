@@ -85,17 +85,13 @@ const DashboardPage: React.FC<Props> = () => {
       }
     >
       <DashboardSidebar />
-      <div className="px-2 w-full h-full overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-hidden">
-          <Routes>
-            <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
-            <Route path={`${routes.SEARCH}/*`} element={<Search />} />
-            <Route path={`${routes.PLUGINS}/*`} element={<Plugins />} />
-            <Route path={`${routes.DOWNLOADS}/*`} element={<Downloads />} />
-            <Route path="*" element={<Library />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
+        <Route path={`${routes.SEARCH}/*`} element={<Search />} />
+        <Route path={`${routes.PLUGINS}/*`} element={<Plugins />} />
+        <Route path={`${routes.DOWNLOADS}/*`} element={<Downloads />} />
+        <Route path="*" element={<Library />} />
+      </Routes>
     </SidebarProvider>
   );
 };
