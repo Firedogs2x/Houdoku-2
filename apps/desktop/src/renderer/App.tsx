@@ -44,6 +44,7 @@ export default function App() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | undefined>(undefined);
   const [showUpdateAvailableDialog, setShowUpdateAvailableDialog] = useState(false);
   const [showUpdateDownloadedDialog, setShowUpdateDownloadedDialog] = useState(false);
+  const [showNoUpdateAvailableDialog, setShowNoUpdateAvailableDialog] = useState(false);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setCategoryList = useSetRecoilState(categoryListState);
   const setRunning = useSetRecoilState(runningState);
@@ -66,6 +67,7 @@ export default function App() {
           setShowUpdateAvailableDialog(true);
         },
         () => setShowUpdateDownloadedDialog(true),
+        () => setShowNoUpdateAvailableDialog(true),
       );
 
       // Give the downloader client access to the state modifiers
@@ -96,6 +98,15 @@ export default function App() {
       setLoading(false);
     }
   }, [loading]);
+
+  useEffect(() => {
+    if (showNoUpdateAvailableDialog) {
+      const timer = setTimeout(() => {
+        setShowNoUpdateAvailableDialog(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showNoUpdateAvailableDialog]);
 
   return (
     <>
@@ -139,6 +150,16 @@ export default function App() {
               Restart
             </AlertDialogAction>
           </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showNoUpdateAvailableDialog} onOpenChange={setShowNoUpdateAvailableDialog}>
+        <AlertDialogContent className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">
+              You are using the latest version of Houdoku software.
+            </AlertDialogTitle>
+          </AlertDialogHeader>
         </AlertDialogContent>
       </AlertDialog>
 

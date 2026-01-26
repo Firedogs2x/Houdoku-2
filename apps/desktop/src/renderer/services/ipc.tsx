@@ -50,6 +50,7 @@ export const loadStoredTrackerTokens = () => {
 export const createRendererIpcHandlers = (
   showUpdateAvailableDialog: (updateInfo: UpdateInfo) => void,
   showUpdateDownloadedDialog: () => void,
+  showNoUpdateAvailableDialog: () => void,
 ) => {
   console.debug('Creating renderer IPC handlers...');
 
@@ -78,5 +79,9 @@ export const createRendererIpcHandlers = (
 
   ipcRenderer.on(ipcChannels.APP.SHOW_RESTART_UPDATE_DIALOG, () => {
     showUpdateDownloadedDialog();
+  });
+
+  ipcRenderer.on(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG, () => {
+    showNoUpdateAvailableDialog();
   });
 };

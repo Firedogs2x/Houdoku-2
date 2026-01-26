@@ -21,11 +21,7 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
       .then((result: UpdateCheckResult) => {
         if (result.updateInfo.version === packageJson.version) {
           console.info(`Already up-to-date at version ${packageJson.version}`);
-          event.sender.send(
-            ipcChannels.APP.SEND_NOTIFICATION,
-            'Houdoku is up-to-date!',
-            'You are using the latest version.',
-          );
+          event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
           return;
         }
 
