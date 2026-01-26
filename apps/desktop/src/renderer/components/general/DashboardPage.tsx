@@ -78,6 +78,7 @@ const DashboardPage: React.FC<Props> = () => {
 
   return (
     <SidebarProvider
+      className="h-full"
       style={
         {
           '--sidebar-width': '200px',
@@ -85,7 +86,7 @@ const DashboardPage: React.FC<Props> = () => {
       }
     >
       <DashboardSidebar />
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 flex flex-col">
         <Routes>
           <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
           <Route path={`${routes.SEARCH}/*`} element={<Search />} />

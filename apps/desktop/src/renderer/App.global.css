@@ -112,7 +112,7 @@ body {
 }
 
 #root {
-  height: calc(100vh);
+  height: calc(100vh - 24px);
   overflow-y: auto;
 
   --titlebar-height: 24px;
