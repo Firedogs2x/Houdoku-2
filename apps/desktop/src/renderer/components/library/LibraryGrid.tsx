@@ -3,7 +3,9 @@ import path from 'path';
 import React, { useEffect } from 'react';
 const { ipcRenderer } = require('electron');
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
+// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Series = any;
+// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Chapter = any;
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';

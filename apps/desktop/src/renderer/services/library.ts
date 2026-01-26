@@ -67,7 +67,7 @@ const upsertSeries = (series: Series): Series => {
 
   // Merge existing series with incoming values so fields not supplied by the
   // caller (e.g. numberUnread) are preserved instead of being dropped.
-  let newSeries: Series = { ...(existing || {}), ...series, id: seriesId };
+  const newSeries: Series = { ...(existing || {}), ...series, id: seriesId };
 
   // Set lastReadDate to backfill date if still missing
   if (!newSeries.lastReadDate) {
