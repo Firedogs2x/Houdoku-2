@@ -687,3 +687,127 @@ The implementation uses the app's existing `AlertDialog` component (from Radix U
 
 ---
 
+_**User (2026-01-26 19:03Z)**_
+
+After starting up the program I did not see any type of message verifying that the Automatic update check had been performed.
+And even after I tried the manual update check I did not see any notification.
+Do a detail check of the software to fix this issue.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts)</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.tsx#1-1), lines 1 to 110</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.tsx#1-1), lines 1 to 110
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/services/ipc.tsx#1-1), lines 1 to 83</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/services/ipc.tsx#1-1), lines 1 to 83
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/services/ipc.tsx#75-75), lines 75 to 88</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/services/ipc.tsx#75-75), lines 75 to 88
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardSidebar.tsx#70-70), lines 70 to 100</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/general/DashboardSidebar.tsx#70-70), lines 70 to 100
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/constants/ipcChannels.json#1-1), lines 1 to 15</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/constants/ipcChannels.json#1-1), lines 1 to 15
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.tsx#130-130), lines 130 to 179</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/App.tsx#130-130), lines 130 to 179
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/index.ts#1-1), lines 1 to 60</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/index.ts#1-1), lines 1 to 60
+
+</details>
+</tool-use>
+
+---
+
+The user is saying that after starting up the program, there's no notification verifying that the automatic update check was performed. And even when they manually check for updates, they don't see a notification.
+
+Let me think about what could be going wrong:
+
+1. The automatic check might be running but not showing the notification
+2. The manual check might not be working
+3. The notification dialog might not be appearing
+
+I need to:
+1. Check the current state of all the files I modified
+2. Verify the flow is correct
+3. Check if there are any issues with the code
+
+Let me start by reading the current files to see what the user or a formatter may have changed.I'll do a detailed check of the update notification system to identify and fix the issue. Let me start by examining the current state of all the modified files. I found the issue! The `createRendererIpcHandlers` function in `ipc.tsx` is incomplete - it's missing the handler for the `SHOW_NO_UPDATE_AVAILABLE_DIALOG` channel. Let me check the complete file and see what's missing: Good, the IPC handler is there. Let me check the DashboardSidebar to see how the manual update check is triggered: Now let me check the `ipcChannels.json` to verify the channel name is correct: Now let me check the complete `App.tsx` to see if the dialog is properly rendered: The code looks correct. The issue is likely that there's an error occurring during the update check. Let me check the main process index to see if the updater handlers are being properly registered: 
+
+---
+

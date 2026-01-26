@@ -10,6 +10,7 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     console.debug('Handling check for updates request...');
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       console.info('Skipping update check because we are in dev environment');
+      event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
       return;
     }
 
@@ -31,7 +32,10 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
         event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
         return 4;
       })
-      .catch((e) => console.error(e));
+      .catch((e) => {
+        console.error(e);
+        event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
+      });
   });
 
   ipcMain.handle(ipcChannels.APP.PERFORM_UPDATE, (event) => {
