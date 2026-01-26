@@ -108,7 +108,7 @@ const Plugins: React.FC = () => {
     currentTiyoVersion && availableTiyoVersion && gt(currentTiyoVersion, availableTiyoVersion);
 
   return (
-    <div className="px-2 w-full h-full overflow-auto flex flex-col">
+    <div className="h-full overflow-auto flex flex-col">
       <PluginSettingsModal showing={showingSettingsModal} setShowing={setShowingSettingsModal} />
 
       <div className="flex justify-start py-2 space-x-2">

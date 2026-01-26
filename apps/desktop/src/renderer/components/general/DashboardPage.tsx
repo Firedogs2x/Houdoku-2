@@ -85,13 +85,15 @@ const DashboardPage: React.FC<Props> = () => {
       }
     >
       <DashboardSidebar />
-      <Routes>
-        <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
-        <Route path={`${routes.SEARCH}/*`} element={<Search />} />
-        <Route path={`${routes.PLUGINS}/*`} element={<Plugins />} />
-        <Route path={`${routes.DOWNLOADS}/*`} element={<Downloads />} />
-        <Route path="*" element={<Library />} />
-      </Routes>
+      <div className="flex-1 min-h-0">
+        <Routes>
+          <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
+          <Route path={`${routes.SEARCH}/*`} element={<Search />} />
+          <Route path={`${routes.PLUGINS}/*`} element={<Plugins />} />
+          <Route path={`${routes.DOWNLOADS}/*`} element={<Downloads />} />
+          <Route path="*" element={<Library />} />
+        </Routes>
+      </div>
     </SidebarProvider>
   );
 };
