@@ -4,7 +4,7 @@ import MyDownloads from './MyDownloads';
 
 const Downloads: React.FC = () => {
   return (
-    <div className="h-full overflow-auto flex flex-col">
+    <div className="h-full flex flex-col">
       <DownloadQueue />
       <div className="h-4" />
       <MyDownloads />

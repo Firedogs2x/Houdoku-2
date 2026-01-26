@@ -135,7 +135,7 @@ const SearchGrid: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScrollArea viewportRef={viewportRef} className="flex-1 w-full pr-4 -mr-2">
+      <ScrollArea viewportRef={viewportRef} className="flex-1 min-h-0 w-full pr-4 -mr-2">
         <div
           className={cn(
             libraryColumns === 2 && 'grid-cols-2',
