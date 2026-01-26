@@ -1252,3 +1252,59 @@ The fix has been verified and contains no TypeScript or compilation errors. The 
 
 ---
 
+_**User (2026-01-26 13:57Z)**_
+
+IContinuation of the Button clipping.
+This issue is still happening. 
+I started the program and everything looked fine.
+I clicked on a Series card and proceeded to read a chapter.
+When I returned to the All Series Page the buttons were being clipped again.
+Please look into this issue again for potential fixes.
+Do not modify the program beyond what is absolutely necessary.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/SeriesDetails.tsx#1-1), lines 1 to 100</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/SeriesDetails.tsx#1-1), lines 1 to 100
+
+</details>
+</tool-use>
+
+---
+
+The user is saying that the clipping issue is still occurring after navigating away from the Series page and returning to the library. This suggests the issue might be related to how the SeriesDetails page (the reader page) is affecting the layout when returning to the Library.
+
+Let me investigate:
+1. The user navigates to a Series card (SeriesDetails)
+2. Reads a chapter
+3. Returns to the All Series page (Library)
+4. The buttons are clipped again
+
+This suggests that when SeriesDetails is rendered, it might be affecting the parent container's layout in some way, and when they return, something isn't resetting properly.
+
+Let me think about the layout structure:
+- DashboardPage has a SidebarProvider with a div that has Routes
+- The Routes show either SeriesDetails or Library (or Search, etc.)
+
+The issue might be that SeriesDetails is taking a different approach to height/layout that's affecting the parent. Let me check the SeriesDetails component to see if it's using a different layout approach.
+
+Also, I notice in my previous fix I added `h-full` to the content div in DashboardPage. But the issue might be that when the component unmounts/remounts, the scroll or height calculations are being affected.
+
+Let me check:
+1. SeriesDetails layout
+2. How the parent handles route changes
+3. Whether there's any CSS that's being applied differently
+
+Actually, wait. The user said "Do not modify the program beyond what is absolutely necessary." This means I should be very careful and only fix what's absolutely needed.
+
+Let me investigate the actual problem first before making changes.I need to investigate this further. The clipping reappearing after navigating suggests there might be a layout issue when returning from SeriesDetails. Let me examine the SeriesDetails component and how the layout is affected: 
+
+---
+
