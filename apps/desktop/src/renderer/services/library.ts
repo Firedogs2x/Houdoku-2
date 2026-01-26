@@ -35,8 +35,8 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
   const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
 
-  // Backfill missing dateAdded with 01/09/2026 (ISO)
-  const CHAPTER_BACKFILL_DATE = '2026-01-09T00:00:00Z';
+  // Backfill missing dateAdded with current date (ISO)
+  const CHAPTER_BACKFILL_DATE = new Date().toISOString();
   let changed = false;
   chapters.forEach((c) => {
     if (!c.dateAdded) {
