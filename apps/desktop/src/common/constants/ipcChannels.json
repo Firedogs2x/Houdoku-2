@@ -8,6 +8,7 @@
     "SHOW_OPEN_DIALOG": "show-open-dialog",
     "SHOW_RESTART_UPDATE_DIALOG": "show-restart-update-dialog",
     "SHOW_PERFORM_UPDATE_DIALOG": "show-perform-update-dialog",
+    "SHOW_NO_UPDATE_AVAILABLE_DIALOG": "show-no-update-available-dialog",
     "READ_ENTIRE_FILE": "read-entire-file",
     "CREATE_OBJECT_URL": "create-object-url"
   },
