@@ -516,7 +516,7 @@ const ReaderPage: React.FC = () => {
       !readerChapter.read &&
       lastPageNumber > 0
     ) {
-      if (pageNumber >= Math.floor(0.8 * lastPageNumber)) {
+      if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
         markChapters(
           [readerChapter, ...languageChapterList],
           readerSeries,
