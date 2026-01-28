@@ -5,6 +5,7 @@ import { Series, SeriesStatus, LanguageKey } from '@tiyo/common';
 import { pathToFileURL } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import ipcChannels from '@/common/constants/ipcChannels.json';
+import constants from '@/common/constants/constants.json';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 
 interface SeriesAutoOptions {
@@ -118,7 +119,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
     async (_event, options: SeriesAutoOptions) => {
       console.info('Starting Series Auto scan...');
 
-      const { masterFolder, coverImageFolder, coverImageName, chapterFolder } = options;
+      const { masterFolder, coverImageFolder, coverImageName, chapterFolder, currentSeriesList } = options;
 
       if (!fs.existsSync(masterFolder)) {
         throw new Error(`Master folder does not exist: ${masterFolder}`);

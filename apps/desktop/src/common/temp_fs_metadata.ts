@@ -1,3 +1,4 @@
+// @ts-expect-error: @tiyo/common exports this type but TS cannot resolve it
 import { ExtensionMetadata } from '@tiyo/common';
 
 // TODO move this

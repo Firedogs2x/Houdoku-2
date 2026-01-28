@@ -1,3 +1,4 @@
+// @ts-expect-error: @tiyo/common exports these types but TS cannot resolve them
 import { LanguageKey, Series, SeriesStatus, SettingType } from '@tiyo/common';
 
 export type ExtensionTableRow = {
