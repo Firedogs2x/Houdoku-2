@@ -512,10 +512,11 @@ const ReaderPage: React.FC = () => {
   }, [offsetPages]);
 
   useEffect(() => {
-    // Mark the chapter as read ONLY when all pages have been viewed
-    // This ensures users must view every page in a chapter before it's marked as complete
+    // Mark the chapter as read when (total pages - 2) have been viewed
+    // This ensures users must view most pages before marking as complete, with 2-page tolerance
     // pageNumber is 1-indexed, lastPageNumber is the total page count
-    // Example: for a 20-page chapter, user must reach pageNumber >= 20 to mark as read
+    // Example: for a 33-page chapter, user must reach pageNumber >= 31 to mark as read (33-2)
+    // Example: for a 20-page chapter, user must reach pageNumber >= 18 to mark as read (20-2)
     if (
       readerSeries !== undefined &&
       readerChapter !== undefined &&
@@ -525,8 +526,10 @@ const ReaderPage: React.FC = () => {
       !(readerChapter as any).read &&
       lastPageNumber > 0
     ) {
-      // Require viewing 100% of pages (1.0 * lastPageNumber means all pages must be seen)
-      if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
+      // Require viewing (lastPageNumber - 2) pages before marking as read
+      // This allows users to skip the last 2 pages (typically back cover/end pages)
+      const requiredPages = Math.max(1, lastPageNumber - 2);
+      if (pageNumber >= requiredPages) {
         markChapters(
           [readerChapter, ...languageChapterList],
           readerSeries,

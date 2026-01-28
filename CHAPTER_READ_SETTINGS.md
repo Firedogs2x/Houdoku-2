@@ -6,12 +6,13 @@ This document explains how and when chapters are marked as "read" in Houdoku, in
 ## Current Behavior
 
 ### Automatic Mark as Read (Reader Page)
-When viewing a chapter in the reader, the chapter is **automatically marked as read** ONLY AFTER viewing all pages in the chapter.
+When viewing a chapter in the reader, the chapter is **automatically marked as read** after viewing (total pages - 2) pages in the chapter.
 
 **Key Points:**
-- User must view **every single page** before the chapter is marked as read
+- User must view **at least (total pages - 2)** before the chapter is marked as read
+- This allows users to skip the final 2 pages (typically back cover/end pages)
 - The check happens continuously as the user navigates through pages
-- Once the last page is reached, the chapter is immediately marked as read
+- Once the required threshold is reached, the chapter is immediately marked as read
 - This applies to single chapters and language variants of the same chapter
 
 **Location:** [`apps/desktop/src/renderer/components/reader/ReaderPage.tsx`](apps/desktop/src/renderer/components/reader/ReaderPage.tsx#L512-L540)
@@ -20,25 +21,32 @@ When viewing a chapter in the reader, the chapter is **automatically marked as r
 
 #### Page Threshold Logic
 ```typescript
-// Line 525: Require viewing 100% of pages before marking as read
-if (pageNumber >= Math.floor(1.0 * lastPageNumber))
+// Require viewing (lastPageNumber - 2) pages before marking as read
+// This allows skipping the last 2 pages (typically back cover/end pages)
+const requiredPages = Math.max(1, lastPageNumber - 2);
+if (pageNumber >= requiredPages) {
+  markChapters([readerChapter, ...languageChapterList], ...);
+}
 ```
 
 **Explanation:**
 - `pageNumber`: Current page being viewed (1-indexed, starts at 1)
 - `lastPageNumber`: Total number of pages in the chapter
-- The multiplier `1.0` means **100%** of pages must be viewed
-- When `pageNumber >= lastPageNumber`, the chapter is marked as read
+- `requiredPages`: Calculated as `lastPageNumber - 2` (with minimum of 1 page)
+- When `pageNumber >= requiredPages`, the chapter is marked as read
 
 **Example:**
-- Chapter with 20 pages
-- User must reach `pageNumber >= 20` to trigger the mark-as-read logic
-- This ensures the user has viewed the final page
+- Chapter with 33 pages
+- User must reach `pageNumber >= 31` to trigger the mark-as-read logic (33-2=31)
+- This means the user can skip the final 2 pages and still mark the chapter as read
+- Chapter with 3 pages: User must reach pageNumber >= 1 (minimum, so all 3 pages still viewable)
+- Chapter with 20 pages: User must reach pageNumber >= 18 to mark as read (20-2=18)
 
 #### Related Code Block
 ```typescript
 useEffect(() => {
-  // Mark the chapter as read ONLY when all pages have been viewed
+  // Mark the chapter as read when (total pages - 2) have been viewed
+  // This allows users to skip the final 2 pages (typically back cover/end pages)
   if (
     readerSeries !== undefined &&
     readerChapter !== undefined &&
@@ -48,8 +56,9 @@ useEffect(() => {
     !(readerChapter as any).read &&  // Only if not already marked as read
     lastPageNumber > 0
   ) {
-    // Require viewing 100% of pages (1.0 * lastPageNumber)
-    if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
+    // Require viewing (lastPageNumber - 2) pages before marking as read
+    const requiredPages = Math.max(1, lastPageNumber - 2);
+    if (pageNumber >= requiredPages) {
       // Mark chapter and all language variants as read
       markChapters([readerChapter, ...languageChapterList], ...);
       // Update series unread count and last read date

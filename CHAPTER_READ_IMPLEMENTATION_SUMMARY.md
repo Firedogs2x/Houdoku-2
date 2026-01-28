@@ -1,25 +1,27 @@
-# Chapter Read Settings - Thorough Analysis & Implementation
+# Chapter Read Settings - Implementation Update
 
 **Date:** 2026-01-28
-**Task:** Verify and ensure all pages must be viewed before a chapter is marked as read
+**Task:** Fix chapter read marking to require (total pages - 2) instead of all pages
 
 ## Summary
 
 After a thorough investigation of the Houdoku manga reader codebase, I have:
 
-1. ✅ **Verified the current implementation** - Confirmed that chapters ARE marked as read ONLY when all pages have been viewed
-2. ✅ **Enhanced the code documentation** - Added clear, comprehensive comments explaining the page threshold logic
-3. ✅ **Created detailed settings documentation** - Generated `CHAPTER_READ_SETTINGS.md` with complete technical details
+1. ✅ **Identified and fixed the issue** - Changed the page threshold from 100% to (x-2) pages
+2. ✅ **Updated code implementation** - Modified `ReaderPage.tsx` to use the correct formula
+3. ✅ **Updated documentation** - Regenerated `CHAPTER_READ_SETTINGS.md` with the new behavior
 
 ## Key Findings
 
-### Current Implementation is Correct ✅
+### Updated Implementation ✅
 
-The chapter read logic in `ReaderPage.tsx` (lines 512-540) correctly implements the "all pages required" behavior:
+The chapter read logic in `ReaderPage.tsx` (lines 512-540) has been corrected to implement the "(total pages - 2) required" behavior:
 
 ```typescript
-// Require viewing 100% of pages (1.0 * lastPageNumber means all pages must be seen)
-if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
+// Require viewing (lastPageNumber - 2) pages before marking as read
+// This allows users to skip the final 2 pages (typically back cover/end pages)
+const requiredPages = Math.max(1, lastPageNumber - 2);
+if (pageNumber >= requiredPages) {
   // Mark chapter as read
   markChapters([readerChapter, ...languageChapterList], ...);
 }
@@ -28,56 +30,50 @@ if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
 **How it works:**
 - `pageNumber`: Current page being viewed (1-indexed, starts at 1)
 - `lastPageNumber`: Total number of pages in the chapter
-- The multiplier `1.0` represents 100% of pages
-- The condition `pageNumber >= Math.floor(1.0 * lastPageNumber)` ensures the user has reached the final page
+- `requiredPages`: Calculated as `lastPageNumber - 2` (minimum 1 page for very small chapters)
+- The condition `pageNumber >= requiredPages` ensures the threshold is met
 
 **Example:**
-- 20-page chapter: User must reach pageNumber ≥ 20 to mark as read
-- 50-page chapter: User must reach pageNumber ≥ 50 to mark as read
+- 33-page chapter: User must reach pageNumber ≥ 31 to mark as read (33-2=31)
+- 20-page chapter: User must reach pageNumber ≥ 18 to mark as read (20-2=18)
+- 3-page chapter: User must reach pageNumber ≥ 1 to mark as read (minimum threshold)
 
-### Why It's Working Correctly
+### Why This Fix Was Needed
 
-The formula `Math.floor(1.0 * lastPageNumber)` is mathematically equivalent to `lastPageNumber` for integer values:
-- `Math.floor(1.0 * 20) = Math.floor(20.0) = 20`
-- `Math.floor(1.0 * 50) = Math.floor(50.0) = 50`
-
-This ensures that the last page is the threshold for marking as read, meaning ALL pages must be viewed first.
+Users were able to skip the final 2 pages and still fully complete a chapter, which should be the intended behavior for skipping back covers and end pages. The previous implementation required viewing all pages including the final page, which was too strict.
 
 ## Changes Made
 
-### 1. Code Documentation Enhancement
-**File:** [`apps/desktop/src/renderer/components/reader/ReaderPage.tsx`](apps/desktop/src/renderer/components/reader/ReaderPage.tsx#L514-L530)
+### 1. Code Implementation Fix
+**File:** [`apps/desktop/src/renderer/components/reader/ReaderPage.tsx`](apps/desktop/src/renderer/components/reader/ReaderPage.tsx#L514-L532)
 
 **Changes:**
-- Replaced generic comment "mark the chapter as read if past a certain page threshold" with detailed explanation
-- Added multiple clarifying comments explaining the page indexing and percentage requirement
-- Included a concrete example showing what "all pages" means
-- Documented the 1.0 multiplier as representing 100% of pages
+- Changed page threshold formula from `Math.floor(1.0 * lastPageNumber)` to `Math.max(1, lastPageNumber - 2)`
+- Updated comments to clearly explain the (x-2) requirement
+- Added detailed examples showing the new behavior
+- Ensured minimum threshold of 1 page for very small chapters
 
 **Before:**
 ```typescript
-// mark the chapter as read if past a certain page threshold
-```
-
-**After:**
-```typescript
-// Mark the chapter as read ONLY when all pages have been viewed
-// This ensures users must view every page in a chapter before it's marked as complete
-// pageNumber is 1-indexed, lastPageNumber is the total page count
-// Example: for a 20-page chapter, user must reach pageNumber >= 20 to mark as read
-
-// ... condition check ...
-
 // Require viewing 100% of pages (1.0 * lastPageNumber means all pages must be seen)
 if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
 ```
 
-### 2. Comprehensive Documentation File
+**After:**
+```typescript
+// Require viewing (lastPageNumber - 2) pages before marking as read
+// This allows users to skip the final 2 pages (typically back cover/end pages)
+const requiredPages = Math.max(1, lastPageNumber - 2);
+if (pageNumber >= requiredPages) {
+```
+
+### 2. Documentation File Updates
 **File:** [`CHAPTER_READ_SETTINGS.md`](CHAPTER_READ_SETTINGS.md)
 
 **Contents:**
-- Overview of automatic and manual mark-as-read behavior
-- Detailed implementation explanation with code examples
+- Updated overview of automatic mark-as-read behavior to reflect (x-2) requirement
+- Changed implementation explanation with updated code examples
+````
 - How chapters are persisted to storage
 - Language variant handling explanation
 - User-facing settings (and lack thereof)

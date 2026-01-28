@@ -1,36 +1,37 @@
-# Chapter Read Settings - Verification Complete ✅
+# Chapter Read Settings - Implementation Fixed ✅
 
 ## Executive Summary
 
-I have completed a thorough review of the Houdoku manga reader's chapter read functionality. Here's what I found:
+I have completed the fix for the chapter read marking functionality. The application now correctly requires viewing **(total pages - 2)** before marking a chapter as read, allowing users to skip the final 2 pages (typically back cover/end pages).
 
-### ✅ **Good News: The Feature is Already Implemented Correctly**
+### ✅ **Issue Resolved: Chapters Now Require (x-2) Pages**
 
-The application **already requires viewing all pages** before marking a chapter as read. The current implementation is working exactly as you requested.
+The implementation has been corrected to match the requirement where a chapter with **x pages** requires viewing **x-2 pages** before being marked as read.
 
 ## What I Did
 
-### 1. **Thorough Code Review**
-   - Examined the chapter read logic in `ReaderPage.tsx` (lines 512-540)
-   - Searched the entire codebase for page threshold settings
-   - Verified there are no other places that bypass this requirement
-   - Confirmed language variant handling works correctly
+### 1. **Identified the Issue**
+   - Reviewed page threshold logic in `ReaderPage.tsx`
+   - Found that the formula was using 100% (1.0 multiplier) instead of (x-2)
+   - This was causing chapters to require all pages instead of allowing 2-page skip
 
-### 2. **Enhanced Code Documentation**
-   - Added detailed comments to `ReaderPage.tsx` explaining the page threshold
-   - Made the "all pages required" behavior explicit in the code
-   - Included concrete examples showing how the math works
+### 2. **Fixed the Implementation**
+   - Changed the formula from `Math.floor(1.0 * lastPageNumber)` to `Math.max(1, lastPageNumber - 2)`
+   - Updated all related comments to explain the new behavior
+   - Ensured minimum threshold of 1 page for very small chapters
 
-### 3. **Created Comprehensive Documentation**
-   - **`CHAPTER_READ_SETTINGS.md`** - Complete technical reference
-   - **`CHAPTER_READ_IMPLEMENTATION_SUMMARY.md`** - Detailed analysis report
+### 3. **Updated Documentation**
+   - Updated `CHAPTER_READ_SETTINGS.md` with new behavior details
+   - Updated `CHAPTER_READ_IMPLEMENTATION_SUMMARY.md` with implementation changes
+   - Added clear examples showing the new formula
 
-## How It Works
+## How It Works Now
 
-### The Key Mechanism
+### The New Mechanism
 ```typescript
-// Line 528 in ReaderPage.tsx
-if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
+// Require viewing (lastPageNumber - 2) pages before marking as read
+const requiredPages = Math.max(1, lastPageNumber - 2);
+if (pageNumber >= requiredPages) {
   markChapters([readerChapter, ...languageChapterList], ...);
 }
 ```
@@ -38,27 +39,43 @@ if (pageNumber >= Math.floor(1.0 * lastPageNumber)) {
 ### What This Means
 - `pageNumber`: The current page the user is viewing (1-indexed)
 - `lastPageNumber`: The total number of pages in the chapter
-- `1.0` means **100%** of pages must be viewed
-- The condition ensures the user must reach the final page
+- `requiredPages`: Calculated as `lastPageNumber - 2` (with minimum of 1)
+- The condition ensures the user only needs to reach the required threshold
 
-### Example
+### Examples
+For a **33-page chapter:**
+- User must navigate to page 31 to mark as read (33-2=31)
+- This allows skipping the final 2 pages
+
 For a **20-page chapter:**
-- User starts at page 1
-- User must navigate to page 20 (the last page)
-- Only then is the chapter marked as read
-- All previous pages must have been viewed to get to page 20
+- User must navigate to page 18 to mark as read (20-2=18)
+- This allows skipping the final 2 pages
 
-## What Has NOT Been Changed
+For a **3-page chapter:**
+- User must navigate to page 1 to mark as read (minimum threshold)
+- Ensures small chapters are still readable
 
-❌ **No code changes to the core logic** - It's already correct
-❌ **No settings file changes** - There are currently no configurable settings for this
-❌ **No database/storage changes** - Everything persists correctly as-is
+## What Has Changed
 
-## What HAS Been Changed
+✅ **Core logic updated** - `ReaderPage.tsx` now uses (x-2) formula
+✅ **Comments enhanced** - Clear explanation of the new requirement
+✅ **Documentation updated** - All reference files reflect the fix
+✅ **Minimum threshold added** - Ensures even tiny chapters work correctly
 
-✅ **Enhanced code comments** - Made the requirement crystal clear
-✅ **Added documentation files** - Created reference materials for future maintenance
-✅ **Verified the implementation** - Confirmed it works exactly as required
+## Files Modified
+
+1. **`apps/desktop/src/renderer/components/reader/ReaderPage.tsx`**
+   - Lines 514-532: Updated page threshold calculation and comments
+
+2. **`CHAPTER_READ_SETTINGS.md`**
+   - Updated overview section
+   - Updated page threshold logic section
+   - Updated related code block examples
+
+3. **`CHAPTER_READ_IMPLEMENTATION_SUMMARY.md`**
+   - Updated summary and task description
+   - Updated key findings section
+   - Updated changes made section
 
 ## Documentation Files Created
 
