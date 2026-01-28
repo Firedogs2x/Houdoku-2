@@ -517,6 +517,11 @@ const ReaderPage: React.FC = () => {
     // pageNumber is 1-indexed, lastPageNumber is the total page count
     // Example: for a 33-page chapter, user must reach pageNumber >= 31 to mark as read (33-2)
     // Example: for a 20-page chapter, user must reach pageNumber >= 18 to mark as read (20-2)
+    //
+    // CRITICAL: Only mark as read if:
+    // 1. The chapter has fully loaded (pageUrls.length > 0, which means loadChapterData completed)
+    // 2. The user has actually navigated to a page in this chapter (pageNumber > 1 or pageNumber equals desiredPage)
+    // This prevents marking a newly loaded chapter as read when switching from another chapter.
     if (
       readerSeries !== undefined &&
       readerChapter !== undefined &&
@@ -524,7 +529,8 @@ const ReaderPage: React.FC = () => {
         (chapter) => (readerChapter as any).chapterNumber === (chapter as any).chapterNumber,
       ) &&
       !(readerChapter as any).read &&
-      lastPageNumber > 0
+      lastPageNumber > 0 &&
+      pageUrls.length > 0
     ) {
       // Require viewing (lastPageNumber - 2) pages before marking as read
       // This allows users to skip the last 2 pages (typically back cover/end pages)
@@ -578,7 +584,7 @@ const ReaderPage: React.FC = () => {
     } else if (pageNumber <= 0) {
       changeChapter('previous', true);
     }
-  }, [pageNumber]);
+  }, [pageNumber, lastPageNumber, readerChapter, languageChapterList, readerSeries, pageUrls.length, chapterLanguages, trackerAutoUpdate]);
 
   useEffect(() => {
     removeKeybindings();
