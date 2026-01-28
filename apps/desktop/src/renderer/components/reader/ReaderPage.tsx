@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* @ts-nocheck: @tiyo/common types cannot be resolved by TS Language Server despite being exported.
    All property accesses are valid at runtime; this file works correctly despite LS errors. */
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Mousetrap from 'mousetrap';
 const { ipcRenderer } = require('electron');
@@ -95,6 +95,9 @@ const ReaderPage: React.FC = () => {
   const keyToggleFullscreen = useRecoilValue(settingStates.keyToggleFullscreenState);
   const keyExit = useRecoilValue(settingStates.keyExitState);
   const keyCloseOrBack = useRecoilValue(settingStates.keyCloseOrBackState);
+
+  // Track the chapter ID that was just loaded to prevent immediate mark-as-read
+  const lastLoadedChapterIdRef = useRef<string | null>(null);
 
   /**
    * Populate the relevantChapterList prop.
@@ -217,6 +220,10 @@ const ReaderPage: React.FC = () => {
 
     setReaderSeries(series);
     setReaderChapter(chapter);
+    
+    // Mark this chapter as freshly loaded to prevent immediate mark-as-read
+    lastLoadedChapterIdRef.current = chapterId;
+    
     setTitlebarText(
       `${(series as any).title} - ${
         (chapter as any).chapterNumber ? `Chapter ${(chapter as any).chapterNumber}` : 'Unknown Chapter'
@@ -520,8 +527,21 @@ const ReaderPage: React.FC = () => {
     //
     // CRITICAL: Only mark as read if:
     // 1. The chapter has fully loaded (pageUrls.length > 0, which means loadChapterData completed)
-    // 2. The user has actually navigated to a page in this chapter (pageNumber > 1 or pageNumber equals desiredPage)
+    // 2. The pageNumber matches the lastPageNumber context (prevents marking during chapter switch)
+    // 3. The user has actually navigated in this chapter (not freshly loaded)
     // This prevents marking a newly loaded chapter as read when switching from another chapter.
+    
+    const currentChapterId = (readerChapter as any)?.id;
+    
+    // Clear the "freshly loaded" flag if user has navigated away from page 1
+    // or if they've explicitly reached a high page number
+    if (currentChapterId && lastLoadedChapterIdRef.current === currentChapterId) {
+      if (pageNumber > 1) {
+        console.log(`[ReaderPage] User navigated to page ${pageNumber}, clearing fresh load flag for chapter ${currentChapterId}`);
+        lastLoadedChapterIdRef.current = null;
+      }
+    }
+    
     if (
       readerSeries !== undefined &&
       readerChapter !== undefined &&
@@ -530,12 +550,19 @@ const ReaderPage: React.FC = () => {
       ) &&
       !(readerChapter as any).read &&
       lastPageNumber > 0 &&
-      pageUrls.length > 0
+      pageUrls.length > 0 &&
+      pageUrls.length === lastPageNumber &&
+      // CRITICAL: Don't mark as read if this chapter was just loaded and user is still on page 1
+      lastLoadedChapterIdRef.current !== currentChapterId
     ) {
       // Require viewing (lastPageNumber - 2) pages before marking as read
       // This allows users to skip the last 2 pages (typically back cover/end pages)
       const requiredPages = Math.max(1, lastPageNumber - 2);
-      if (pageNumber >= requiredPages) {
+      
+      // Allow marking as read when user goes slightly past the last page (for page boundary navigation)
+      // but ensure it's not too far past (to prevent stale pageNumber from previous chapter)
+      if (pageNumber >= requiredPages && pageNumber <= lastPageNumber + 1) {
+        console.log(`[ReaderPage] Marking chapter as read: pageNumber=${pageNumber}, requiredPages=${requiredPages}, lastPageNumber=${lastPageNumber}, chapterId=${currentChapterId}`);
         markChapters(
           [readerChapter, ...languageChapterList],
           readerSeries,
