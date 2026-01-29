@@ -89,8 +89,7 @@
   "overrides": [
     {
       "include": [
-        "**/ReaderPage.tsx",
-        "**/downloader.ts"
+        "**/ReaderPage.tsx"
       ],
       "linter": {
         "rules": {
