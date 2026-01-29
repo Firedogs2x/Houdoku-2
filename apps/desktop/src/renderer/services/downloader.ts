@@ -1,8 +1,5 @@
-/* @ts-nocheck: @tiyo/common types cannot be resolved by TS Language Server despite being exported.
-   All property accesses are valid at runtime; this file works correctly despite LS errors. */
 const fs = require('fs');
 const { ipcRenderer } = require('electron');
-// @ts-expect-error: @tiyo/common exports these types but TS cannot resolve them
 import { Chapter, PageRequesterData, Series } from '@tiyo/common';
 import path from 'path';
 import { toast } from '@houdoku/ui/hooks/use-toast';
@@ -31,7 +28,7 @@ const showDownloadNotification = (
 
   const queueStr = queueSize && queueSize > 0 ? ` (${queueSize} downloads queued)` : '';
   update({
-    title: `Downloading ${task.series.title} chapter ${(task.chapter as any).chapterNumber}`,
+    title: `Downloading ${task.series.title} chapter ${task.chapter.chapterNumber}`,
     description: `Page ${task.page || 0}/${task.totalPages || '??'}${queueStr}`,
     duration: 900000,
   });
@@ -131,7 +128,7 @@ class DownloaderClient {
           ipcChannels.EXTENSION.GET_PAGE_REQUESTER_DATA,
           task.series.extensionId,
           task.series.sourceId,
-          (task.chapter as any).sourceId,
+          task.chapter.sourceId,
         )
         .then((pageRequesterData: PageRequesterData) =>
           ipcRenderer.invoke(
@@ -154,7 +151,7 @@ class DownloaderClient {
         break;
       }
 
-      console.debug(`Downloading pages for chapter ${(task.chapter as any).id} of series ${task.series.id}`);
+      console.debug(`Downloading pages for chapter ${task.chapter.id} of series ${task.series.id}`);
 
       const startPage = task.page === undefined ? 1 : task.page;
       console.debug(`Starting download at page ${startPage}`);
@@ -175,7 +172,7 @@ class DownloaderClient {
                 .then(async (response) => response.arrayBuffer())
                 .catch((err) => {
                   update({
-                    title: `Failed to download ${task.series.title} chapter ${(task.chapter as any).chapterNumber}`,
+                    title: `Failed to download ${task.series.title} chapter ${task.chapter.chapterNumber}`,
                     description: `Error: ${err.message}`,
                     duration: 5000,
                   });
@@ -210,7 +207,7 @@ class DownloaderClient {
 
     if (this.running) {
       update({
-        title: `Downloaded ${this.currentTask?.series.title} chapter ${(this.currentTask?.chapter as any)?.chapterNumber}`,
+        title: `Downloaded ${this.currentTask?.series.title} chapter ${this.currentTask?.chapter.chapterNumber}`,
         description: startingQueueSize > 1 ? `Downloaded ${tasksCompleted} chapters` : '',
         duration: 5000,
       });
@@ -232,7 +229,7 @@ class DownloaderClient {
 
   add = (tasks: DownloadTask[]) => {
     const filteredTasks = tasks.filter(
-      (task) => !this.queue.some((existingTask) => (existingTask.chapter as any).id === (task.chapter as any).id),
+      (task) => !this.queue.some((existingTask) => existingTask.chapter.id === task.chapter.id),
     );
 
     this.setQueue([...this.queue, ...filteredTasks]);
