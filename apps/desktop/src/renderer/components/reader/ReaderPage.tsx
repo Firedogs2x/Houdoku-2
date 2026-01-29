@@ -534,9 +534,9 @@ const ReaderPage: React.FC = () => {
     const currentChapterId = (readerChapter as any)?.id;
     
     // Clear the "freshly loaded" flag if user has navigated away from page 1
-    // or if they've explicitly reached a high page number
+    // ONLY clear if page data is fully loaded to ensure user actually navigated
     if (currentChapterId && lastLoadedChapterIdRef.current === currentChapterId) {
-      if (pageNumber > 1) {
+      if (pageNumber > 1 && pageUrls.length > 0 && lastPageNumber > 0) {
         console.log(`[ReaderPage] User navigated to page ${pageNumber}, clearing fresh load flag for chapter ${currentChapterId}`);
         lastLoadedChapterIdRef.current = null;
       }
