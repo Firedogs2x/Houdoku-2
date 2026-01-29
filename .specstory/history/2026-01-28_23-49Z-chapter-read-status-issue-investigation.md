@@ -982,3 +982,88 @@ The fix is minimal - I only added two additional conditions to the existing chec
 
 ---
 
+_**User (2026-01-29 02:13Z)**_
+
+The same issue still continues. Again, look into both the tracking of what page is being read and what process happens when a chapter is marked as read.
+Any changes made should only effect those two processes unless it is found that something else if part of the issue.
+Must not cause issues with the lint build and release build.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/reader/ReaderPage.tsx#520-520), lines 520 to 570</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/reader/ReaderPage.tsx#520-520), lines 520 to 570
+
+</details>
+</tool-use>
+
+---
+
+The user is saying the issue still persists. They want me to look at:
+1. The tracking of what page is being read
+2. What process happens when a chapter is marked as read
+
+And they want minimal changes that only affect those two processes.
+
+Let me think about this more carefully. The user said:
+- "after I have viewed all of the pages in one chapter and I click on the last page which opens the next chapter, that new chapter that just opened is now marked as read"
+
+The issue is that when switching chapters, the NEW chapter is being marked as read immediately.
+
+Let me trace through the actual flow more carefully:
+
+1. User is on page 33 of a 33-page chapter
+2. User clicks next → pageNumber becomes 34
+3. useEffect runs with pageNumber=34, lastPageNumber=33
+4. The mark-as-read check passes for the OLD chapter (34 >= 31) → Old chapter marked as read
+5. The boundary check `pageNumber > lastPageNumber` triggers changeChapter('next', true)
+6. changeChapter calls setChapter(newChapterId, 1)
+7. setChapter calls:
+   - setPageNumber(1)
+   - setPageUrls([])
+   - setLastPageNumber(0)
+   - loadChapterData(newChapterId, seriesId, 1)
+8. React batches these state updates
+9. useEffect runs again with pageNumber=1, pageUrls=[], lastPageNumber=0, but readerChapter might still be the OLD chapter or transitioning
+10. The flag check prevents marking because pageUrls is empty
+11. loadChapterData eventually completes and:
+    - Sets readerChapter to new chapter
+    - Sets pageUrls to array
+    - Sets lastPageNumber to new count
+
+The issue might be that when loadChapterData completes, it's setting readerChapter BEFORE pageUrls and lastPageNumber are set. Let me check the order of operations in loadChapterData.
+
+
+Actually, I should reconsider the pageNumber tracking itself. When switching chapters, maybe pageNumber isn't resetting properly or there's a timing issue where the old pageNumber value persists. What if the new chapter loads while pageNumber still holds a high value from the previous chapter, and then the mark-as-read logic fires because it sees pageNumber=31 against the new chapter's lastPageNumber, triggering the read condition?
+
+The guards like pageUrls.length === lastPageNumber and lastLoadedChapterIdRef should block this, but there could be a race condition where these checks pass momentarily. More likely, there's an async timing problem: setChapter calls setPageNumber(1) synchronously, but loadChapterData is async, so React might re-render with the new pageNumber before the chapter data finishes loading, creating a window where the marking logic could execute incorrectly.
+
+Looking at the actual flow in loadChapterData—it sets the page URLs and last page number, then conditionally calls setPageNumber again if desiredPage exists. Since desiredPage=1 is truthy, setPageNumber gets called twice in quick succession. The core issue the user reported is that newly opened chapters are immediately marked as read, which suggests the marking logic is triggering when it shouldn't.
+
+I need to examine the state management more carefully. The readerChapter, pageNumber, lastPageNumber, and pageUrls are all Recoil states, so there's potential for stale values to persist across chapter transitions. The marking should only happen when the chapter data is fully loaded, the current pageNumber actually belongs to the new chapter rather than carrying over from the previous one, and the user has genuinely navigated to that page. The lastLoadedChapterIdRef helps but doesn't fully solve it—pageNumber itself might be outdated when the new chapter loads.
+
+A better approach would be resetting pageNumber to 1 when switching chapters and only marking as read if pageNumber exceeds 1 AND the chapter data is completely loaded. But looking back at the original issue, there seem to be two separate problems: chapters marked as read too early (at page 20 of 33) and new chapters immediately marked as read upon opening. The first suggests the completion formula or lastPageNumber calculation is incorrect, while the second points to a timing issue with state initialization.
+
+Since the user is now focused on the second problem, I should prevent marking chapters as read until actual navigation occurs. The ref-based approach might not be working due to timing. Another angle: what if the issue is that pageNumber or pageUrls are in a transitional state when the chapter loads? Or perhaps I need to clear pageNumber when switching chapters to prevent stale values from triggering the read status. The user mentioned clicking on the last page specifically, which opens the next chapter—so they're not scrolling past the final page, but rather clicking a link that transitions to the new chapter. This means the flow involves a page click that simultaneously loads the next chapter.
+
+At that moment, the old chapter should be marked as read since the page number would meet the threshold. But if the new chapter is being marked as read instead, maybe the auto-navigation happens before the ref updates, or the guard checking the read status is failing somehow.
+
+The ref guard seems critical here—it should prevent marking a chapter as read until the flag is cleared. But the flag clearing happens at the start of the effect, before the marking logic runs. So if pageNumber exceeds the threshold right after navigation, the new chapter could get marked immediately if the ref hasn't been properly set or compared.
+
+The real issue is the order of operations: clearing the flag before checking it means the guard condition will always pass on subsequent renders. The fix is to reverse this—check whether the chapter has already been marked before clearing the flag, or clear it only after the marking logic completes.Let me take a more systematic approach. I need to understand the exact sequence of events when a chapter switches and why the new chapter gets marked as read. I see the issue now! Look at the logic:
+
+1. Lines 539-545: The flag is **cleared** if user navigated
+2. Lines 555: Then we check `lastLoadedChapterIdRef.current !== currentChapterId`
+
+But here's the bug: **If the flag was just cleared on line 544, then `lastLoadedChapterIdRef.current` is now `null`, and `currentChapterId` is the new chapter ID, so `null !== newChapterId` is TRUE, allowing the marking to proceed!**
+
+The fix is to check the flag status BEFORE clearing it. Let me reorder the logic: 
+
+---
+

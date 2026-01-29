@@ -524,24 +524,11 @@ const ReaderPage: React.FC = () => {
     // pageNumber is 1-indexed, lastPageNumber is the total page count
     // Example: for a 33-page chapter, user must reach pageNumber >= 31 to mark as read (33-2)
     // Example: for a 20-page chapter, user must reach pageNumber >= 18 to mark as read (20-2)
-    //
-    // CRITICAL: Only mark as read if:
-    // 1. The chapter has fully loaded (pageUrls.length > 0, which means loadChapterData completed)
-    // 2. The pageNumber matches the lastPageNumber context (prevents marking during chapter switch)
-    // 3. The user has actually navigated in this chapter (not freshly loaded)
-    // This prevents marking a newly loaded chapter as read when switching from another chapter.
     
     const currentChapterId = (readerChapter as any)?.id;
+    const isFreshlyLoaded = lastLoadedChapterIdRef.current === currentChapterId;
     
-    // Clear the "freshly loaded" flag if user has navigated away from page 1
-    // ONLY clear if page data is fully loaded to ensure user actually navigated
-    if (currentChapterId && lastLoadedChapterIdRef.current === currentChapterId) {
-      if (pageNumber > 1 && pageUrls.length > 0 && lastPageNumber > 0) {
-        console.log(`[ReaderPage] User navigated to page ${pageNumber}, clearing fresh load flag for chapter ${currentChapterId}`);
-        lastLoadedChapterIdRef.current = null;
-      }
-    }
-    
+    // Check if chapter should be marked as read (do this BEFORE clearing the flag)
     if (
       readerSeries !== undefined &&
       readerChapter !== undefined &&
@@ -552,17 +539,13 @@ const ReaderPage: React.FC = () => {
       lastPageNumber > 0 &&
       pageUrls.length > 0 &&
       pageUrls.length === lastPageNumber &&
-      // CRITICAL: Don't mark as read if this chapter was just loaded and user is still on page 1
-      lastLoadedChapterIdRef.current !== currentChapterId
+      !isFreshlyLoaded
     ) {
       // Require viewing (lastPageNumber - 2) pages before marking as read
       // This allows users to skip the last 2 pages (typically back cover/end pages)
       const requiredPages = Math.max(1, lastPageNumber - 2);
       
-      // Allow marking as read when user goes slightly past the last page (for page boundary navigation)
-      // but ensure it's not too far past (to prevent stale pageNumber from previous chapter)
       if (pageNumber >= requiredPages && pageNumber <= lastPageNumber + 1) {
-        console.log(`[ReaderPage] Marking chapter as read: pageNumber=${pageNumber}, requiredPages=${requiredPages}, lastPageNumber=${lastPageNumber}, chapterId=${currentChapterId}`);
         markChapters(
           [readerChapter, ...languageChapterList],
           readerSeries,
@@ -599,6 +582,12 @@ const ReaderPage: React.FC = () => {
 
         if (trackerAutoUpdate) sendProgressToTrackers(readerChapter, readerSeries);
       }
+    }
+    
+    // Clear the "freshly loaded" flag AFTER the marking check
+    // Only clear if user has navigated away from page 1 with full data loaded
+    if (isFreshlyLoaded && pageNumber > 1 && pageUrls.length > 0 && lastPageNumber > 0) {
+      lastLoadedChapterIdRef.current = null;
     }
 
     // if we go past the last page or before the first page, change the chapter
