@@ -304,6 +304,13 @@ const ReaderPage: React.FC = () => {
    * @param id the chapter id
    */
   const setChapter = (id: string, desiredPage?: number) => {
+    // Reset scroll position to prevent stale scroll position from being used
+    // when calculating visible page in the new chapter
+    const root = document.getElementById('root');
+    if (root) {
+      root.scrollTop = 0;
+    }
+
     // Clear page data before loading new chapter
     // Note: We set lastPageNumber to 0 FIRST to signal that data is being loaded
     // This prevents stale state from affecting the mark-as-read logic
