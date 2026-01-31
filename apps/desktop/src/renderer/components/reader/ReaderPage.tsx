@@ -197,7 +197,9 @@ const ReaderPage: React.FC = () => {
 
     setPageUrls(newPageUrls);
     setLastPageNumber(newPageUrls.length);
-    if (desiredPage) setPageNumber(Math.min(newPageUrls.length, desiredPage));
+    const resolvedPage = desiredPage ?? 1;
+    const clampedPage = Math.min(newPageUrls.length || 1, resolvedPage);
+    setPageNumber(clampedPage);
   };
 
   /**
@@ -266,7 +268,9 @@ const ReaderPage: React.FC = () => {
 
     setPageUrls(newPageUrls);
     setLastPageNumber(newPageUrls.length);
-    if (desiredPage) setPageNumber(Math.min(newPageUrls.length, desiredPage));
+    const resolvedPage = desiredPage ?? 1;
+    const clampedPage = Math.min(newPageUrls.length || 1, resolvedPage);
+    setPageNumber(clampedPage);
   };
 
   /**
