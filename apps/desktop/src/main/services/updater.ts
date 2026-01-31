@@ -1,5 +1,6 @@
 import { IpcMain } from 'electron';
 import { autoUpdater, UpdateCheckResult } from 'electron-updater';
+import semver from 'semver';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../../package.json';
 
@@ -20,14 +21,23 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     return autoUpdater
       .checkForUpdates()
       .then((result: UpdateCheckResult) => {
-        if (result.updateInfo.version === packageJson.version) {
-          console.info(`Already up-to-date at version ${packageJson.version}`);
+        const remoteVersion = semver.clean(result.updateInfo.version);
+        const localVersion = semver.clean(packageJson.version);
+        
+        if (!remoteVersion || !localVersion) {
+          console.error(`Invalid version format: remote=${result.updateInfo.version}, local=${packageJson.version}`);
+          event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
+          return;
+        }
+
+        if (semver.lte(remoteVersion, localVersion)) {
+          console.info(`Already up-to-date at version ${localVersion} (remote: ${remoteVersion})`);
           event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
           return;
         }
 
         console.info(
-          `Found update to version ${result.updateInfo.version} (from ${packageJson.version})`,
+          `Found update to version ${remoteVersion} (from ${localVersion})`,
         );
         event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
         return 4;
@@ -62,11 +72,14 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     autoUpdater
       .checkForUpdates()
       .then((result) => {
-        if (result.updateInfo.version !== packageJson.version) {
+        const remoteVersion = semver.clean(result.updateInfo.version);
+        const localVersion = semver.clean(packageJson.version);
+        
+        if (remoteVersion && localVersion && semver.gt(remoteVersion, localVersion)) {
           event.sender.send(
             ipcChannels.APP.SEND_NOTIFICATION,
             'Downloading update',
-            `Downloading update for v${result.updateInfo.version}`,
+            `Downloading update for v${remoteVersion}`,
           );
           autoUpdater.downloadUpdate();
         }
