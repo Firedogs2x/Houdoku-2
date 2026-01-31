@@ -304,9 +304,12 @@ const ReaderPage: React.FC = () => {
    * @param id the chapter id
    */
   const setChapter = (id: string, desiredPage?: number) => {
-    setPageNumber(desiredPage || 1);
-    setPageUrls([]);
+    // Clear page data before loading new chapter
+    // Note: We set lastPageNumber to 0 FIRST to signal that data is being loaded
+    // This prevents stale state from affecting the mark-as-read logic
     setLastPageNumber(0);
+    setPageUrls([]);
+    setPageNumber(desiredPage || 1);
 
     loadChapterData(id, series_id!, desiredPage);
   };
@@ -533,6 +536,7 @@ const ReaderPage: React.FC = () => {
     const isFreshlyLoaded = lastLoadedChapterIdRef.current === currentChapterId;
     
     // Check if chapter should be marked as read (do this BEFORE clearing the flag)
+    // Only mark as read if we have valid page data loaded
     if (
       readerSeries !== undefined &&
       readerChapter !== undefined &&
@@ -543,49 +547,44 @@ const ReaderPage: React.FC = () => {
       lastPageNumber > 0 &&
       pageUrls.length > 0 &&
       pageUrls.length === lastPageNumber &&
-      !isFreshlyLoaded
+      !isFreshlyLoaded &&
+      pageNumber >= Math.max(1, lastPageNumber - 2)
     ) {
-      // Require viewing (lastPageNumber - 2) pages before marking as read
-      // This allows users to skip the last 2 pages (typically back cover/end pages)
-      const requiredPages = Math.max(1, lastPageNumber - 2);
+      markChapters(
+        [readerChapter, ...languageChapterList],
+        readerSeries,
+        true,
+        setChapterList,
+        setLibrarySeries,
+        chapterLanguages,
+        setSeriesList,
+      );
+      setReaderChapter({ ...(readerChapter as any), read: true });
+
+      // Update series lastReadDate and unread status when chapter is read to completion
+      const nowIso = new Date().toISOString();
       
-      if (pageNumber >= requiredPages && pageNumber <= lastPageNumber + 1) {
-        markChapters(
-          [readerChapter, ...languageChapterList],
-          readerSeries,
-          true,
-          setChapterList,
-          setLibrarySeries,
-          chapterLanguages,
-          setSeriesList,
-        );
-        setReaderChapter({ ...(readerChapter as any), read: true });
-
-        // Update series lastReadDate and unread status when chapter is read to completion
-        const nowIso = new Date().toISOString();
-        
-        // Fetch the fresh series data from storage (which has the updated numberUnread from markChapters)
-        // and add the lastReadDate update
-        const freshSeries = library.fetchSeries(readerSeries.id!);
-        if (freshSeries) {
-          const updatedSeries = {
-            ...freshSeries,
-            lastReadDate: nowIso,
-            unread: false,
-          };
-          library.upsertSeries(updatedSeries);
-          setLibrarySeries(library.fetchSeries(readerSeries.id!));
-        }
-
-        // Ensure the global series list state is refreshed after the final
-        // upsert so the Library view reflects the newest `numberUnread`/`unread`.
-        const finalSeriesList = library.fetchSeriesList();
-        const thisSeriesInFinal = finalSeriesList.find(s => s.id === readerSeries.id);
-        console.log(`[ReaderPage] After final upsertSeries, refreshing seriesListState. This series: title="${thisSeriesInFinal?.title}", numberUnread=${thisSeriesInFinal?.numberUnread}, unread=${thisSeriesInFinal?.unread}`);
-        setSeriesList(finalSeriesList);
-
-        if (trackerAutoUpdate) sendProgressToTrackers(readerChapter, readerSeries);
+      // Fetch the fresh series data from storage (which has the updated numberUnread from markChapters)
+      // and add the lastReadDate update
+      const freshSeries = library.fetchSeries(readerSeries.id!);
+      if (freshSeries) {
+        const updatedSeries = {
+          ...freshSeries,
+          lastReadDate: nowIso,
+          unread: false,
+        };
+        library.upsertSeries(updatedSeries);
+        setLibrarySeries(library.fetchSeries(readerSeries.id!));
       }
+
+      // Ensure the global series list state is refreshed after the final
+      // upsert so the Library view reflects the newest `numberUnread`/`unread`.
+      const finalSeriesList = library.fetchSeriesList();
+      const thisSeriesInFinal = finalSeriesList.find(s => s.id === readerSeries.id);
+      console.log(`[ReaderPage] After final upsertSeries, refreshing seriesListState. This series: title="${thisSeriesInFinal?.title}", numberUnread=${thisSeriesInFinal?.numberUnread}, unread=${thisSeriesInFinal?.unread}`);
+      setSeriesList(finalSeriesList);
+
+      if (trackerAutoUpdate) sendProgressToTrackers(readerChapter, readerSeries);
     }
     
     // Clear the "freshly loaded" flag AFTER the marking check
@@ -595,13 +594,14 @@ const ReaderPage: React.FC = () => {
     }
 
     // if we go past the last page or before the first page, change the chapter
-    if (pageNumber > lastPageNumber && lastPageNumber !== 0) {
+    // Only trigger this if we have valid page data (lastPageNumber > 0)
+    if (lastPageNumber > 0 && pageNumber > lastPageNumber) {
       const changed = changeChapter('next', true);
       if (!changed) {
         setShowingNoNextChapter(true);
         setPageNumber(lastPageNumber);
       }
-    } else if (pageNumber <= 0) {
+    } else if (pageNumber <= 0 && lastPageNumber > 0) {
       changeChapter('previous', true);
     }
   }, [pageNumber, lastPageNumber, readerChapter, languageChapterList, readerSeries, pageUrls.length, chapterLanguages, trackerAutoUpdate]);
