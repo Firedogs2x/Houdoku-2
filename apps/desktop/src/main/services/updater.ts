@@ -4,6 +4,22 @@ import semver from 'semver';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../../package.json';
 
+/**
+ * Checks if a remote version is greater than the local version.
+ * Handles version parsing and validation.
+ */
+const isUpdateAvailable = (remoteVersionStr: string, localVersionStr: string): boolean => {
+  const remoteVersion = semver.clean(remoteVersionStr);
+  const localVersion = semver.clean(localVersionStr);
+
+  if (!remoteVersion || !localVersion) {
+    console.error(`Invalid version format: remote=${remoteVersionStr}, local=${localVersionStr}`);
+    return false;
+  }
+
+  return semver.gt(remoteVersion, localVersion);
+};
+
 export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
   console.debug('Creating updater IPC handlers in main...');
 
@@ -21,29 +37,19 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     return autoUpdater
       .checkForUpdates()
       .then((result: UpdateCheckResult) => {
-        const remoteVersion = semver.clean(result.updateInfo.version);
-        const localVersion = semver.clean(packageJson.version);
-        
-        if (!remoteVersion || !localVersion) {
-          console.error(`Invalid version format: remote=${result.updateInfo.version}, local=${packageJson.version}`);
-          event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
-          return;
-        }
+        const hasUpdate = isUpdateAvailable(result.updateInfo.version, packageJson.version);
 
-        if (semver.lte(remoteVersion, localVersion)) {
-          console.info(`Already up-to-date at version ${localVersion} (remote: ${remoteVersion})`);
+        if (hasUpdate) {
+          const remoteVersion = semver.clean(result.updateInfo.version);
+          console.info(`Found update to version ${remoteVersion} (from ${packageJson.version})`);
+          event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
+        } else {
+          console.info(`Already up-to-date at version ${packageJson.version}`);
           event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
-          return;
         }
-
-        console.info(
-          `Found update to version ${remoteVersion} (from ${localVersion})`,
-        );
-        event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
-        return 4;
       })
       .catch((e) => {
-        console.error(e);
+        console.error('Update check failed:', e);
         event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
       });
   });
@@ -55,7 +61,7 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
       event.sender.send(
         ipcChannels.APP.SEND_NOTIFICATION,
         'Downloaded update',
-        `Restart to finish installing update`,
+        'Restart to finish installing update',
       );
       event.sender.send(ipcChannels.APP.SHOW_RESTART_UPDATE_DIALOG);
     });
@@ -72,10 +78,8 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     autoUpdater
       .checkForUpdates()
       .then((result) => {
-        const remoteVersion = semver.clean(result.updateInfo.version);
-        const localVersion = semver.clean(packageJson.version);
-        
-        if (remoteVersion && localVersion && semver.gt(remoteVersion, localVersion)) {
+        if (isUpdateAvailable(result.updateInfo.version, packageJson.version)) {
+          const remoteVersion = semver.clean(result.updateInfo.version);
           event.sender.send(
             ipcChannels.APP.SEND_NOTIFICATION,
             'Downloading update',
@@ -84,7 +88,7 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
           autoUpdater.downloadUpdate();
         }
       })
-      .catch((e) => console.error(e));
+      .catch((e) => console.error('Failed to download update:', e));
   });
 
   ipcMain.handle(ipcChannels.APP.UPDATE_AND_RESTART, () => {
