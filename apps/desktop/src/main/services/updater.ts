@@ -9,15 +9,22 @@ import packageJson from '../../../package.json';
  * Handles version parsing and validation.
  */
 const isUpdateAvailable = (remoteVersionStr: string, localVersionStr: string): boolean => {
+  console.debug(`Comparing versions - Remote: "${remoteVersionStr}", Local: "${localVersionStr}"`);
+  
   const remoteVersion = semver.clean(remoteVersionStr);
   const localVersion = semver.clean(localVersionStr);
+
+  console.debug(`After semver.clean - Remote: "${remoteVersion}", Local: "${localVersion}"`);
 
   if (!remoteVersion || !localVersion) {
     console.error(`Invalid version format: remote=${remoteVersionStr}, local=${localVersionStr}`);
     return false;
   }
 
-  return semver.gt(remoteVersion, localVersion);
+  const isNewer = semver.gt(remoteVersion, localVersion);
+  console.debug(`Version comparison result: ${isNewer ? 'UPDATE AVAILABLE' : 'UP TO DATE'}`);
+  
+  return isNewer;
 };
 
 export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
@@ -25,6 +32,8 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
 
   ipcMain.handle(ipcChannels.APP.CHECK_FOR_UPDATES, (event) => {
     console.debug('Handling check for updates request...');
+    console.info(`Current application version: ${packageJson.version}`);
+    
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       console.info('Skipping update check because we are in dev environment');
       event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
@@ -37,14 +46,16 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     return autoUpdater
       .checkForUpdates()
       .then((result: UpdateCheckResult) => {
+        console.info(`Remote version from electron-updater: ${result.updateInfo.version}`);
         const hasUpdate = isUpdateAvailable(result.updateInfo.version, packageJson.version);
 
         if (hasUpdate) {
           const remoteVersion = semver.clean(result.updateInfo.version);
-          console.info(`Found update to version ${remoteVersion} (from ${packageJson.version})`);
+          console.info(`Update available! Remote: ${remoteVersion}, Local: ${packageJson.version}`);
           event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
         } else {
-          console.info(`Already up-to-date at version ${packageJson.version}`);
+          const remoteVersion = semver.clean(result.updateInfo.version) || result.updateInfo.version;
+          console.info(`Already up-to-date. Remote: ${remoteVersion}, Local: ${packageJson.version}`);
           event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
         }
       })
