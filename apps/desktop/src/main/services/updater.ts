@@ -6,13 +6,20 @@ import packageJson from '../../../package.json';
 
 /**
  * Checks if a remote version is greater than the local version.
- * Handles version parsing and validation.
+ * Handles version parsing and validation, including uppercase 'V' prefix from GitHub release tags.
  */
 const isUpdateAvailable = (remoteVersionStr: string, localVersionStr: string): boolean => {
   console.debug(`Comparing versions - Remote: "${remoteVersionStr}", Local: "${localVersionStr}"`);
   
-  const remoteVersion = semver.clean(remoteVersionStr);
-  const localVersion = semver.clean(localVersionStr);
+  // Normalize version strings by removing uppercase 'V' prefix (from GitHub release tags like V2.17.3)
+  // semver.clean() handles lowercase 'v', but we need to handle uppercase 'V' as well
+  const normalizeVersion = (version: string): string => {
+    const trimmed = version.trim();
+    return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;
+  };
+  
+  const remoteVersion = semver.clean(normalizeVersion(remoteVersionStr));
+  const localVersion = semver.clean(normalizeVersion(localVersionStr));
 
   console.debug(`After semver.clean - Remote: "${remoteVersion}", Local: "${localVersion}"`);
 
