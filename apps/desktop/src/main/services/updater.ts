@@ -5,18 +5,20 @@ import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../../package.json';
 
 /**
+ * Normalizes version strings by removing uppercase 'V' prefix (from GitHub release tags like V2.17.3).
+ * semver.clean() handles lowercase 'v', but we need to handle uppercase 'V' as well.
+ */
+const normalizeVersion = (version: string): string => {
+  const trimmed = version.trim();
+  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;
+};
+
+/**
  * Checks if a remote version is greater than the local version.
  * Handles version parsing and validation, including uppercase 'V' prefix from GitHub release tags.
  */
 const isUpdateAvailable = (remoteVersionStr: string, localVersionStr: string): boolean => {
   console.debug(`Comparing versions - Remote: "${remoteVersionStr}", Local: "${localVersionStr}"`);
-  
-  // Normalize version strings by removing uppercase 'V' prefix (from GitHub release tags like V2.17.3)
-  // semver.clean() handles lowercase 'v', but we need to handle uppercase 'V' as well
-  const normalizeVersion = (version: string): string => {
-    const trimmed = version.trim();
-    return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;
-  };
   
   const remoteVersion = semver.clean(normalizeVersion(remoteVersionStr));
   const localVersion = semver.clean(normalizeVersion(localVersionStr));
@@ -57,11 +59,11 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
         const hasUpdate = isUpdateAvailable(result.updateInfo.version, packageJson.version);
 
         if (hasUpdate) {
-          const remoteVersion = semver.clean(result.updateInfo.version);
+          const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version));
           console.info(`Update available! Remote: ${remoteVersion}, Local: ${packageJson.version}`);
           event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
         } else {
-          const remoteVersion = semver.clean(result.updateInfo.version) || result.updateInfo.version;
+          const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version)) || result.updateInfo.version;
           console.info(`Already up-to-date. Remote: ${remoteVersion}, Local: ${packageJson.version}`);
           event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
         }
@@ -97,7 +99,7 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
       .checkForUpdates()
       .then((result) => {
         if (isUpdateAvailable(result.updateInfo.version, packageJson.version)) {
-          const remoteVersion = semver.clean(result.updateInfo.version);
+          const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version));
           event.sender.send(
             ipcChannels.APP.SEND_NOTIFICATION,
             'Downloading update',
