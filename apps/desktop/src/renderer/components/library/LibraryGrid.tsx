@@ -132,7 +132,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   />
 
                   {series.numberUnread > 0 && (
-                    <div className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-white text-center" style={{ backgroundColor: '#fc5603' }}>
+                    <div className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-white text-center" style={{ backgroundColor: 'var(--chapter-count-bg-color, #fc5603)' }}>
                       {`${series.numberUnread} : ${totalChapters}`}
                     </div>
                   )}

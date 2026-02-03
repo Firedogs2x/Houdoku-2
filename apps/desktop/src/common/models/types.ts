@@ -82,6 +82,8 @@ export type Category = {
 
 export enum GeneralSetting {
   ApplicationTheme = 'ApplicationTheme',
+  ChapterCountBgColor = 'ChapterCountBgColor',
+  ScrollBarSliderColor = 'ScrollBarSliderColor',
   ChapterLanguages = 'ChapterLanguages',
   RefreshOnStart = 'RefreshOnStart',
   AutoCheckForUpdates = 'AutoCheckForUpdates',
@@ -202,6 +204,8 @@ export enum AppLoadStep {
 
 export const SettingTypes = {
   [GeneralSetting.ApplicationTheme]: SettingType.STRING,
+  [GeneralSetting.ChapterCountBgColor]: SettingType.STRING,
+  [GeneralSetting.ScrollBarSliderColor]: SettingType.STRING,
   [GeneralSetting.ChapterLanguages]: SettingType.STRING_ARRAY,
   [GeneralSetting.RefreshOnStart]: SettingType.BOOLEAN,
   [GeneralSetting.AutoCheckForUpdates]: SettingType.BOOLEAN,
@@ -264,6 +268,8 @@ export const SettingTypes = {
 
 export const DefaultSettings = {
   [GeneralSetting.ApplicationTheme]: ApplicationTheme.Dark,
+  [GeneralSetting.ChapterCountBgColor]: 'rgba(255, 165, 0, 1)',
+  [GeneralSetting.ScrollBarSliderColor]: 'rgba(0, 191, 252, 1)',
   [GeneralSetting.ChapterLanguages]: [LanguageKey.ENGLISH],
   [GeneralSetting.RefreshOnStart]: true,
   [GeneralSetting.AutoCheckForUpdates]: true,
