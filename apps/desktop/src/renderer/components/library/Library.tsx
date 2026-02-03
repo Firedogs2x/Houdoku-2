@@ -24,7 +24,7 @@ import LibraryGrid from './LibraryGrid';
 import LibraryList from './LibraryList';
 import library from '@/renderer/services/library';
 import LibraryControlBarMultiSelect from './LibraryControlBarMultiSelect';
-import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
+import { ScrollArea, ScrollBar } from '@houdoku/ui/components/ScrollArea';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
 
 type Props = unknown;
@@ -234,6 +234,7 @@ const Library: React.FC<Props> = () => {
         {activeSeriesList.length === 0 && renderEmptyMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}
+        <ScrollBar thumbClassName="custom-scrollbar-thumb" />
       </ScrollArea>
     </div>
   );
