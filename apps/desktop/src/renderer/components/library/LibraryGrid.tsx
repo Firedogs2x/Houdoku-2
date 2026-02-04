@@ -94,12 +94,19 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
       {props.getFilteredList().map((series: Series) => {
         const coverSource = getImageSource(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
-        const totalChapters = series.id ? library.fetchChapters(series.id).length : 0;
         const chapters = series.id ? library.fetchChapters(series.id) : [];
+        const totalChapters = chapters.length;
         const hasUnreadFlag = series.unread === true;
         const hasNewDate =
           series.lastReadDate && chapters.some((c: Chapter) => c.dateAdded && new Date(c.dateAdded) > new Date(series.lastReadDate));
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
+        const latestChapterAddedDate = chapters.reduce((latest: string | undefined, chapter: Chapter) => {
+          if (!chapter?.dateAdded) return latest;
+          if (!latest) return chapter.dateAdded;
+          return new Date(chapter.dateAdded).getTime() > new Date(latest).getTime()
+            ? chapter.dateAdded
+            : latest;
+        }, undefined);
 
         return (
           <div key={`${series.id}-${series.title}`} className="space-y-2">
@@ -167,8 +174,10 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
               <div className="space-y-1 text-sm pb-3">
                 <h3 className="font-medium leading-none line-clamp-3">{series.title}</h3>
                 {series.lastReadDate && (
-                  <p className="text-xs text-muted-foreground">
-                    Last read: {formatDateMMDDYYYY(series.lastReadDate)}
+                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">
+                    {latestChapterAddedDate
+                      ? `Last Read: ${formatDateMMDDYYYY(series.lastReadDate)} Ch. Update: ${formatDateMMDDYYYY(latestChapterAddedDate)}`
+                      : `Last Read: ${formatDateMMDDYYYY(series.lastReadDate)}`}
                   </p>
                 )}
               </div>
