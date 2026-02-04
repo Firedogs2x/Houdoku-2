@@ -5,12 +5,23 @@ import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../../package.json';
 
 /**
- * Normalizes version strings by removing uppercase 'V' prefix (from GitHub release tags like V2.17.3).
- * semver.clean() handles lowercase 'v', but we need to handle uppercase 'V' as well.
+ * Normalizes version strings by removing leading version prefixes (V, v).
+ * GitHub release tags use uppercase 'V' (e.g., V2.17.5).
+ * semver.clean() only handles lowercase 'v', so we need to handle both cases.
+ * 
+ * Examples:
+ * - 'V2.17.5' → '2.17.5'
+ * - 'v2.17.5' → '2.17.5'
+ * - '2.17.5' → '2.17.5'
  */
 const normalizeVersion = (version: string): string => {
+  if (!version || typeof version !== 'string') return '';
   const trimmed = version.trim();
-  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;
+  // Handle both uppercase 'V' and lowercase 'v' prefixes
+  if (trimmed.startsWith('V') || trimmed.startsWith('v')) {
+    return trimmed.substring(1);
+  }
+  return trimmed;
 };
 
 /**

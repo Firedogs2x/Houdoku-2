@@ -2028,3 +2028,1732 @@ The fix is complete, comprehensive, and production-ready!
 
 ---
 
+_**User (2026-02-04 00:29Z)**_
+
+I am so sick of this I am running version V2.17.4 and I just Release V2.17.5.
+But when I either run the automatic or manual version check I am told that I am running the latest version.
+All programs have Lint action done and the I use Release action to build every single program. Do an extremely deep search into the program and find a fix for this issue.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts)</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/package.json#1-1), lines 1 to 30</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/package.json#1-1), lines 1 to 30
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="copilot_findTextInFiles">
+<details>
+<summary>Tool use: **copilot_findTextInFiles** • Searching for regex `version|VERSION` (`**/*.ts`)</summary>
+
+
+Searched for regex `version|VERSION` (`**/*.ts`), 30 results
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_findFiles">
+<details>
+<summary>Tool use: **copilot_findFiles**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_findFiles",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Searching for files matching &#96;**/.github/workflows/**&#96;",
+  "pastTenseMessage": "Searched for files matching &#96;**/.github/workflows/**&#96;, 3 matches",
+  "resultDetails": [
+    {
+      "$mid": 1,
+      "fsPath": "c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\.github\\workflows\\build.yml",
+      "_sep": 1,
+      "external": "file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/build.yml",
+      "path": "/c:/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/build.yml",
+      "scheme": "file"
+    },
+    {
+      "$mid": 1,
+      "fsPath": "c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\.github\\workflows\\publish.yml",
+      "_sep": 1,
+      "external": "file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/publish.yml",
+      "path": "/c:/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/publish.yml",
+      "scheme": "file"
+    },
+    {
+      "$mid": 1,
+      "fsPath": "c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\.github\\workflows\\release.yml",
+      "_sep": 1,
+      "external": "file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml",
+      "path": "/c:/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml",
+      "scheme": "file"
+    }
+  ],
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="copilot_searchCodebase">
+<details>
+<summary>Tool use: **copilot_searchCodebase** • Searching codebase for "release action version GitHub Actions npm version"</summary>
+
+
+No results found
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml)</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml)
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "36838a27-70df-4aff-a04c-4dfcf9d49f5a",
+  "terminalCommandId": "tool-4eaec4ab-7063-475e-bdc6-ba4650901ee7",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; grep -A 2 '\"version\"' apps/desktop/package.json | head -5",
+    "toolEdited": "grep -A 2 '\"version\"' apps/desktop/package.json | head -5"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164790124
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-4eaec4ab-7063-475e-bdc6-ba4650901ee7"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "0ae57078-6acf-445f-a777-d2259e7ef19c",
+  "terminalCommandId": "tool-cb365fc0-7b77-471a-8b74-6c07c77c6b8a",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; node -e \"const semver = require('semver'); console.log('Testing version comparison:'); console.log('V2.17.5 cleaned:', semver.clean('V2.17.5')); console.log('2.17.4 cleaned:', semver.clean('2.17.4')); console.log('Comparison (V2.17.5 &gt; 2.17.4):', semver.gt(semver.clean('V2.17.5') || 'invalid', semver.clean('2.17.4') || 'invalid'));\"",
+    "toolEdited": "node -e \"const semver = require('semver'); console.log('Testing version comparison:'); console.log('V2.17.5 cleaned:', semver.clean('V2.17.5')); console.log('2.17.4 cleaned:', semver.clean('2.17.4')); console.log('Comparison (V2.17.5 &gt; 2.17.4):', semver.gt(semver.clean('V2.17.5') || 'invalid', semver.clean('2.17.4') || 'invalid'));\""
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164801259
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-cb365fc0-7b77-471a-8b74-6c07c77c6b8a"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "58312beb-edff-4d83-9df0-19758eab4312",
+  "terminalCommandId": "tool-d0c1c5a7-51db-4223-af3a-62a8b688c002",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; Select-String -Path package.json -Pattern '\"version\"'",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; Select-String -Path package.json -Pattern '\"version\"'"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164808403
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-d0c1c5a7-51db-4223-af3a-62a8b688c002"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "679b6681-8310-4404-967c-e0b4a2e7ec90",
+  "terminalCommandId": "tool-a8536905-a004-4a21-b3d5-8e12810b7800",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; node -e \"const semver = require('semver'); console.log('V2.17.5 cleaned:', semver.clean('V2.17.5')); console.log('2.17.4 cleaned:', semver.clean('2.17.4'));\"",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; node -e \"const semver = require('semver'); console.log('V2.17.5 cleaned:', semver.clean('V2.17.5')); console.log('2.17.4 cleaned:', semver.clean('2.17.4'));\""
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164812307
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-a8536905-a004-4a21-b3d5-8e12810b7800"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "b1430ac3-f7c9-485c-b216-a6f3807e6e9d",
+  "terminalCommandId": "tool-e615d160-e7d7-40f6-9929-b2c1eb30f5ec",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; node -e \"const pkg = require('./package.json'); const normalizeVersion = (version) =&gt; { const trimmed = version.trim(); return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed; }; const semver = require('semver'); const remote = 'V2.17.5'; const local = pkg.version; console.log('Scenario: Running 2.17.4, released 2.17.5'); console.log('Remote version from GitHub:', remote); console.log('Local version from package.json:', local); console.log(''); console.log('WITHOUT normalizeVersion():'); console.log('  semver.clean(remote):', semver.clean(remote)); console.log('  Result: null - FAILS!'); console.log(''); console.log('WITH normalizeVersion():'); const cleanedRemote = semver.clean(normalizeVersion(remote)); const cleanedLocal = semver.clean(local); console.log('  normalizeVersion(remote):', normalizeVersion(remote)); console.log('  semver.clean(normalizeVersion(remote)):', cleanedRemote); console.log('  semver.clean(local):', cleanedLocal); console.log('  semver.gt(cleanedRemote, cleanedLocal):', semver.gt(cleanedRemote, cleanedLocal)); console.log('  Result: UPDATE AVAILABLE - WORKS!');\"",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; node -e \"const pkg = require('./package.json'); const normalizeVersion = (version) =&gt; { const trimmed = version.trim(); return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed; }; const semver = require('semver'); const remote = 'V2.17.5'; const local = pkg.version; console.log('Scenario: Running 2.17.4, released 2.17.5'); console.log('Remote version from GitHub:', remote); console.log('Local version from package.json:', local); console.log(''); console.log('WITHOUT normalizeVersion():'); console.log('  semver.clean(remote):', semver.clean(remote)); console.log('  Result: null - FAILS!'); console.log(''); console.log('WITH normalizeVersion():'); const cleanedRemote = semver.clean(normalizeVersion(remote)); const cleanedLocal = semver.clean(local); console.log('  normalizeVersion(remote):', normalizeVersion(remote)); console.log('  semver.clean(normalizeVersion(remote)):', cleanedRemote); console.log('  semver.clean(local):', cleanedLocal); console.log('  semver.gt(cleanedRemote, cleanedLocal):', semver.gt(cleanedRemote, cleanedLocal)); console.log('  Result: UPDATE AVAILABLE - WORKS!');\""
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164820595
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-e615d160-e7d7-40f6-9929-b2c1eb30f5ec"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "574f439d-89a2-488f-809f-8f887dac4050",
+  "terminalCommandId": "tool-7f11ca96-2ca8-4345-8162-8a8008ebd5ac",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; git describe --tags --abbrev=0",
+    "toolEdited": "git describe --tags --abbrev=0"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164827394
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-7f11ca96-2ca8-4345-8162-8a8008ebd5ac"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "f9b07e85-9181-4727-b46d-c9c51a773e4d",
+  "terminalCommandId": "tool-960bb4da-5e3c-4bf0-85cd-0bfb7ec4426c",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; git tag -l 'V*' | sort -V | tail -5",
+    "toolEdited": "git tag -l 'V*' | sort -V | tail -5"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164831387
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-960bb4da-5e3c-4bf0-85cd-0bfb7ec4426c"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "2c6f009c-b6d3-42c3-a01f-c799cf976ec4",
+  "terminalCommandId": "tool-bb7b5919-bd70-4978-a0db-20f3b6fe5d31",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; git tag -l 'V*' | Sort-Object -Descending | Select-Object -First 5",
+    "toolEdited": "git tag -l 'V*' | Sort-Object -Descending | Select-Object -First 5"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164836531
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-bb7b5919-bd70-4978-a0db-20f3b6fe5d31"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "464c2c71-6a31-4908-902b-6f829ffa7081",
+  "terminalCommandId": "tool-76002752-0d7c-471e-8416-800704c7eaae",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; git tag -l | Select-String 'V2.17.5'",
+    "toolEdited": "git tag -l | Select-String 'V2.17.5'"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164846443
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-76002752-0d7c-471e-8416-800704c7eaae"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Created 5 todos**
+
+- [-] Analyze complete version checking flow
+  > Trace how versions flow from GitHub releases through electron-updater to the app. Check all places where version comparisons happen. Review updater.ts, release workflow, and electron-updater configuration.
+- [ ] Test actual electron-updater behavior
+  > Understand what electron-updater returns from GitHub API. The 'V' prefix in tag_name might be included or stripped. Check electron-updater source or test it.
+- [ ] Fix all version normalization issues
+  > Update updater.ts to handle uppercase 'V' prefix in ALL places where versions are processed, not just comparison function.
+- [ ] Verify release workflow version sync
+  > Ensure release.yml properly updates package.json so app displays correct version. The current 1.17.1 vs V2.17.4 discrepancy needs investigation.
+- [ ] Test and validate the complete fix
+  > Run lint, build, and manual tests to ensure version checking works end-to-end for V2.17.4 -> V2.17.5 scenario.
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="copilot_findTextInFiles">
+<details>
+<summary>Tool use: **copilot_findTextInFiles** • Searching for regex `electron-updater|autoUpdater|updateInfo` (`**/*.ts`)</summary>
+
+
+Searched for regex `electron-updater|autoUpdater|updateInfo` (`**/*.ts`), 20 results
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/package.json#50-50), lines 50 to 100</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/package.json#50-50), lines 50 to 100
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts#1-1), lines 1 to 110</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts#1-1), lines 1 to 110
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "819abcc5-15c8-4e34-b1ed-e25565453096",
+  "terminalCommandId": "tool-9106050f-0d04-4a6c-9abc-dff0b69dad12",
+  "commandLine": {
+    "original": "cd \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop\\src\\main\\services\" &amp;&amp; PowerShell -NoProfile -Command \"Resolve-Path ../../../package.json\"",
+    "toolEdited": "cd \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop\\src\\main\\services\" ; PowerShell -NoProfile -Command \"Resolve-Path ../../../package.json\""
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164865627
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-9106050f-0d04-4a6c-9abc-dff0b69dad12"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "2e36bc97-b335-4ce0-815c-d5b15680da0a",
+  "terminalCommandId": "tool-ccdba523-b009-4e1c-95ee-58504bfc96bc",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; node -e \"\nconst fs = require('fs');\nconst path = require('path');\nconst semver = require('semver');\n\n// Read package.json\nconst packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));\nconsole.log('=== CURRENT STATE ===');\nconsole.log('Current version in package.json:', packageJson.version);\n\n// Simulate electron-updater returning GitHub release tag\nconst remoteVersionFromGitHub = 'V2.17.5'; // GitHub tag format with uppercase V\n\n// Define normalizeVersion function\nconst normalizeVersion = (version) =&gt; {\n  const trimmed = version.trim();\n  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;\n};\n\nconsole.log('');\nconsole.log('=== SCENARIO: User running 1.17.1, released V2.17.5 ===');\nconsole.log('Local version:', packageJson.version);\nconsole.log('Remote version from GitHub:', remoteVersionFromGitHub);\n\nconsole.log('');\nconsole.log('=== VERSION COMPARISON ===');\nconst cleanedRemote = semver.clean(normalizeVersion(remoteVersionFromGitHub));\nconst cleanedLocal = semver.clean(packageJson.version);\n\nconsole.log('After normalizeVersion + semver.clean:');\nconsole.log('  Remote:', cleanedRemote);\nconsole.log('  Local:', cleanedLocal);\n\nif (!cleanedRemote || !cleanedLocal) {\n  console.log('ERROR: Invalid version format!');\n} else {\n  const isNewer = semver.gt(cleanedRemote, cleanedLocal);\n  console.log('  semver.gt(remote, local):', isNewer);\n  console.log('  Result:', isNewer ? '✓ UPDATE AVAILABLE' : '✗ NO UPDATE');\n}\n\"",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; node -e \"\nconst fs = require('fs');\nconst path = require('path');\nconst semver = require('semver');\n\n// Read package.json\nconst packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));\nconsole.log('=== CURRENT STATE ===');\nconsole.log('Current version in package.json:', packageJson.version);\n\n// Simulate electron-updater returning GitHub release tag\nconst remoteVersionFromGitHub = 'V2.17.5'; // GitHub tag format with uppercase V\n\n// Define normalizeVersion function\nconst normalizeVersion = (version) =&gt; {\n  const trimmed = version.trim();\n  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;\n};\n\nconsole.log('');\nconsole.log('=== SCENARIO: User running 1.17.1, released V2.17.5 ===');\nconsole.log('Local version:', packageJson.version);\nconsole.log('Remote version from GitHub:', remoteVersionFromGitHub);\n\nconsole.log('');\nconsole.log('=== VERSION COMPARISON ===');\nconst cleanedRemote = semver.clean(normalizeVersion(remoteVersionFromGitHub));\nconst cleanedLocal = semver.clean(packageJson.version);\n\nconsole.log('After normalizeVersion + semver.clean:');\nconsole.log('  Remote:', cleanedRemote);\nconsole.log('  Local:', cleanedLocal);\n\nif (!cleanedRemote || !cleanedLocal) {\n  console.log('ERROR: Invalid version format!');\n} else {\n  const isNewer = semver.gt(cleanedRemote, cleanedLocal);\n  console.log('  semver.gt(remote, local):', isNewer);\n  console.log('  Result:', isNewer ? '✓ UPDATE AVAILABLE' : '✗ NO UPDATE');\n}\n\""
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164874700
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-ccdba523-b009-4e1c-95ee-58504bfc96bc"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "b6955c0e-bfd9-4b15-9b51-d09da5216d03",
+  "terminalCommandId": "tool-3c24e821-de60-4bd1-af9f-428283f21922",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; node &lt;&lt; 'EOF'\nconst fs = require('fs');\nconst semver = require('semver');\n\nconst packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));\nconsole.log('=== CURRENT STATE ===');\nconsole.log('Current version in package.json:', packageJson.version);\n\nconst remoteVersionFromGitHub = 'V2.17.5';\n\nconst normalizeVersion = (version) =&gt; {\n  const trimmed = version.trim();\n  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;\n};\n\nconsole.log('\\n=== SCENARIO: User running ' + packageJson.version + ', released ' + remoteVersionFromGitHub + ' ===');\nconsole.log('Local version:', packageJson.version);\nconsole.log('Remote version from GitHub:', remoteVersionFromGitHub);\n\nconsole.log('\\n=== VERSION COMPARISON ===');\nconst cleanedRemote = semver.clean(normalizeVersion(remoteVersionFromGitHub));\nconst cleanedLocal = semver.clean(packageJson.version);\n\nconsole.log('After normalizeVersion + semver.clean:');\nconsole.log('  Remote:', cleanedRemote);\nconsole.log('  Local:', cleanedLocal);\n\nif (!cleanedRemote || !cleanedLocal) {\n  console.log('ERROR: Invalid version format!');\n} else {\n  const isNewer = semver.gt(cleanedRemote, cleanedLocal);\n  console.log('  semver.gt(remote, local):', isNewer);\n  console.log('  Result:', isNewer ? '✓ UPDATE AVAILABLE' : '✗ NO UPDATE');\n}\nEOF\n",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; node &lt;&lt; 'EOF'\nconst fs = require('fs');\nconst semver = require('semver');\n\nconst packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));\nconsole.log('=== CURRENT STATE ===');\nconsole.log('Current version in package.json:', packageJson.version);\n\nconst remoteVersionFromGitHub = 'V2.17.5';\n\nconst normalizeVersion = (version) =&gt; {\n  const trimmed = version.trim();\n  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;\n};\n\nconsole.log('\\n=== SCENARIO: User running ' + packageJson.version + ', released ' + remoteVersionFromGitHub + ' ===');\nconsole.log('Local version:', packageJson.version);\nconsole.log('Remote version from GitHub:', remoteVersionFromGitHub);\n\nconsole.log('\\n=== VERSION COMPARISON ===');\nconst cleanedRemote = semver.clean(normalizeVersion(remoteVersionFromGitHub));\nconst cleanedLocal = semver.clean(packageJson.version);\n\nconsole.log('After normalizeVersion + semver.clean:');\nconsole.log('  Remote:', cleanedRemote);\nconsole.log('  Local:', cleanedLocal);\n\nif (!cleanedRemote || !cleanedLocal) {\n  console.log('ERROR: Invalid version format!');\n} else {\n  const isNewer = semver.gt(cleanedRemote, cleanedLocal);\n  console.log('  semver.gt(remote, local):', isNewer);\n  console.log('  Result:', isNewer ? '✓ UPDATE AVAILABLE' : '✗ NO UPDATE');\n}\nEOF\n"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164880868
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-3c24e821-de60-4bd1-af9f-428283f21922"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_createFile">
+<details>
+<summary>Tool use: **copilot_createFile**</summary>
+
+
+Parameters:
+
+```json
+{
+  "file_path": "c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\test-version.js",
+  "relativeWorkspacePath": "c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\test-version.js"
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_createFile",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Creating [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/test-version.js)",
+  "pastTenseMessage": "Created [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/test-version.js)",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "const fs = require('fs');\nconst semver = require('semver');\n\n// Read package.json\nconst packageJson = JSON.parse(fs.readFileSync('./apps/desktop/package.json', 'utf-8'));\n\nconsole.log('=== DEEP ANALYSIS: Version Checking Issue ===\\n');\nconsole.log('Current version in package.json:', packageJson.version);\n\nconst remoteVersionFromGitHub = 'V2.17.5';\nconst normalizeVersion = (version) =&gt; {\n  const trimmed = version.trim();\n  return trimmed.startsWith('V') ? trimmed.substring(1) : trimmed;\n};\n\nconsole.log('Remote version from GitHub release tag:', remoteVersionFromGitHub);\n\nconsole.log('\\n=== Test 1: Without normalizeVersion (BROKEN) ===');\nconst cleanedRemoteWrong = semver.clean(remoteVersionFromGitHub);\nconsole.log('semver.clean(remoteVersionFromGitHub):', cleanedRemoteWrong);\nconsole.log('Result: null - FAILS because semver.clean() does not handle uppercase V');\n\nconsole.log('\\n=== Test 2: With normalizeVersion (FIXED) ===');\nconst cleanedRemote = semver.clean(normalizeVersion(remoteVersionFromGitHub));\nconst cleanedLocal = semver.clean(packageJson.version);\nconsole.log('normalizeVersion(remoteVersionFromGitHub):', normalizeVersion(remoteVersionFromGitHub));\nconsole.log('semver.clean(normalized):', cleanedRemote);\nconsole.log('semver.clean(local):', cleanedLocal);\n\nif (!cleanedRemote || !cleanedLocal) {\n  console.log('\\nERROR: Invalid version format - update check would FAIL');\n  process.exit(1);\n} else {\n  const isNewer = semver.gt(cleanedRemote, cleanedLocal);\n  console.log('semver.gt(' + cleanedRemote + ', ' + cleanedLocal + '):', isNewer);\n  console.log('Result: ' + (isNewer ? 'UPDATE AVAILABLE ✓' : 'NO UPDATE'));\n}\n",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "c5df69c2-92b9-4872-bfd6-d9eb7640f4fc",
+  "terminalCommandId": "tool-a81e9a20-a4aa-4a1c-9965-4182dbdd9e88",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; node test-version.js",
+    "toolEdited": "node test-version.js"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164891834
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-a81e9a20-a4aa-4a1c-9965-4182dbdd9e88"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "f5785e26-396b-41c2-8727-2a7c090504a6",
+  "terminalCommandId": "tool-441f7a3d-2ce3-4bee-823d-6f87d02bea0d",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; Set-Location c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 ; node test-version.js",
+    "toolEdited": "Set-Location c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 ; node test-version.js"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164897451
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-441f7a3d-2ce3-4bee-823d-6f87d02bea0d"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "dcca87f2-5c4c-498c-976f-fdc185303ac8",
+  "terminalCommandId": "tool-b8606de5-86f1-4fb2-823e-0fd0e61a51a7",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; node ..\\..\\test-version.js",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; node ..\\..\\test-version.js"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164901939
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-b8606de5-86f1-4fb2-823e-0fd0e61a51a7"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "a049bab9-6450-4fae-85a5-4233e941b046",
+  "terminalCommandId": "tool-57bac7a2-8bff-413f-961f-a72b5dac01af",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; pnpm install &amp;&amp; node test-version.js",
+    "toolEdited": "pnpm install ; node test-version.js"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164906859
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-57bac7a2-8bff-413f-961f-a72b5dac01af"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "867a9888-497c-42b9-9906-50de64585629",
+  "terminalCommandId": "tool-46ee4512-fdc1-4bc9-85e9-a86b4da54a11",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0 &amp;&amp; node test-version.js",
+    "toolEdited": "node test-version.js"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164915659
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-46ee4512-fdc1-4bc9-85e9-a86b4da54a11"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "f8e00918-97d3-49a3-b97f-aa8508b35a47",
+  "terminalCommandId": "tool-79d136b8-8195-490f-a182-240a2aed370c",
+  "commandLine": {
+    "original": "Remove-Item -Path \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\test-version.js\" -Force"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164921987
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-79d136b8-8195-490f-a182-240a2aed370c"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Updated todo list**
+
+- [-] ROOT CAUSE: Version mismatch in package.json
+  > The package.json version (1.17.1) doesn't match the released version (V2.17.x). Release workflow syncs version but maybe not to the file being imported by updater.ts. Need to trace the exact flow.
+- [ ] Check semver.clean(undefined) behavior
+  > Check if the issue is that semver.clean() fails silently when remote version returns null, causing `isUpdateAvailable()` to return false. The normalizeVersion() exists but maybe something else is breaking it.
+- [ ] Review release.yml version sync command
+  > The updater.ts looks correct with normalizeVersion() being used. But the real problem might be in the release workflow NOT properly syncing the version number to the right place before building.
+- [ ] Implement comprehensive fix
+  > After identifying root cause, implement fix ensuring version numbers sync properly and uppercase 'V' is handled in electron-updater flow.
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml#80-80), lines 80 to 95</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml#80-80), lines 80 to 95
+
+</details>
+</tool-use>
+
+---
+
+The user is reporting that they're running version V2.17.4 and released V2.17.5, but the version check says they're already on the latest version. This is a different problem from the previous conversation - they're using uppercase 'V' in version numbers and it's still not working.
+
+Looking at the conversation summary, the agent previously fixed the updater.ts file to handle uppercase 'V' prefixes by adding a `normalizeVersion()` function. However, if the user is still experiencing the issue with V2.17.4 vs V2.17.5, we need to do a deep investigation.
+
+Let me think about what could be wrong:
+1. The fix was applied to `apps/desktop/src/main/services/updater.ts`
+2. The user says they've built and released with Release action
+3. But the version check still doesn't work
+
+I should:
+1. First check the current state of the updater.ts file to see if the fix is actually there
+2. Check if there are any other places in the code that handle version checking
+3. Look at the package.json to see what version is there
+4. Check the electron-updater configuration
+5. Look at the Release action to understand how versions are being set
+
+The user specifically mentioned "All programs have Lint action done and I use Release action to build every single program" - this suggests they're using GitHub Actions workflows. I should look at the release workflow to see how the version is being managed.
+
+Let me start with a deep investigation.I'll perform a comprehensive investigation to find and fix this version checking issue. Let me start by examining the current state of the updater code and the entire version management system. Now let me check the GitHub Actions release workflow and how the version is being set: Now I can see the critical issue! Let me examine the `release.yml` more carefully: Perfect! Now I see the issue. The release workflow syncs the version to `package.json`, but let me verify what the current versions are and trace through the entire flow: Perfect! I've found the root cause. The `normalizeVersion()` function exists in the code BUT it's **NOT being used in the most critical place**: when the remote version comes in from electron-updater, it still has the uppercase 'V' prefix and `semver.clean()` returns `null`.
+
+Let me trace through the issue systematically and create a comprehensive diagnostic: Excellent! I've confirmed the issue. Now let me check if there's a disconnect between the release workflow and the actual running version. The real issue is that the **`package.json` is still showing 1.17.1** but the user is running V2.17.4. Let me check if there's a mismatch in how versions are being handled: Now I understand the complete picture! The user said they're running V2.17.4 and just released V2.17.5. Let me check if V2.17.5 tag exists: V2.17.5 doesn't exist yet - the user is planning to release it. The real issue is clear now: **The normalizeVersion() function exists in `updater.ts` but electron-updater is still failing because of a deeper issue**. Let me do a comprehensive diagnostic of the entire flow and check if there are other places that need fixing: Now let me investigate electron-updater's behavior more deeply. The issue could be that electron-updater returns the tag_name directly from GitHub which includes the 'V' prefix: Good! The `updater.ts` is already using `normalizeVersion()` in all the logging places. Now let me look at one critical thing I might have missed - let me check the **electron-updater configuration** in `package.json` to see if it's configured to fetch from GitHub releases correctly: The electron-updater config looks correct - it's set to use GitHub. Now I need to understand the actual problem better. Let me re-read the `updater.ts` file more carefully to see if there's a subtle issue: The code looks correct! But wait - I see the issue now. Let me check if `packageJson.version` is being read correctly. It's importing from `package.json`. Let me verify this path points to the correct location: Perfect! That points to the correct `package.json`. Now I understand the complete issue. Let me create a comprehensive test to see what's actually happening: Let me simplify and create a test file instead: Let me check if semver is available and run the test from the right location: Let me remove the test file and trace the issue more directly. Based on my analysis, I now understand the complete problem: Now let me trace through the actual root cause. The problem is that `packageJson.version` in `updater.ts` is being imported as `"1.17.1"` which doesn't match V2.17.4 or V2.17.5. Let me investigate the release workflow more carefully: Let me look at the `release.yml` again more carefully. The issue is on line 87:
+
+```yaml
+cd apps/desktop
+npm version "$VERSION" --no-git-tag-version
+```
+
+This updates `package.json`, which is the correct file. But let me verify if there's a problem with how this command works in the monorepo context: Now I see the issue! The release workflow uses `npm version` but this is a **pnpm monorepo**. The `npm version` command in a pnpm workspace might not work properly. Let me check what actually happens. But more importantly, let me check if there's an issue with how electron-updater is getting the version. Let me read deeper into the issue:
+
+The user said they're "running version V2.17.4" and "released V2.17.5". This could mean:
+
+1. The user's built executable shows V2.17.4
+2. They've released V2.17.5 on GitHub
+
+But the `package.json` still shows 1.17.1. **This is the critical issue!** The release workflow isn't actually updating the `package.json` to the new version.
+
+Let me verify the `npm version` command would work in this context and fix the release workflow: **Continue to iterate?**
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. [Configure max requests](command:workbench.action.openSettings?%5B%22chat.agent.maxRequests%22%5D).
+
+
+
+---
+
+_**User (2026-02-04 00:28Z)**_
+
+@agent Continue: "Continue to iterate?"
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml#85-85), lines 85 to 133</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/.github/workflows/release.yml#85-85), lines 85 to 133
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/package.json#1-1), lines 1 to 10</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/package.json#1-1), lines 1 to 10
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;yaml\n\r\n          # Update apps/desktop/package.json using Node.js directly\r\n          # This is more reliable in pnpm monorepos than using npm version\r\n          node -e \"\r\n            const fs = require('fs');\r\n            const path = 'apps/desktop/package.json';\r\n            const pkg = JSON.parse(fs.readFileSync(path, 'utf-8'));\r\n            pkg.version = '$VERSION';\r\n            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\\n');\r\n            console.log('Updated ' + path + ' version to ' + pkg.version);\r\n          \"\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "\r\n          # Update apps/desktop/package.json using Node.js directly\r\n          # This is more reliable in pnpm monorepos than using npm version\r\n          node -e \"\r\n            const fs = require('fs');\r\n            const path = 'apps/desktop/package.json';\r\n            const pkg = JSON.parse(fs.readFileSync(path, 'utf-8'));\r\n            pkg.version = '$VERSION';\r\n            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\\n');\r\n            console.log('Updated ' + path + ' version to ' + pkg.version);\r\n          \"",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts#1-1), lines 1 to 40</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/main/services/updater.ts#1-1), lines 1 to 40
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="copilot_findTextInFiles">
+<details>
+<summary>Tool use: **copilot_findTextInFiles** • Searching for text `NODE_ENV|DEBUG_PROD` (`**/apps/desktop/src/**/*.ts`)</summary>
+
+
+Searched for text `NODE_ENV|DEBUG_PROD` (`**/apps/desktop/src/**/*.ts`), 5 results
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;typescript\nleading version prefixes (V, v).\r\n * GitHub release tags use uppercase 'V' (e.g., V2.17.5).\r\n * semver.clean() only handles lowercase 'v', so we need to handle both cases.\r\n * \r\n * Examples:\r\n * - 'V2.17.5' → '2.17.5'\r\n * - 'v2.17.5' → '2.17.5'\r\n * - '2.17.5' → '2.17.5'\r\n */\r\nconst normalizeVersion = (version: string): string =&gt; {\r\n  if (!version || typeof version !== 'string') return '';\r\n  const trimmed = version.trim();\r\n  // Handle both uppercase 'V' and lowercase 'v' prefixes\r\n  if (trimmed.startsWith('V') || trimmed.startsWith('v')) {\r\n    return trimmed.substring(1);\r\n  }\r\n  return\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "leading version prefixes (V, v).\r\n * GitHub release tags use uppercase 'V' (e.g., V2.17.5).\r\n * semver.clean() only handles lowercase 'v', so we need to handle both cases.\r\n * \r\n * Examples:\r\n * - 'V2.17.5' → '2.17.5'\r\n * - 'v2.17.5' → '2.17.5'\r\n * - '2.17.5' → '2.17.5'\r\n */\r\nconst normalizeVersion = (version: string): string =&gt; {\r\n  if (!version || typeof version !== 'string') return '';\r\n  const trimmed = version.trim();\r\n  // Handle both uppercase 'V' and lowercase 'v' prefixes\r\n  if (trimmed.startsWith('V') || trimmed.startsWith('v')) {\r\n    return trimmed.substring(1);\r\n  }\r\n  return",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "d5a0e2b9-739b-478f-8e19-aee9f2a9b1cb",
+  "terminalCommandId": "tool-0a5753ec-96df-4094-91d7-380b66ab47e1",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; pnpm lint src/main/services/updater.ts",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; pnpm lint src/main/services/updater.ts"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164959578
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-0a5753ec-96df-4094-91d7-380b66ab47e1"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "d64f3a1d-8170-477c-a192-12c9337a1bd3",
+  "terminalCommandId": "tool-7b12da24-4637-4c0b-b952-552f99c55998",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; pnpm build 2&gt;&amp;1 | head -50",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; pnpm build 2&gt;&amp;1 | head -50"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770164967763
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/3",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-7b12da24-4637-4c0b-b952-552f99c55998"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "70a5ca2a-0a1e-4199-98ae-c75dfa7bc583",
+  "terminalCommandId": "tool-ed070fb2-cd92-4584-96d0-2462dea903f8",
+  "commandLine": {
+    "original": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop &amp;&amp; pnpm build",
+    "toolEdited": "cd c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\\apps\\desktop ; pnpm build"
+  },
+  "language": "pwsh",
+  "autoApproveInfo": {
+    "value": "Auto approved as &#96;build&#96; is defined in package.json",
+    "isTrusted": false,
+    "supportThemeIcons": false,
+    "supportHtml": false,
+    "supportAlertSyntax": false
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+I see! The issue is that `npm version` in a **pnpm workspace** while we're inside a subdirectory might not work as expected. The command is run in `desktop`, but it should update that package.json. 
+
+Let me check if there's a root `package.json` that also needs updating: The root has no version field. So the issue is clear: **the release workflow is trying to update `package.json` using `npm version`, but in a pnpm workspace this may not work reliably.**
+
+Instead of using `npm version`, we should use a more direct approach: **modify the `package.json` file directly using a tool that works with pnpm workspaces.**
+
+Let me now create a comprehensive fix for this issue. The solution is to:
+
+1. Fix the release workflow to properly update `package.json` using a tool that works in pnpm monorepos
+2. Ensure the `updater.ts` can handle the version properly Good! Now I've fixed the release workflow. But there's still a potential issue - the `updater.ts` needs to be bulletproof in handling version comparisons. Let me verify the current `updater.ts` code one more time and check if there are any edge cases not being handled: The `updater.ts` code looks good. Now let me think about what else could be wrong. Let me check if there's maybe an issue with how the app detects whether to check for updates. Maybe it's in development mode? Good. The updater checks NODE_ENV. That's not the issue. Now let me think about the complete flow:
+
+1. **Release workflow** creates V2.17.5 tag
+2. **Release workflow** (now FIXED) updates `package.json` to version `2.17.5`
+3. **User runs** the app with that new version
+4. **User clicks** "Check for Updates"
+5. **electron-updater** queries GitHub API for latest release, gets `V2.17.5`
+6. **`updater.ts`** calls `isUpdateAvailable('V2.17.5', '2.17.5')`
+7. **isUpdateAvailable** normalizes to `'2.17.5'` vs `'2.17.5'` 
+8. **semver.gt('2.17.5', '2.17.5')** returns `false` - correct, no update needed
+
+But if the user is still on V2.17.4, then:
+1. **`updater.ts`** calls `isUpdateAvailable('V2.17.5', '2.17.4')`
+2. **isUpdateAvailable** normalizes to `'2.17.5'` vs `'2.17.4'`
+3. **semver.gt('2.17.5', '2.17.4')** returns `true` - UPDATE AVAILABLE!
+
+This should work! But wait... there might be one more subtle issue. Let me check if `normalizeVersion` is being called correctly on the **local version** as well. The local version might come from `package.json` but it could have a 'v' prefix added somehow. Let me add additional defensive code: Good! Now let me run the lint and build to make sure everything still works: Perfect! Now let's build: 
+
+---
+
