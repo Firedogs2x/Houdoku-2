@@ -99,8 +99,17 @@ jobs:
         run: |
           VERSION="${{ needs.tag.outputs.version }}"
           VERSION="${VERSION#V}"
-          cd apps/desktop
-          npm version "$VERSION" --no-git-tag-version
+          
+          # Update apps/desktop/package.json using Node.js directly
+          # This is more reliable in pnpm monorepos than using npm version
+          node -e "
+            const fs = require('fs');
+            const path = 'apps/desktop/package.json';
+            const pkg = JSON.parse(fs.readFileSync(path, 'utf-8'));
+            pkg.version = '$VERSION';
+            fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+            console.log('Updated ' + path + ' version to ' + pkg.version);
+          "
 
       - name: Build desktop app
         run: pnpm --filter @houdoku/desktop build
