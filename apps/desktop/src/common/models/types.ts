@@ -123,6 +123,7 @@ export enum LibrarySort {
   TitleDesc = 'TitleDesc',
   UnreadAsc = 'UnreadAsc',
   UnreadDesc = 'UnreadDesc',
+  DateLastRead = 'DateLastRead',
 }
 
 export enum LibraryView {
