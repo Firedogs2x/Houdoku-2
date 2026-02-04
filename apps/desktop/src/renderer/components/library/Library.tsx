@@ -139,6 +139,16 @@ const Library: React.FC<Props> = () => {
         return filteredList.sort((a: Series, b: Series) => a.title.localeCompare(b.title));
       case LibrarySort.TitleDesc:
         return filteredList.sort((a: Series, b: Series) => b.title.localeCompare(a.title));
+      case LibrarySort.DateLastRead:
+        return filteredList.sort((a: Series, b: Series) => {
+          // Sort by latest date first
+          const dateCompare = new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();
+          // If dates are equal, sort alphabetically A to Z
+          if (dateCompare === 0) {
+            return a.title.localeCompare(b.title);
+          }
+          return dateCompare;
+        });
       default:
         return filteredList;
     }

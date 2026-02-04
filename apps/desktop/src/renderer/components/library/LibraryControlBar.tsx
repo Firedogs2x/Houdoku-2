@@ -23,6 +23,7 @@ import {
   ArrowUp,
   CaseUpper,
   Check,
+  Clock,
   Columns2,
   Hash,
   ImageIcon,
@@ -182,6 +183,23 @@ const LibraryControlBar: React.FC<Props> = () => {
                 Unread
                 {[LibrarySort.UnreadAsc, LibrarySort.UnreadDesc].includes(librarySort) && (
                   <DropdownMenuShortcut>{SORT_ICONS[librarySort]}</DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibrarySort(LibrarySort.DateLastRead);
+                }}
+              >
+                <Clock />
+                <span className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-medium">12</span>
+                  <span>Date Last Read</span>
+                </span>
+                {librarySort === LibrarySort.DateLastRead && (
+                  <DropdownMenuShortcut>
+                    <Check className="w-4 h-4" />
+                  </DropdownMenuShortcut>
                 )}
               </DropdownMenuItem>
             </DropdownMenuGroup>
