@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 const { ipcRenderer } = require('electron');
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import routes from '@/common/constants/routes.json';
+import storeKeys from '@/common/constants/storeKeys.json';
 import DashboardPage from './components/general/DashboardPage';
 import ReaderPage from './components/reader/ReaderPage';
 import ipcChannels from '@/common/constants/ipcChannels.json';
@@ -24,6 +25,7 @@ import {
   loadStoredExtensionSettings,
   loadStoredTrackerTokens,
 } from './services/ipc';
+import { DefaultSettings, GeneralSetting } from '@/common/models/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +54,22 @@ export default function App() {
   const setCurrentTask = useSetRecoilState(currentTaskState);
   const setDownloadErrors = useSetRecoilState(downloadErrorsState);
   const autoCheckForUpdates = useRecoilValue(autoCheckForUpdatesState);
+
+  useEffect(() => {
+    const chapterColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ChapterCountBgColor}`;
+    const scrollbarColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ScrollBarSliderColor}`;
+    const storedChapterColor = localStorage.getItem(chapterColorKey);
+    const storedScrollbarColor = localStorage.getItem(scrollbarColorKey);
+    const chapterColor = storedChapterColor?.length
+      ? storedChapterColor
+      : DefaultSettings[GeneralSetting.ChapterCountBgColor];
+    const scrollbarColor = storedScrollbarColor?.length
+      ? storedScrollbarColor
+      : DefaultSettings[GeneralSetting.ScrollBarSliderColor];
+
+    document.documentElement.style.setProperty('--chapter-count-bg-color', chapterColor);
+    document.documentElement.style.setProperty('--scrollbar-slider-color', scrollbarColor);
+  }, []);
 
   useEffect(() => {
     if (loading) {
