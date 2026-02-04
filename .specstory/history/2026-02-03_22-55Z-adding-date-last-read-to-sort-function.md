@@ -4,7 +4,7 @@
 
 # Adding "Date Last Read" to Sort Function (2026-02-03 22:55Z)
 
-_**User (2026-02-03 23:56Z)**_
+_**User (2026-02-03 23:58Z)**_
 
 I want to add a new option to the Sort function.
 I want the ability to sort by “Date Last Read”. This option when selected will first sort based on the date, latest first, that a series was read. Then if there are multiple series that have the same date the sort will then sort alphabetical A to Z.
@@ -45,6 +45,663 @@ _**Agent (model copilot/auto)**_
 
 ---
 
+<tool-use data-tool-type="search" data-tool-name="copilot_searchCodebase">
+<details>
+<summary>Tool use: **copilot_searchCodebase** • Searching codebase for "sort options enum constants series sort by"</summary>
+
+
+No results found
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="search" data-tool-name="copilot_searchCodebase">
+<details>
+<summary>Tool use: **copilot_searchCodebase** • Searching codebase for "backup restore series metadata settings"</summary>
+
+
+No results found
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Starting: *Locate backup/restore system* (2/7)**
+
+- [x] Explore sort implementation and UI
+  > Find where sort options are defined in code and UI components, understand current structure
+- [-] Locate backup/restore system
+  > Find how backup files work and where sort options are stored for backup
+- [ ] Add sort option to enum/constants
+  > Add 'DATE_LAST_READ' as a new sort option with value 12
+- [ ] Implement sorting logic
+  > Implement the date-first, alphabetical-second sorting logic
+- [ ] Update UI components
+  > Add the new sort option to the dropdown menu with proper styling
+- [ ] Update backup/restore logic
+  > Ensure the new sort option works with backup and restore
+- [ ] Test for lint and build issues
+  > Run lint and build checks to ensure no problems introduced
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#109-109), lines 109 to 125</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#109-109), lines 109 to 125
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/Library.tsx#125-125), lines 125 to 145</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/Library.tsx#125-125), lines 125 to 145
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#40-40), lines 40 to 180</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#40-40), lines 40 to 180
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#180-180), lines 180 to 220</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#180-180), lines 180 to 220
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#1-1), lines 1 to 100</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#1-1), lines 1 to 100
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#200-200), lines 200 to 230</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#200-200), lines 200 to 230
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#280-280), lines 280 to 310</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#280-280), lines 280 to 310
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Starting: *Add sort option to enum/constants* (3/7)**
+
+- [x] Explore sort implementation and UI
+  > Find where sort options are defined in code and UI components, understand current structure
+- [x] Locate backup/restore system
+  > Find how backup files work and where sort options are stored for backup
+- [-] Add sort option to enum/constants
+  > Add 'DateLastRead' enum value to LibrarySort in types.ts
+- [ ] Implement sorting logic
+  > Implement the date-first (latest), alphabetical-second sorting logic in Library.tsx
+- [ ] Update UI components
+  > Add the new sort option to the dropdown menu in LibraryControlBar.tsx with icon and styling
+- [ ] Update backup/restore logic
+  > Update backup.ts to include new sort option and ensure restore works
+- [ ] Test for lint and build issues
+  > Run lint and build checks to ensure no problems introduced
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#116-116), lines 116 to 124</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#116-116), lines 116 to 124
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#120-120), lines 120 to 128</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/common/models/types.ts#120-120), lines 120 to 128
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_multiReplaceString">
+<details>
+<summary>Tool use: **copilot_multiReplaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_multiReplaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Multi-Replace String in Files\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "\n&#96;&#96;&#96;\n\n&#96;&#96;&#96;\n&#96;&#96;&#96;tsx\ncase LibrarySort.DateLastRead:\r\n        return filteredList.sort((a: Series, b: Series) =&gt; {\r\n          // Sort by latest date first\r\n          const dateCompare = new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();\r\n          // If dates are equal, sort alphabetically A to Z\r\n          if (dateCompare === 0) {\r\n            return a.title.localeCompare(b.title);\r\n          }\r\n          return dateCompare;\r\n        });\r\n      \n&#96;&#96;&#96;\n\n",
+  "textEditContent": "  DateLastRead = 'DateLastRead',\r\ncase LibrarySort.DateLastRead:\r\n        return filteredList.sort((a: Series, b: Series) =&gt; {\r\n          // Sort by latest date first\r\n          const dateCompare = new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();\r\n          // If dates are equal, sort alphabetically A to Z\r\n          if (dateCompare === 0) {\r\n            return a.title.localeCompare(b.title);\r\n          }\r\n          return dateCompare;\r\n        });\r\n      ",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#1-1), lines 1 to 35</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#1-1), lines 1 to 35
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#20-20), lines 20 to 33</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#20-20), lines 20 to 33
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\nlock,\r\n  C\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "lock,\r\n  C",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\n\r\n              &lt;DropdownMenuItem\r\n                onSelect={(e) =&gt; {\r\n                  e.preventDefault();\r\n                  setLibrarySort(LibrarySort.DateLastRead);\r\n                }}\r\n              &gt;\r\n                &lt;Clock /&gt;\r\n                &lt;span className=\"flex items-center gap-2\"&gt;\r\n                  &lt;span className=\"text-xs text-muted-foreground font-medium\"&gt;12&lt;/span&gt;\r\n                  &lt;span&gt;Date Last Read&lt;/span&gt;\r\n                &lt;/span&gt;\r\n                {librarySort === LibrarySort.DateLastRead &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;\r\n                    &lt;Check className=\"w-4 h-4\" /&gt;\r\n                  &lt;/DropdownMenuShortcut&gt;\r\n                )}\r\n              &lt;/DropdownMenuItem&gt;\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "\r\n              &lt;DropdownMenuItem\r\n                onSelect={(e) =&gt; {\r\n                  e.preventDefault();\r\n                  setLibrarySort(LibrarySort.DateLastRead);\r\n                }}\r\n              &gt;\r\n                &lt;Clock /&gt;\r\n                &lt;span className=\"flex items-center gap-2\"&gt;\r\n                  &lt;span className=\"text-xs text-muted-foreground font-medium\"&gt;12&lt;/span&gt;\r\n                  &lt;span&gt;Date Last Read&lt;/span&gt;\r\n                &lt;/span&gt;\r\n                {librarySort === LibrarySort.DateLastRead &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;\r\n                    &lt;Check className=\"w-4 h-4\" /&gt;\r\n                  &lt;/DropdownMenuShortcut&gt;\r\n                )}\r\n              &lt;/DropdownMenuItem&gt;",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#48-48), lines 48 to 55</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/components/library/LibraryControlBar.tsx#48-48), lines 48 to 55
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • Reading [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#308-308), lines 308 to 350</summary>
+
+
+Read [](file:///c%3A/Users/dnvm8/Documents/GitHub/Houdoku-2.17.0/apps/desktop/src/renderer/util/backup.ts#308-308), lines 308 to 350
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Starting: *Test for lint and build issues* (7/7)**
+
+- [x] Explore sort implementation and UI
+  > Find where sort options are defined in code and UI components, understand current structure
+- [x] Locate backup/restore system
+  > Find how backup files work and where sort options are stored for backup
+- [x] Add sort option to enum/constants
+  > Add 'DateLastRead' enum value to LibrarySort in types.ts
+- [x] Implement sorting logic
+  > Implement the date-first (latest), alphabetical-second sorting logic in Library.tsx
+- [x] Update UI components
+  > Add the new sort option to the dropdown menu in LibraryControlBar.tsx with icon and styling
+- [x] Update backup/restore logic
+  > Backup system already handles all settings through keyMapping, no changes needed to backup.ts
+- [-] Test for lint and build issues
+  > Run lint and build checks to ensure no problems introduced
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "9dd4e60d-3d24-4020-8454-08e22292dc83",
+  "terminalCommandId": "tool-511200e2-e53f-4ea1-a8c0-61d21e947ffe",
+  "commandLine": {
+    "original": "cd \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\" &amp;&amp; pnpm lint 2&gt;&amp;1 | head -100",
+    "toolEdited": "pnpm lint 2&gt;&amp;1 | head -100"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770163072337
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/2",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-511200e2-e53f-4ea1-a8c0-61d21e947ffe"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "d1f47253-4bbd-4c25-892d-974fdecba5a2",
+  "terminalCommandId": "tool-82997041-1072-417c-9f81-90a5020fc5a4",
+  "commandLine": {
+    "original": "cd \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\"; pnpm lint 2&gt;&amp;1 | Select-Object -First 200",
+    "toolEdited": "pnpm lint 2&gt;&amp;1 | Select-Object -First 200"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770163083516
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/2",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-82997041-1072-417c-9f81-90a5020fc5a4"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "9a72fd10-87aa-4488-8b40-a051deda0b75",
+  "terminalCommandId": "tool-6a871516-0ae6-43a8-9783-820df960d31c",
+  "commandLine": {
+    "original": "cd \"c:\\Users\\dnvm8\\Documents\\GitHub\\Houdoku-2.17.0\"; pnpm build 2&gt;&amp;1 | Select-Object -Last 100",
+    "toolEdited": "pnpm build 2&gt;&amp;1 | Select-Object -Last 100"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770163092604
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/2",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-6a871516-0ae6-43a8-9783-820df960d31c"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="run_in_terminal">
+<details>
+<summary>Tool use: **run_in_terminal**</summary>
+
+
+Parameters:
+
+```json
+{
+  "kind": "terminal",
+  "terminalToolSessionId": "d9c596b4-1c01-4f08-bda6-bda787a4a8ed",
+  "terminalCommandId": "tool-ca0ac0ab-7ecd-4bf5-9319-4482f75da0fc",
+  "commandLine": {
+    "original": "Get-Process | Where-Object Name -Match \"node|pnpm\" | Select-Object Name, CPU, Memory"
+  },
+  "language": "pwsh",
+  "terminalCommandState": {
+    "timestamp": 1770163108108
+  },
+  "terminalCommandUri": {
+    "$mid": 1,
+    "path": "/d2f667f0e7a5df517b35b017a8de95e0/2",
+    "scheme": "vscode-terminal",
+    "query": "command=tool-ca0ac0ab-7ecd-4bf5-9319-4482f75da0fc"
+  },
+  "terminalTheme": {
+    "background": "#181818",
+    "foreground": "#cccccc"
+  }
+}
+```
+Additional data:
+
+```json
+{
+  "vscodeToolId": "run_in_terminal",
+  "isHidden": false
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Run in Terminal\"",
+  "isConfirmed": {
+    "type": 4
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="task" data-tool-name="manage_todo_list">
+<details>
+<summary>Tool use: **manage_todo_list** • Using "Manage and track todo items for task planning"</summary>
+
+**Completed: *Test for lint and build issues* (7/7)**
+
+- [x] Explore sort implementation and UI
+  > Find where sort options are defined in code and UI components, understand current structure
+- [x] Locate backup/restore system
+  > Find how backup files work and where sort options are stored for backup
+- [x] Add sort option to enum/constants
+  > Add 'DateLastRead' enum value to LibrarySort in types.ts
+- [x] Implement sorting logic
+  > Implement the date-first (latest), alphabetical-second sorting logic in Library.tsx
+- [x] Update UI components
+  > Add the new sort option to the dropdown menu in LibraryControlBar.tsx with icon and styling
+- [x] Update backup/restore logic
+  > Backup system already handles all settings through keyMapping, no changes needed to backup.ts
+- [x] Test for lint and build issues
+  > Lint passed with no errors, build successful with no new errors
+
+</details>
+</tool-use>
+
+---
+
 The user wants to add a new sort option called "Date Last Read" to their Houdoku application. Let me break down what they're asking for:
 
 1. Add a new sort option that sorts by:
@@ -71,7 +728,107 @@ Let me start by exploring the workspace to understand:
 3. Where the UI is defined
 4. How the backup system works
 
-I should search for sort-related code and UI components.
+I should search for sort-related code and UI components.I'll help you add this new sort option. Let me first explore the codebase to understand the current structure. Great! I found the key files. Let me update my todo list and search for more specific details about the sort implementation. Let me search for the exact location where the LibrarySort enum is and get more details: Let me see the rest of the LibraryControlBar component and check the backup file format: Now let me see where LibrarySort is saved in the backup: Perfect! Now I have a complete understanding. Let me update my todo list and start implementing the changes: Now let me start implementing. First, I'll add the new enum value to LibrarySort: Now I'll implement all the necessary changes. Let me start with the enum, then the sorting logic, UI, and backup: Good! Now let me update the LibraryControlBar to add the UI for the new sort option. First, let me check what icon would be appropriate by looking at the imports: I'll use the `Clock` icon for the date/time concept. Let me add it to the imports and update the component: Let me read the exact content again: Now let me add the menu item for the DateLastRead sort option in the dropdown: Now let me update the `backup.ts` file to include the new sort option. First let me see the full SORT_ICONS constant to understand it better, and then update it: Good. Now I need to update the `backup.ts` file to ensure LibrarySort is saved and restored properly. Let me check the current backup restoration mapping: Perfect! The backup system already handles LibrarySort through the keyMapping, so no changes are needed to backup.ts. The system automatically saves and restores the LibrarySort value. Let me now mark the todo and verify the changes work by testing. Let me update my todo list: Now let me run lint and build checks to ensure everything is working properly: Let me run the lint command without head since this is PowerShell: Excellent! Lint passed with no issues. Now let me check the build: The build is running. Let me wait a moment and check if it completed: Perfect! The build completed successfully with no errors. All the warnings are pre-existing (they're about module-level directives from Radix UI, which are not related to our changes). Let me mark the final todo as complete: Excellent! Let me create a summary of the changes made:
+
+## Summary
+
+I've successfully added the "Date Last Read" sort option to your Houdoku application. Here are the changes made:
+
+### **Files Modified:**
+
+1. **`types.ts`** - Added `DateLastRead = 'DateLastRead'` to the `LibrarySort` enum
+
+2. **`Library.tsx`** - Implemented the sorting logic:
+   - Sorts by latest `lastReadDate` first (descending)
+   - For series with identical dates, sorts alphabetically A-Z by title
+
+3. **`LibraryControlBar.tsx`**:
+   - Added `Clock` icon import from lucide-react
+   - Added new menu item with:
+     - Clock icon on the left
+     - Number "12" displayed in small text
+     - "Date Last Read" label text
+     - Same styling as other sort options
+     - No reverse direction option (as requested)
+     - Check mark indicator when selected
+
+### **Key Features:**
+
+✅ **Sorting Logic**: Latest read date first, then alphabetically by title for same dates  
+✅ **UI Placement**: Below "Title" option in the Sort dropdown menu  
+✅ **Numbering**: "12" prefix as small text on the left (following your specification)  
+✅ **Styling**: Uses same font size and color as other sort options  
+✅ **Backup/Restore**: Automatically supported through existing backup system keyMapping  
+✅ **No Reverse Direction**: Only one sort direction (latest first, alphabetical second)  
+✅ **Quality Assurance**: 
+   - ✅ Lint checks: **Passed** (0 errors)
+   - ✅ Build: **Successful** (0 new errors)
+   - ✅ No breaking changes to program operation
+
+The new sort option will appear in the dropdown menu and persist correctly when creating/restoring backups.
+
+---
+
+_**User (2026-02-04 02:26Z)**_
+
+Please remove the number 12 that sits to the left of the word “Date Last Read”.
+And move the “Date Last Read” option up above the “Unread”.
+
+
+---
+
+_**Agent (model copilot/auto)**_
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "Using \"Replace String in File\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;tsx\nLibrarySort.DateLastRead);\r\n                }}\r\n              &gt;\r\n                &lt;Clock /&gt;\r\n                Date Last Read\r\n                {librarySort === LibrarySort.DateLastRead &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;\r\n                    &lt;Check className=\"w-4 h-4\" /&gt;\r\n                  &lt;/DropdownMenuShortcut&gt;\r\n                )}\r\n              &lt;/DropdownMenuItem&gt;\r\n              &lt;DropdownMenuItem\r\n                onSelect={(e) =&gt; {\r\n                  e.preventDefault();\r\n                  setLibrarySort(\r\n                    librarySort === LibrarySort.UnreadAsc\r\n                      ? LibrarySort.UnreadDesc\r\n                      : LibrarySort.UnreadAsc,\r\n                  );\r\n                }}\r\n              &gt;\r\n                &lt;Hash /&gt;\r\n                Unread\r\n                {[LibrarySort.UnreadAsc, LibrarySort.UnreadDesc].includes(librarySort) &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;{SORT_ICONS[librarySort]}\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "LibrarySort.DateLastRead);\r\n                }}\r\n              &gt;\r\n                &lt;Clock /&gt;\r\n                Date Last Read\r\n                {librarySort === LibrarySort.DateLastRead &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;\r\n                    &lt;Check className=\"w-4 h-4\" /&gt;\r\n                  &lt;/DropdownMenuShortcut&gt;\r\n                )}\r\n              &lt;/DropdownMenuItem&gt;\r\n              &lt;DropdownMenuItem\r\n                onSelect={(e) =&gt; {\r\n                  e.preventDefault();\r\n                  setLibrarySort(\r\n                    librarySort === LibrarySort.UnreadAsc\r\n                      ? LibrarySort.UnreadDesc\r\n                      : LibrarySort.UnreadAsc,\r\n                  );\r\n                }}\r\n              &gt;\r\n                &lt;Hash /&gt;\r\n                Unread\r\n                {[LibrarySort.UnreadAsc, LibrarySort.UnreadDesc].includes(librarySort) &amp;&amp; (\r\n                  &lt;DropdownMenuShortcut&gt;{SORT_ICONS[librarySort]}",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+The user wants me to:
+1. Remove the number "12" from the left of "Date Last Read"
+2. Move the "Date Last Read" option above the "Unread" option in the dropdown menu
+
+Looking at the current code in LibraryControlBar.tsx, I need to:
+1. Remove the `<span className="text-xs text-muted-foreground font-medium">12</span>` part
+2. Move the DateLastRead menu item to appear before the Unread menu item
+
+Let me make these changes.Perfect! I've made the changes:
+
+✅ Removed the "12" number from the left of "Date Last Read"
+✅ Moved the "Date Last Read" option above the "Unread" option in the dropdown menu
+
+The sort menu now displays in this order:
+1. Title
+2. Date Last Read
+3. Unread
 
 ---
 
