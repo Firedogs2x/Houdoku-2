@@ -94,6 +94,7 @@ export enum GeneralSetting {
   LibraryColumns = 'LibraryColumns',
   LibraryView = 'LibraryView',
   LibrarySort = 'LibrarySort',
+  LibraryDisplayMode = 'LibraryDisplayMode',
   LibraryFilterStatus = 'LibraryFilterStatus',
   LibraryFilterProgress = 'LibraryFilterProgress',
   LibraryFilterCategory = 'LibraryFilterCategory',
@@ -124,6 +125,7 @@ export enum LibrarySort {
   UnreadAsc = 'UnreadAsc',
   UnreadDesc = 'UnreadDesc',
   DateLastRead = 'DateLastRead',
+  ChapterUpdate = 'ChapterUpdate',
 }
 
 export enum LibraryView {
@@ -131,6 +133,11 @@ export enum LibraryView {
   GridCoversOnly = 'GRID_COVERS_ONLY',
   GridComfortable = 'GRID_COMFORTABLE',
   List = 'LIST',
+}
+
+export enum LibraryDisplayMode {
+  All = 'All',
+  FilterByCategory = 'FilterByCategory',
 }
 
 export enum ReaderSetting {
@@ -217,6 +224,7 @@ export const SettingTypes = {
   [GeneralSetting.LibraryColumns]: SettingType.NUMBER,
   [GeneralSetting.LibraryView]: SettingType.STRING,
   [GeneralSetting.LibrarySort]: SettingType.STRING,
+  [GeneralSetting.LibraryDisplayMode]: SettingType.STRING,
   [GeneralSetting.LibraryFilterStatus]: SettingType.STRING,
   [GeneralSetting.LibraryFilterProgress]: SettingType.STRING,
   [GeneralSetting.LibraryFilterCategory]: SettingType.STRING,
@@ -281,6 +289,7 @@ export const DefaultSettings = {
   [GeneralSetting.LibraryColumns]: 4,
   [GeneralSetting.LibraryView]: LibraryView.GridCompact,
   [GeneralSetting.LibrarySort]: LibrarySort.TitleAsc,
+  [GeneralSetting.LibraryDisplayMode]: LibraryDisplayMode.All,
   [GeneralSetting.LibraryFilterStatus]: SeriesStatus.ONGOING,
   [GeneralSetting.LibraryFilterProgress]: ProgressFilter.All,
   [GeneralSetting.LibraryFilterCategory]: '',

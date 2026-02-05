@@ -13,6 +13,7 @@ import {
   IntegrationSetting,
   LibrarySort,
   LibraryView,
+  LibraryDisplayMode,
   OffsetPages,
   PageStyle,
   ProgressFilter,
@@ -86,6 +87,7 @@ export const additionalFolder2State = atm<string>(GeneralSetting.AdditionalFolde
 export const libraryColumnsState = atm<number>(GeneralSetting.LibraryColumns);
 export const libraryViewState = atm<LibraryView>(GeneralSetting.LibraryView);
 export const librarySortState = atm<LibrarySort>(GeneralSetting.LibrarySort);
+export const libraryDisplayModeState = atm<LibraryDisplayMode>(GeneralSetting.LibraryDisplayMode);
 // biome-ignore format: TODO ignore block
 export const libraryFilterStatusState = atm<SeriesStatus | null>(GeneralSetting.LibraryFilterStatus);
 export const libraryFilterProgressState = atm<ProgressFilter>(GeneralSetting.LibraryFilterProgress);
