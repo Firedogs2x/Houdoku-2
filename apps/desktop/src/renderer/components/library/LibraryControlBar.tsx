@@ -2,7 +2,7 @@ import React from 'react';
 import { Series, SeriesStatus } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { reloadSeriesList } from '@/renderer/features/library/utils';
-import { LibrarySort, LibraryView, ProgressFilter } from '@/common/models/types';
+import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';
 import {
   filterState,
   reloadingSeriesListState,
@@ -16,6 +16,7 @@ import {
   libraryViewState,
   librarySortState,
   chapterLanguagesState,
+  libraryDisplayModeState,
 } from '@/renderer/state/settingStates';
 import { Button } from '@houdoku/ui/components/Button';
 import {
@@ -32,6 +33,7 @@ import {
   PanelBottom,
   Rows2,
   Search,
+  CalendarClock,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -47,7 +49,7 @@ import {
 } from '@houdoku/ui/components/DropdownMenu';
 import { Input } from '@houdoku/ui/components/Input';
 
-const SORT_ICONS = {
+const SORT_ICONS: Partial<Record<LibrarySort, JSX.Element>> = {
   [LibrarySort.TitleAsc]: <ArrowUp size={14} />,
   [LibrarySort.TitleDesc]: <ArrowDown size={14} />,
   [LibrarySort.UnreadAsc]: <ArrowUp size={14} />,
@@ -69,6 +71,7 @@ const LibraryControlBar: React.FC<Props> = () => {
   const [libraryColumns, setLibraryColumns] = useRecoilState(libraryColumnsState);
   const [libraryView, setLibraryView] = useRecoilState(libraryViewState);
   const [librarySort, setLibrarySort] = useRecoilState(librarySortState);
+  const [libraryDisplayMode, setLibraryDisplayMode] = useRecoilState(libraryDisplayModeState);
   const chapterLanguages = useRecoilValue(chapterLanguagesState);
 
   const refreshHandler = () => {
@@ -85,6 +88,77 @@ const LibraryControlBar: React.FC<Props> = () => {
           {reloadingSeriesList && <Loader2 className="animate-spin" />}
           {reloadingSeriesList ? 'Refreshing...' : 'Refresh'}{' '}
         </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Sort</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Sort</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibrarySort(
+                    librarySort === LibrarySort.TitleAsc
+                      ? LibrarySort.TitleDesc
+                      : LibrarySort.TitleAsc,
+                  );
+                }}
+              >
+                <CaseUpper />
+                Title
+                {[LibrarySort.TitleAsc, LibrarySort.TitleDesc].includes(librarySort) && (
+                  <DropdownMenuShortcut>{SORT_ICONS[librarySort]}</DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibrarySort(LibrarySort.DateLastRead);
+                }}
+              >
+                <Clock />
+                Date Last Read
+                {librarySort === LibrarySort.DateLastRead && (
+                  <DropdownMenuShortcut>
+                    <Check className="w-4 h-4" />
+                  </DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibrarySort(LibrarySort.ChapterUpdate);
+                }}
+              >
+                <CalendarClock />
+                Chapter Update
+                {librarySort === LibrarySort.ChapterUpdate && (
+                  <DropdownMenuShortcut>
+                    <Check className="w-4 h-4" />
+                  </DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibrarySort(
+                    librarySort === LibrarySort.UnreadAsc
+                      ? LibrarySort.UnreadDesc
+                      : LibrarySort.UnreadAsc,
+                  );
+                }}
+              >
+                <Hash />
+                Unread
+                {[LibrarySort.UnreadAsc, LibrarySort.UnreadDesc].includes(librarySort) && (
+                  <DropdownMenuShortcut>{SORT_ICONS[librarySort]}</DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -151,55 +225,24 @@ const LibraryControlBar: React.FC<Props> = () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>Sort</DropdownMenuLabel>
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setLibrarySort(
-                    librarySort === LibrarySort.TitleAsc
-                      ? LibrarySort.TitleDesc
-                      : LibrarySort.TitleAsc,
-                  );
-                }}
+            <DropdownMenuLabel className="whitespace-normal">All Series Library: Display Cards</DropdownMenuLabel>
+            <DropdownMenuRadioGroup
+              value={libraryDisplayMode}
+              onValueChange={(value) => setLibraryDisplayMode(value as LibraryDisplayMode)}
+            >
+              <DropdownMenuRadioItem
+                value={LibraryDisplayMode.All}
+                onSelect={(e) => e.preventDefault()}
               >
-                <CaseUpper />
-                Title
-                {[LibrarySort.TitleAsc, LibrarySort.TitleDesc].includes(librarySort) && (
-                  <DropdownMenuShortcut>{SORT_ICONS[librarySort]}</DropdownMenuShortcut>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setLibrarySort(LibrarySort.DateLastRead);
-                }}
+                All
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem
+                value={LibraryDisplayMode.FilterByCategory}
+                onSelect={(e) => e.preventDefault()}
               >
-                <Clock />
-                Date Last Read
-                {librarySort === LibrarySort.DateLastRead && (
-                  <DropdownMenuShortcut>
-                    <Check className="w-4 h-4" />
-                  </DropdownMenuShortcut>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                  setLibrarySort(
-                    librarySort === LibrarySort.UnreadAsc
-                      ? LibrarySort.UnreadDesc
-                      : LibrarySort.UnreadAsc,
-                  );
-                }}
-              >
-                <Hash />
-                Unread
-                {[LibrarySort.UnreadAsc, LibrarySort.UnreadDesc].includes(librarySort) && (
-                  <DropdownMenuShortcut>{SORT_ICONS[librarySort]}</DropdownMenuShortcut>
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+                Filter by Category
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onSelect={(e) => {
