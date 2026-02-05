@@ -28,6 +28,8 @@ import {
   Columns2,
   Hash,
   ImageIcon,
+  Filter,
+  FilterX,
   LayoutGrid,
   Loader2,
   PanelBottom,
@@ -226,23 +228,36 @@ const LibraryControlBar: React.FC<Props> = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="whitespace-normal">All Series Library: Display Cards</DropdownMenuLabel>
-            <DropdownMenuRadioGroup
-              value={libraryDisplayMode}
-              onValueChange={(value) => setLibraryDisplayMode(value as LibraryDisplayMode)}
-            >
-              <DropdownMenuRadioItem
-                value={LibraryDisplayMode.All}
-                onSelect={(e) => e.preventDefault()}
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibraryDisplayMode(LibraryDisplayMode.All);
+                }}
               >
+                <FilterX />
                 All
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem
-                value={LibraryDisplayMode.FilterByCategory}
-                onSelect={(e) => e.preventDefault()}
+                {libraryDisplayMode === LibraryDisplayMode.All && (
+                  <DropdownMenuShortcut>
+                    <Check className="w-4 h-4" />
+                  </DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setLibraryDisplayMode(LibraryDisplayMode.FilterByCategory);
+                }}
               >
+                <Filter />
                 Filter by Category
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
+                {libraryDisplayMode === LibraryDisplayMode.FilterByCategory && (
+                  <DropdownMenuShortcut>
+                    <Check className="w-4 h-4" />
+                  </DropdownMenuShortcut>
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onSelect={(e) => {
