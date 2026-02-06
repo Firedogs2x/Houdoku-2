@@ -69,7 +69,7 @@ import {
 import { EditCategoryDialog } from './EditCategoryDialog';
 import { RemoveCategoryDialog } from './RemoveCategoryDialog';
 import library from '@/renderer/services/library';
-import { seriesListState } from '@/renderer/state/libraryStates';
+import { seriesListState, activeSeriesListState } from '@/renderer/state/libraryStates';
 
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
@@ -79,8 +79,21 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const [showingRemoveCategoryDialog, setShowingRemoveCategoryDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const categories = useRecoilValue(categoryListState);
+  const activeSeriesList = useRecoilValue(activeSeriesListState);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
+
+  // Helper function to count series in a specific category
+  const getSeriesCountInCategory = (categoryId: string): number => {
+    return activeSeriesList.filter((series) =>
+      series.categories?.includes(categoryId)
+    ).length;
+  };
+
+  // Helper function to get total series count
+  const getTotalSeriesCount = (): number => {
+    return activeSeriesList.length;
+  };
 
   const handleUpdateCheck = () => {
     if (!checkingForUpdate) {
@@ -138,7 +151,12 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                           navigate(routes.LIBRARY);
                         }}
                       >
-                        <span>All Series</span>
+                        <div className="flex justify-between items-center w-full gap-2">
+                          <span>All Series</span>
+                          <span className="tabular-nums w-8 text-right text-sm font-normal">
+                            {getTotalSeriesCount()}
+                          </span>
+                        </div>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     {categories.map((category) => (
@@ -153,7 +171,12 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 navigate(routes.LIBRARY);
                               }}
                             >
-                              <span>{category.label}</span>
+                              <div className="flex justify-between items-center w-full gap-2">
+                                <span>{category.label}</span>
+                                <span className="tabular-nums w-8 text-right text-sm font-normal">
+                                  {getSeriesCountInCategory(category.id)}
+                                </span>
+                              </div>
                             </SidebarMenuSubButton>
                           </ContextMenuTrigger>
                           <ContextMenuContent className="w-40">
