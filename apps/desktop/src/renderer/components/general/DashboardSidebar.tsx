@@ -84,16 +84,13 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
-  // Note: SidebarMenuSubButton has 8px (0.5rem) right padding built-in
+  // Use negative margin to position the count box from the right edge
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 4;
-  const SIDEBAR_BUTTON_PADDING_RIGHT = 4; // px-2 = 0.5rem = 8px
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    // Calculate negative margin to position from visible edge
-    const actualMargin = -(SIDEBAR_BUTTON_PADDING_RIGHT - CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX);
     return {
       marginLeft: 'auto',
-      marginRight: `${actualMargin}px`,
+      marginRight: `-${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
     };
   };
 
