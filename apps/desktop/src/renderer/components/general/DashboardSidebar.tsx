@@ -82,15 +82,15 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const activeSeriesList = useRecoilValue(activeSeriesListState);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
-  const CATEGORY_COUNT_ALIGN: 'left' | 'right' = 'right';
-  const CATEGORY_COUNT_OFFSET_PX = 4;
+  
+  // Distance from right edge of sidebar (in pixels)
+  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    if (CATEGORY_COUNT_ALIGN === 'left') {
-      return { marginRight: 'auto', marginLeft: CATEGORY_COUNT_OFFSET_PX };
-    }
-
-    return { marginLeft: 'auto', marginRight: CATEGORY_COUNT_OFFSET_PX };
+    return {
+      marginLeft: 'auto',
+      marginRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
+    };
   };
 
   // Helper function to count series in a specific category
@@ -161,9 +161,9 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                           navigate(routes.LIBRARY);
                         }}
                       >
-                        <span className="flex-1 truncate max-w-[12rem]">All Series</span>
+                        <span className="truncate max-w-[12rem]">All Series</span>
                         <span
-                          className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0"
+                          className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
                           style={getCategoryCountStyle()}
                         >
                           {getTotalSeriesCount()}
@@ -187,7 +187,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                   {category.label}
                                 </span>
                                 <span
-                                  className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0"
+                                  className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
                                   style={getCategoryCountStyle()}
                                 >
                                   {getSeriesCountInCategory(category.id)}
