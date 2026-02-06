@@ -83,16 +83,16 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
   
-  // Distance from right edge of sidebar (in pixels)
-  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
   // Font size for counter numbers (in pixels)
-  const CATEGORY_COUNT_FONT_SIZE_PX = 10;
+  const CATEGORY_COUNT_FONT_SIZE_PX = 14;
+  // Distance from right edge (in pixels)  
+  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    // Use absolute positioning to avoid clipping and render artifacts
+    // Push to right with flex margin, then add padding for final distance from edge
     return {
-      position: 'absolute',
-      right: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
+      marginLeft: 'auto',
+      paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
       fontSize: `${CATEGORY_COUNT_FONT_SIZE_PX}px`,
     };
   };
@@ -158,7 +158,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton
-                        className="cursor-pointer relative"
+                        className="cursor-pointer"
                         onClick={() => {
                           setLibraryFilterCategory('');
                           setSeriesList(library.fetchSeriesList());
@@ -167,7 +167,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       >
                         <span className="truncate max-w-[12rem]">All Series</span>
                         <span
-                          className="tabular-nums text-left font-normal w-[3ch]"
+                          className="tabular-nums text-left font-normal flex-shrink-0 whitespace-nowrap"
                           style={getCategoryCountStyle()}
                         >
                           {getTotalSeriesCount()}
@@ -179,7 +179,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         <ContextMenu>
                           <ContextMenuTrigger>
                             <SidebarMenuSubButton
-                              className="cursor-pointer relative"
+                              className="cursor-pointer"
                               onClick={() => {
                                 setLibraryFilterCategory(category.id);
                                 setSeriesList(library.fetchSeriesList());
@@ -190,7 +190,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 {category.label}
                               </span>
                               <span
-                                className="tabular-nums text-left font-normal w-[3ch]"
+                                className="tabular-nums text-left font-normal flex-shrink-0 whitespace-nowrap"
                                 style={getCategoryCountStyle()}
                               >
                                 {getSeriesCountInCategory(category.id)}
