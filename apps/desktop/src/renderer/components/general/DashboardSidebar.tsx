@@ -157,7 +157,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton
-                        className="cursor-pointer !pr-0"
+                        className="cursor-pointer !pr-0 !overflow-x-visible"
                         onClick={() => {
                           setLibraryFilterCategory('');
                           setSeriesList(library.fetchSeriesList());
@@ -178,7 +178,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         <ContextMenu>
                           <ContextMenuTrigger>
                             <SidebarMenuSubButton
-                              className="cursor-pointer !pr-0"
+                              className="cursor-pointer !pr-0 !overflow-x-visible"
                               onClick={() => {
                                 setLibraryFilterCategory(category.id);
                                 setSeriesList(library.fetchSeriesList());
