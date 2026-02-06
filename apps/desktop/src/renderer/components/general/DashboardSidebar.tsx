@@ -83,7 +83,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
   const CATEGORY_COUNT_ALIGN: 'left' | 'right' = 'right';
-  const CATEGORY_COUNT_OFFSET_PX = 12;
+  const CATEGORY_COUNT_OFFSET_PX = 4;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
     if (CATEGORY_COUNT_ALIGN === 'left') {
