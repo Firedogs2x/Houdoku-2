@@ -139,3 +139,5 @@ jobs:
             apps/desktop/release/*.nsis
             apps/desktop/release/*.dmg
             apps/desktop/release/*.zip
+            apps/desktop/release/*.yml
+            apps/desktop/release/*.blockmap
