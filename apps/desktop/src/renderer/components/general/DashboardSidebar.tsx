@@ -151,12 +151,10 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                           navigate(routes.LIBRARY);
                         }}
                       >
-                        <div className="flex justify-between items-center w-full gap-2">
-                          <span>All Series</span>
-                          <span className="tabular-nums w-8 text-right text-sm font-normal">
-                            {getTotalSeriesCount()}
-                          </span>
-                        </div>
+                        <span className="flex-1 truncate max-w-[12rem]">All Series</span>
+                        <span className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0">
+                          {getTotalSeriesCount()}
+                        </span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     {categories.map((category) => (
@@ -171,9 +169,11 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 navigate(routes.LIBRARY);
                               }}
                             >
-                              <div className="flex justify-between items-center w-full gap-2">
-                                <span>{category.label}</span>
-                                <span className="tabular-nums w-8 text-right text-sm font-normal">
+                              <div className="flex items-center gap-2 w-full min-w-0">
+                                <span className="truncate max-w-[12rem]">
+                                  {category.label}
+                                </span>
+                                <span className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0">
                                   {getSeriesCountInCategory(category.id)}
                                 </span>
                               </div>
