@@ -86,7 +86,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   // Distance from right edge of sidebar (in pixels)
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
   // Font size for counter numbers (in pixels)
-  const CATEGORY_COUNT_FONT_SIZE_PX = 14;
+  const CATEGORY_COUNT_FONT_SIZE_PX = 10;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
     // Use absolute positioning to avoid clipping and render artifacts
