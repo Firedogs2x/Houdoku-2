@@ -84,19 +84,14 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
-  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 3;
+  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 2;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    // Parent button has gap-2 (8px) between children
-    // We override px-2 right padding with !pr-0 class
-    const GAP = 2; // gap-2 = 0.5rem = 8px
-    
+    // Push content right and pull back 8px to account for gap-2
     return {
       marginLeft: 'auto',
-      // Negative margin cancels out the gap-2 between name and count
-      marginRight: `-${GAP}px`,
-      // Padding controls final distance from visible edge
-      paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
+      marginRight: `-8px`, // Pull back 8px to cancel gap-2
+      paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`, // Distance from right edge
     };
   };
 
@@ -170,7 +165,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       >
                         <span className="truncate max-w-[12rem]">All Series</span>
                         <span
-                          className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
+                          className="tabular-nums text-right text-sm font-normal flex-shrink-0"
                           style={getCategoryCountStyle()}
                         >
                           {getTotalSeriesCount()}
@@ -193,7 +188,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 {category.label}
                               </span>
                               <span
-                                className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
+                                className="tabular-nums text-right text-sm font-normal flex-shrink-0"
                                 style={getCategoryCountStyle()}
                               >
                                 {getSeriesCountInCategory(category.id)}
