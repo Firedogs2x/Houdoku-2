@@ -86,7 +86,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   // Distance from right edge of sidebar (in pixels)
   // Note: SidebarMenuSubButton has 8px (0.5rem) right padding built-in
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 4;
-  const SIDEBAR_BUTTON_PADDING_RIGHT = 8; // px-2 = 0.5rem = 8px
+  const SIDEBAR_BUTTON_PADDING_RIGHT = 4; // px-2 = 0.5rem = 8px
 
   const getCategoryCountStyle = (): React.CSSProperties => {
     // Calculate negative margin to position from visible edge
