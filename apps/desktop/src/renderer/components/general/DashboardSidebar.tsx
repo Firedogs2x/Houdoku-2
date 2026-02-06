@@ -164,7 +164,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       >
                         <span className="truncate max-w-[12rem]">All Series</span>
                         <span
-                          className="tabular-nums text-left text-sm font-normal flex-shrink-0 min-w-fit"
+                          className="tabular-nums text-left text-sm font-normal flex-shrink-0 w-[3ch]"
                           style={getCategoryCountStyle()}
                         >
                           {getTotalSeriesCount()}
@@ -187,7 +187,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 {category.label}
                               </span>
                               <span
-                                className="tabular-nums text-left text-sm font-normal flex-shrink-0 min-w-fit"
+                                className="tabular-nums text-left text-sm font-normal flex-shrink-0 w-[3ch]"
                                 style={getCategoryCountStyle()}
                               >
                                 {getSeriesCountInCategory(category.id)}
