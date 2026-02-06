@@ -82,6 +82,16 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const activeSeriesList = useRecoilValue(activeSeriesListState);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
+  const CATEGORY_COUNT_ALIGN: 'left' | 'right' = 'right';
+  const CATEGORY_COUNT_OFFSET_PX = 8;
+
+  const getCategoryCountStyle = (): React.CSSProperties => {
+    if (CATEGORY_COUNT_ALIGN === 'left') {
+      return { marginRight: 'auto', marginLeft: CATEGORY_COUNT_OFFSET_PX };
+    }
+
+    return { marginLeft: 'auto', marginRight: CATEGORY_COUNT_OFFSET_PX };
+  };
 
   // Helper function to count series in a specific category
   const getSeriesCountInCategory = (categoryId: string): number => {
@@ -152,7 +162,10 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         }}
                       >
                         <span className="flex-1 truncate max-w-[12rem]">All Series</span>
-                        <span className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0">
+                        <span
+                          className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0"
+                          style={getCategoryCountStyle()}
+                        >
                           {getTotalSeriesCount()}
                         </span>
                       </SidebarMenuSubButton>
@@ -173,7 +186,10 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 <span className="truncate max-w-[12rem]">
                                   {category.label}
                                 </span>
-                                <span className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0">
+                                <span
+                                  className="tabular-nums w-8 text-right text-sm font-normal flex-shrink-0"
+                                  style={getCategoryCountStyle()}
+                                >
                                   {getSeriesCountInCategory(category.id)}
                                 </span>
                               </div>
