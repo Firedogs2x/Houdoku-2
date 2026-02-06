@@ -87,10 +87,9 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 2;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    // Push content right and pull back 8px to account for gap-2
+    // Position on the right side while preserving text display
     return {
-      marginLeft: 'auto',
-      marginRight: `-8px`, // Pull back 8px to cancel gap-2
+      marginLeft: 'auto', // Push to the right
       paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`, // Distance from right edge
     };
   };
@@ -165,7 +164,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       >
                         <span className="truncate max-w-[12rem]">All Series</span>
                         <span
-                          className="tabular-nums text-right text-sm font-normal flex-shrink-0"
+                          className="tabular-nums text-left text-sm font-normal flex-shrink-0 min-w-fit"
                           style={getCategoryCountStyle()}
                         >
                           {getTotalSeriesCount()}
@@ -188,7 +187,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 {category.label}
                               </span>
                               <span
-                                className="tabular-nums text-right text-sm font-normal flex-shrink-0"
+                                className="tabular-nums text-left text-sm font-normal flex-shrink-0 min-w-fit"
                                 style={getCategoryCountStyle()}
                               >
                                 {getSeriesCountInCategory(category.id)}
