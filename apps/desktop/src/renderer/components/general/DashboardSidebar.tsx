@@ -84,13 +84,19 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
-  // Use negative margin to position the count box from the right edge
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 4;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
+    // Parent button has gap-2 (8px) between children
+    // We override px-2 right padding with !pr-0 class
+    const GAP = 8; // gap-2 = 0.5rem = 8px
+    
     return {
       marginLeft: 'auto',
-      marginRight: `-${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
+      // Negative margin cancels out the gap-2 between name and count
+      marginRight: `-${GAP}px`,
+      // Padding controls final distance from visible edge
+      paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
     };
   };
 
@@ -155,7 +161,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton
-                        className="cursor-pointer"
+                        className="cursor-pointer !pr-0"
                         onClick={() => {
                           setLibraryFilterCategory('');
                           setSeriesList(library.fetchSeriesList());
@@ -176,7 +182,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         <ContextMenu>
                           <ContextMenuTrigger>
                             <SidebarMenuSubButton
-                              className="cursor-pointer"
+                              className="cursor-pointer !pr-0"
                               onClick={() => {
                                 setLibraryFilterCategory(category.id);
                                 setSeriesList(library.fetchSeriesList());
