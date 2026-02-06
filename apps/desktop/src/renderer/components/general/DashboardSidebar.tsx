@@ -86,7 +86,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const CATEGORY_COUNT_OFFSET_PX = 8;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
-    if (CATEGORY_COUNT_ALIGN === 'left') {
+    if (CATEGORY_COUNT_ALIGN === 'right') {
       return { marginRight: 'auto', marginLeft: CATEGORY_COUNT_OFFSET_PX };
     }
 
