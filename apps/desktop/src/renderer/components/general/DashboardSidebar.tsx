@@ -84,7 +84,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
-  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 2;
+  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 0;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
     // Position on the right side while preserving text display
