@@ -84,12 +84,12 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
-  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 4;
+  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 3;
 
   const getCategoryCountStyle = (): React.CSSProperties => {
     // Parent button has gap-2 (8px) between children
     // We override px-2 right padding with !pr-0 class
-    const GAP = 8; // gap-2 = 0.5rem = 8px
+    const GAP = 2; // gap-2 = 0.5rem = 8px
     
     return {
       marginLeft: 'auto',
