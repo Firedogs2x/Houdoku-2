@@ -84,12 +84,16 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Distance from right edge of sidebar (in pixels)
+  // Note: SidebarMenuSubButton has 8px (0.5rem) right padding built-in
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 4;
+  const SIDEBAR_BUTTON_PADDING_RIGHT = 8; // px-2 = 0.5rem = 8px
 
   const getCategoryCountStyle = (): React.CSSProperties => {
+    // Calculate negative margin to position from visible edge
+    const actualMargin = -(SIDEBAR_BUTTON_PADDING_RIGHT - CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX);
     return {
       marginLeft: 'auto',
-      marginRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
+      marginRight: `${actualMargin}px`,
     };
   };
 
@@ -182,17 +186,15 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                                 navigate(routes.LIBRARY);
                               }}
                             >
-                              <div className="flex items-center gap-2 w-full min-w-0">
-                                <span className="truncate max-w-[12rem]">
-                                  {category.label}
-                                </span>
-                                <span
-                                  className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
-                                  style={getCategoryCountStyle()}
-                                >
-                                  {getSeriesCountInCategory(category.id)}
-                                </span>
-                              </div>
+                              <span className="truncate max-w-[12rem]">
+                                {category.label}
+                              </span>
+                              <span
+                                className="tabular-nums w-8 text-left text-sm font-normal flex-shrink-0"
+                                style={getCategoryCountStyle()}
+                              >
+                                {getSeriesCountInCategory(category.id)}
+                              </span>
                             </SidebarMenuSubButton>
                           </ContextMenuTrigger>
                           <ContextMenuContent className="w-40">
