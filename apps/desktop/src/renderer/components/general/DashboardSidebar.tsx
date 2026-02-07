@@ -79,35 +79,9 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const [showingRemoveCategoryDialog, setShowingRemoveCategoryDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const categories = useRecoilValue(categoryListState);
-  const activeSeriesList = useRecoilValue(activeSeriesListState);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
   const setSeriesList = useSetRecoilState(seriesListState);
-  
-  // Font size for counter numbers (in pixels)
-  const CATEGORY_COUNT_FONT_SIZE_PX = 12;
-  // Distance from right edge (in pixels)  
-  const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
 
-  const getCategoryCountStyle = (): React.CSSProperties => {
-    // Push to right with flex margin, then add padding for final distance from edge
-    return {
-      marginLeft: 'auto',
-      paddingRight: `${CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX}px`,
-      fontSize: `${CATEGORY_COUNT_FONT_SIZE_PX}px`,
-    };
-  };
-
-  // Helper function to count series in a specific category
-  const getSeriesCountInCategory = (categoryId: string): number => {
-    return activeSeriesList.filter((series) =>
-      series.categories?.includes(categoryId)
-    ).length;
-  };
-
-  // Helper function to get total series count
-  const getTotalSeriesCount = (): number => {
-    return activeSeriesList.length;
-  };
 
   const handleUpdateCheck = () => {
     if (!checkingForUpdate) {
@@ -166,12 +140,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         }}
                       >
                         <span className="truncate max-w-[12rem]">All Series</span>
-                        <span
-                          className="tabular-nums text-left font-normal flex-shrink-0 whitespace-nowrap"
-                          style={getCategoryCountStyle()}
-                        >
-                          {getTotalSeriesCount()}
-                        </span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                     {categories.map((category) => (
@@ -188,12 +156,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                             >
                               <span className="truncate max-w-[12rem]">
                                 {category.label}
-                              </span>
-                              <span
-                                className="tabular-nums text-left font-normal flex-shrink-0 whitespace-nowrap"
-                                style={getCategoryCountStyle()}
-                              >
-                                {getSeriesCountInCategory(category.id)}
                               </span>
                             </SidebarMenuSubButton>
                           </ContextMenuTrigger>
