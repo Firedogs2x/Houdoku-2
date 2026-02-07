@@ -84,7 +84,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const setSeriesList = useSetRecoilState(seriesListState);
   
   // Font size for counter numbers (in pixels)
-  const CATEGORY_COUNT_FONT_SIZE_PX = 14;
+  const CATEGORY_COUNT_FONT_SIZE_PX = 12;
   // Distance from right edge (in pixels)  
   const CATEGORY_COUNT_OFFSET_FROM_RIGHT_PX = 8;
 
