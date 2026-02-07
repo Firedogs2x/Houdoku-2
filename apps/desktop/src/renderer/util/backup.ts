@@ -1,4 +1,10 @@
 import { Chapter, Series } from '@tiyo/common';
+import {
+  GeneralSetting,
+  IntegrationSetting,
+  ReaderSetting,
+  TrackerSetting,
+} from '@/common/models/types';
 const fs = require('fs');
 const path = require('path');
 import storeKeys from '@/common/constants/storeKeys.json';
@@ -6,35 +12,92 @@ import { updateSeries } from '../features/library/utils';
 import library from '../services/library';
 import { persistantStore } from './persistantStore';
 
+type BackupSettingsGroup = { [key: string]: string };
+
+type BackupSettings = {
+  General?: BackupSettingsGroup;
+  Theme?: BackupSettingsGroup;
+  Folders?: BackupSettingsGroup;
+  Library?: BackupSettingsGroup;
+  Reader?: BackupSettingsGroup;
+  Keybinds?: BackupSettingsGroup;
+  Trackers?: BackupSettingsGroup;
+  Integrations?: BackupSettingsGroup;
+  Sort?: BackupSettingsGroup;
+  Layout?: BackupSettingsGroup;
+  Filters?: BackupSettingsGroup;
+  // Legacy keys (keep for restore compatibility)
+  general?: BackupSettingsGroup;
+  theme?: BackupSettingsGroup;
+  folders?: BackupSettingsGroup;
+  library?: BackupSettingsGroup;
+  reader?: BackupSettingsGroup;
+  keybinds?: BackupSettingsGroup;
+  trackers?: BackupSettingsGroup;
+  integrations?: BackupSettingsGroup;
+  layoutButton?: BackupSettingsGroup;
+  filtersButton?: BackupSettingsGroup;
+};
+
+type ChapterBackupEntry = {
+  sourceId: string;
+  title: string;
+  volumeNumber: string;
+  chapterNumber: string;
+  languageKey: string;
+  groupName: string;
+  time: number;
+  read: boolean;
+  id: string;
+  dateAdded: string;
+};
+
+type SeriesBackupEntry = {
+  title: string;
+  sourceId: string;
+  id: string;
+  extensionId: string;
+  originalLanguageKey: string;
+  status: string;
+  preview: boolean;
+  altTitles: string[];
+  description: string;
+  authors: string[];
+  artists: string[];
+  tags: string[];
+  remoteCoverUrl: string;
+  trackerKeys: { [key: string]: string };
+  numberUnread: number;
+  lastReadDate: string;
+  unread: boolean;
+  chapters: ChapterBackupEntry[];
+};
+
 // New backup format interface
 interface NewBackupFormat {
   backupDate: string;
-  settings: {
-    general?: { [key: string]: string };
-    reader?: { [key: string]: string };
-    keybinds?: { [key: string]: string };
-    trackers?: { [key: string]: string };
-    integrations?: { [key: string]: string };
-    folders?: { [key: string]: string };
-    library?: { [key: string]: string };
-  };
-  series: Series[];
-  chapters: { [seriesId: string]: Chapter[] };
+  systemSettings?: BackupSettingsGroup;
+  settings: BackupSettings;
+  series: SeriesBackupEntry[];
+  chapters?: { [seriesId: string]: Chapter[] }; // Legacy format
   extensions?: { [extId: string]: string };
   trackers?: { [trackerId: string]: string };
 }
 
-// Helper function to extract settings from localStorage by prefix
-const extractSettingsByPrefix = (prefix: string): { [key: string]: string } => {
-  const settings: { [key: string]: string } = {};
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith(prefix)) {
-      const settingKey = key.substring(prefix.length);
-      settings[settingKey] = localStorage.getItem(key) || '';
-    }
-  });
-  return Object.keys(settings).length > 0 ? settings : undefined;
-};
+const getSettingValue = (prefix: string, key: string): string =>
+  localStorage.getItem(`${prefix}${key}`) || '';
+
+const getGeneralSetting = (key: GeneralSetting): string =>
+  getSettingValue(storeKeys.SETTINGS.GENERAL_PREFIX, key);
+
+const getReaderSetting = (key: ReaderSetting): string =>
+  getSettingValue(storeKeys.SETTINGS.READER_PREFIX, key);
+
+const getTrackerSetting = (key: TrackerSetting): string =>
+  getSettingValue(storeKeys.SETTINGS.TRACKER_PREFIX, key);
+
+const getIntegrationSetting = (key: IntegrationSetting): string =>
+  getSettingValue(storeKeys.SETTINGS.INTEGRATION_PREFIX, key);
 
 // Helper function to extract extensions from localStorage
 const extractExtensions = (): { [extId: string]: string } => {
@@ -64,14 +127,48 @@ const extractTrackers = (): { [trackerId: string]: string } => {
 const isNewBackupFormat = (data: unknown): data is NewBackupFormat => {
   if (typeof data !== 'object' || data === null) return false;
   const obj = data as Record<string, unknown>;
-  return 'backupDate' in obj && 'settings' in obj && 'series' in obj && 'chapters' in obj;
+  return 'backupDate' in obj && 'settings' in obj && 'series' in obj;
 };
 
-export const createBackup = async () => {
+const toChapterBackupEntry = (chapter: Chapter): ChapterBackupEntry => ({
+  sourceId: chapter.sourceId ?? '',
+  title: chapter.title ?? '',
+  volumeNumber: chapter.volumeNumber ?? '',
+  chapterNumber: chapter.chapterNumber ?? '',
+  languageKey: chapter.languageKey ?? '',
+  groupName: chapter.groupName ?? '',
+  time: chapter.time ?? 0,
+  read: chapter.read ?? false,
+  id: chapter.id ?? '',
+  dateAdded: chapter.dateAdded ?? '',
+});
+
+const toSeriesBackupEntry = (series: Series, seriesChapters: Chapter[]): SeriesBackupEntry => ({
+  title: series.title ?? '',
+  sourceId: series.sourceId ?? '',
+  id: series.id ?? '',
+  extensionId: series.extensionId ?? '',
+  originalLanguageKey: series.originalLanguageKey ?? '',
+  status: series.status ?? '',
+  preview: series.preview ?? false,
+  altTitles: series.altTitles ?? [],
+  description: series.description ?? '',
+  authors: series.authors ?? [],
+  artists: series.artists ?? [],
+  tags: series.tags ?? [],
+  remoteCoverUrl: series.remoteCoverUrl ?? '',
+  trackerKeys: series.trackerKeys ?? {},
+  numberUnread: series.numberUnread ?? 0,
+  lastReadDate: series.lastReadDate ?? '',
+  unread: series.unread ?? false,
+  chapters: seriesChapters.map(toChapterBackupEntry),
+});
+
+const buildBackupData = (): NewBackupFormat => {
   const seriesList: Series[] = [];
   const chapters: { [seriesId: string]: Chapter[] } = {};
   const storedSeriesList = localStorage.getItem(storeKeys.LIBRARY.SERIES_LIST);
-  
+
   if (storedSeriesList) {
     const series = JSON.parse(storedSeriesList) as Series[];
     series.forEach((s) => {
@@ -84,37 +181,99 @@ export const createBackup = async () => {
     });
   }
 
-  const backupData: NewBackupFormat = {
+  const seriesEntries = seriesList.map((series) =>
+    toSeriesBackupEntry(series, chapters[series.id] ?? []),
+  );
+
+  return {
     backupDate: new Date().toISOString().split('T')[0],
+    systemSettings: {
+      ChapterListVolOrder: getGeneralSetting(GeneralSetting.ChapterListVolOrder),
+      ChapterListChOrder: getGeneralSetting(GeneralSetting.ChapterListChOrder),
+      ChapterListDateOrder: getGeneralSetting(GeneralSetting.ChapterListDateOrder),
+      ChapterListPageSize: getGeneralSetting(GeneralSetting.ChapterListPageSize),
+    },
     settings: {
-      general: extractSettingsByPrefix(storeKeys.SETTINGS.GENERAL_PREFIX),
-      reader: extractSettingsByPrefix(storeKeys.SETTINGS.READER_PREFIX),
-      keybinds: extractSettingsByPrefix(storeKeys.SETTINGS.KEYBINDS_PREFIX || 'keybind-'),
-      trackers: extractSettingsByPrefix(storeKeys.SETTINGS.TRACKER_PREFIX),
-      integrations: extractSettingsByPrefix(storeKeys.SETTINGS.INTEGRATION_PREFIX),
-      folders: {
-        masterFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}MasterFolder`) || '',
-        useFolderAsTitle: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}UseFolderAsTitle`) || '',
-        coverImageFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CoverImageFolder`) || '',
-        coverImageName: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CoverImageName`) || '',
-        chapterFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ChapterFolder`) || '',
-        chapterName: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ChapterName`) || '',
+      General: {
+        AutoCheckForUpdates: getGeneralSetting(GeneralSetting.AutoCheckForUpdates),
+        autoBackup: getGeneralSetting(GeneralSetting.autoBackup),
+        autoBackupCount: getGeneralSetting(GeneralSetting.autoBackupCount),
       },
-      library: {
-        refreshOnStart: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}RefreshOnStart`) || '',
-        confirmRemoveSeries: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ConfirmRemoveSeries`) || '',
-        cropCoverImages: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryCropCovers`) || '',
-        customDownloadLocation: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CustomDownloadsDir`) || '',
-        libraryColumns: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryColumns`) || '',
-        libraryView: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryView`) || '',
-        librarySort: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibrarySort`) || '',
+      Theme: {
+        ApplicationTheme: getGeneralSetting(GeneralSetting.ApplicationTheme),
+        ChapterCountBgColor: getGeneralSetting(GeneralSetting.ChapterCountBgColor),
+        ScrollBarSliderColor: getGeneralSetting(GeneralSetting.ScrollBarSliderColor),
+      },
+      Folders: {
+        MasterFolder: getGeneralSetting(GeneralSetting.MasterFolder),
+        UseFolderAsTitle: getGeneralSetting(GeneralSetting.UseFolderAsTitle),
+        CoverImageFolder: getGeneralSetting(GeneralSetting.CoverImageFolder),
+        CoverImageName: getGeneralSetting(GeneralSetting.CoverImageName),
+        ChapterFolder: getGeneralSetting(GeneralSetting.ChapterFolder),
+        ChapterName: getGeneralSetting(GeneralSetting.ChapterName),
+      },
+      Library: {
+        RefreshOnStart: getGeneralSetting(GeneralSetting.RefreshOnStart),
+        ConfirmRemoveSeries: getGeneralSetting(GeneralSetting.ConfirmRemoveSeries),
+        LibraryCropCovers: getGeneralSetting(GeneralSetting.LibraryCropCovers),
+        CustomDownloadsDir: getGeneralSetting(GeneralSetting.CustomDownloadsDir),
+      },
+      Reader: {
+        PageStyle: getReaderSetting(ReaderSetting.PageStyle),
+        PageGap: getReaderSetting(ReaderSetting.PageGap),
+        OffsetPages: getReaderSetting(ReaderSetting.OffsetPages),
+        ReadingDirection: getReaderSetting(ReaderSetting.ReadingDirection),
+        FitContainToWidth: getReaderSetting(ReaderSetting.FitContainToWidth),
+        FitContainToHeight: getReaderSetting(ReaderSetting.FitContainToHeight),
+        FitStretch: getReaderSetting(ReaderSetting.FitStretch),
+        MaxPageWidth: getReaderSetting(ReaderSetting.MaxPageWidth),
+        PageWidthMetric: getReaderSetting(ReaderSetting.PageWidthMetric),
+        OptimizeContrast: getReaderSetting(ReaderSetting.OptimizeContrast),
+      },
+      Keybinds: {
+        KeyPageRight: getReaderSetting(ReaderSetting.KeyPageRight),
+        KeyPageLeft: getReaderSetting(ReaderSetting.KeyPageLeft),
+        KeyFirstPage: getReaderSetting(ReaderSetting.KeyFirstPage),
+        KeyLastPage: getReaderSetting(ReaderSetting.KeyLastPage),
+        KeyChapterRight: getReaderSetting(ReaderSetting.KeyChapterRight),
+        KeyChapterLeft: getReaderSetting(ReaderSetting.KeyChapterLeft),
+        KeyExit: getReaderSetting(ReaderSetting.KeyExit),
+        KeyCloseOrBack: getReaderSetting(ReaderSetting.KeyCloseOrBack),
+        KeyToggleReadingDirection: getReaderSetting(ReaderSetting.KeyToggleReadingDirection),
+        KeyTogglePageStyle: getReaderSetting(ReaderSetting.KeyTogglePageStyle),
+        KeyToggleOffsetDoubleSpreads: getReaderSetting(ReaderSetting.KeyToggleOffsetDoubleSpreads),
+        KeyToggleFullscreen: getReaderSetting(ReaderSetting.KeyToggleFullscreen),
+        KeyToggleShowingSettingsModal: getReaderSetting(ReaderSetting.KeyToggleShowingSettingsModal),
+        KeyToggleShowingSidebar: getReaderSetting(ReaderSetting.KeyToggleShowingSidebar),
+      },
+      Trackers: {
+        TrackerAutoUpdate: getTrackerSetting(TrackerSetting.TrackerAutoUpdate),
+      },
+      Integrations: {
+        DiscordPresenceEnabled: getIntegrationSetting(IntegrationSetting.DiscordPresenceEnabled),
+      },
+      Sort: {
+        LibrarySort: getGeneralSetting(GeneralSetting.LibrarySort),
+      },
+      Layout: {
+        LibraryView: getGeneralSetting(GeneralSetting.LibraryView),
+        LibraryColumns: getGeneralSetting(GeneralSetting.LibraryColumns),
+      },
+      Filters: {
+        LibraryDisplayMode: getGeneralSetting(GeneralSetting.LibraryDisplayMode),
+        LibraryFilterStatus: getGeneralSetting(GeneralSetting.LibraryFilterStatus),
+        LibraryFilterProgress: getGeneralSetting(GeneralSetting.LibraryFilterProgress),
+        LibraryFilterCategory: getGeneralSetting(GeneralSetting.LibraryFilterCategory),
       },
     },
-    series: seriesList,
-    chapters,
+    series: seriesEntries,
     extensions: extractExtensions(),
     trackers: extractTrackers(),
   };
+};
+
+export const createBackup = async () => {
+  const backupData = buildBackupData();
 
   const blob = new Blob([JSON.stringify(backupData, null, 2)], {
     type: 'application/json',
@@ -135,53 +294,7 @@ export const createAutoBackup = async (Count = 1) => {
   }
   const fileName = `houdoku_backup_${new Date().toJSON().slice(0, 10)}.json`;
   if (!fs.existsSync(`backups/${fileName}`)) {
-    const seriesList: Series[] = [];
-    const chapters: { [seriesId: string]: Chapter[] } = {};
-    const storedSeriesList = localStorage.getItem(storeKeys.LIBRARY.SERIES_LIST);
-    
-    if (storedSeriesList) {
-      const series = JSON.parse(storedSeriesList) as Series[];
-      series.forEach((s) => {
-        seriesList.push(s);
-        const chapterListKey = `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${s.id}`;
-        const storedChapters = localStorage.getItem(chapterListKey);
-        if (storedChapters) {
-          chapters[s.id] = JSON.parse(storedChapters) as Chapter[];
-        }
-      });
-    }
-
-    const backupData: NewBackupFormat = {
-      backupDate: new Date().toISOString().split('T')[0],
-      settings: {
-        general: extractSettingsByPrefix(storeKeys.SETTINGS.GENERAL_PREFIX),
-        reader: extractSettingsByPrefix(storeKeys.SETTINGS.READER_PREFIX),
-        keybinds: extractSettingsByPrefix(storeKeys.SETTINGS.KEYBINDS_PREFIX || 'keybind-'),
-        trackers: extractSettingsByPrefix(storeKeys.SETTINGS.TRACKER_PREFIX),
-        integrations: extractSettingsByPrefix(storeKeys.SETTINGS.INTEGRATION_PREFIX),
-        folders: {
-          masterFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}MasterFolder`) || '',
-          useFolderAsTitle: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}UseFolderAsTitle`) || '',
-          coverImageFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CoverImageFolder`) || '',
-          coverImageName: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CoverImageName`) || '',
-          chapterFolder: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ChapterFolder`) || '',
-          chapterName: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ChapterName`) || '',
-        },
-        library: {
-          refreshOnStart: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}RefreshOnStart`) || '',
-          confirmRemoveSeries: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}ConfirmRemoveSeries`) || '',
-          cropCoverImages: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryCropCovers`) || '',
-          customDownloadLocation: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}CustomDownloadsDir`) || '',
-          libraryColumns: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryColumns`) || '',
-          libraryView: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibraryView`) || '',
-          librarySort: localStorage.getItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}LibrarySort`) || '',
-        },
-      },
-      series: seriesList,
-      chapters,
-      extensions: extractExtensions(),
-      trackers: extractTrackers(),
-    };
+    const backupData = buildBackupData();
 
     await fs.writeJson(`backups/${fileName}`, backupData);
   }
@@ -200,13 +313,34 @@ export const restoreBackup = (backupFileContent: string) => {
 
   // Check if this is the new format
   if (isNewBackupFormat(data)) {
-    // Restore series
+    // Restore series (supports inline chapters per series)
+    let hasInlineChapters = false;
     if (data.series && Array.isArray(data.series)) {
-      data.series.forEach((series: Series) => updateSeries(series));
+      data.series.forEach((seriesEntry: SeriesBackupEntry) => {
+        const { chapters: seriesChapters, ...seriesInfo } = seriesEntry as SeriesBackupEntry;
+        updateSeries(seriesInfo as Series);
+
+        if (Array.isArray(seriesChapters)) {
+          hasInlineChapters = true;
+          const series = library.fetchSeries(seriesInfo.id);
+          if (!series) return;
+
+          const existingChapters = library.fetchChapters(seriesInfo.id);
+          const chaptersToSave: Chapter[] = [];
+          seriesChapters.forEach((oldChapter) => {
+            const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
+            chaptersToSave.push({
+              ...oldChapter,
+              read: (existingChapter && existingChapter.read) || oldChapter.read,
+            } as Chapter);
+          });
+          library.upsertChapters(chaptersToSave, series);
+        }
+      });
     }
 
-    // Restore chapters
-    if (data.chapters && typeof data.chapters === 'object') {
+    // Restore legacy chapters map if inline chapters were not present
+    if (!hasInlineChapters && data.chapters && typeof data.chapters === 'object') {
       Object.entries(data.chapters).forEach(([seriesId, chapterList]: [string, unknown]) => {
         const series = library.fetchSeries(seriesId);
         if (!series) return;
@@ -226,19 +360,104 @@ export const restoreBackup = (backupFileContent: string) => {
       });
     }
 
-    // Restore settings (optional - can be extended in future)
+    // Restore settings
     if (data.settings) {
-      console.info('Backup contains settings data. Settings restoration can be enabled if needed.');
+      const restoreGroup = (group: BackupSettingsGroup | undefined, prefix: string) => {
+        if (!group) return;
+        Object.entries(group).forEach(([key, value]) => {
+          localStorage.setItem(`${prefix}${key}`, String(value ?? ''));
+        });
+      };
+
+      // Restore system settings (chapter list ordering)
+      restoreGroup(data.systemSettings, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+      // Restore general settings
+      restoreGroup(data.settings.General || data.settings.general, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+      // Restore theme settings
+      const themeSettings = data.settings.Theme || data.settings.theme;
+      if (themeSettings) {
+        const isLegacy = Object.keys(themeSettings).some((key) => key === 'theme');
+        Object.entries(themeSettings).forEach(([key, value]) => {
+          const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
+          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+        });
+      }
+
+      // Restore folders settings
+      const folderSettings = data.settings.Folders || data.settings.folders;
+      if (folderSettings) {
+        const isLegacy = Object.keys(folderSettings).some((key) => key === 'masterFolder');
+        Object.entries(folderSettings).forEach(([key, value]) => {
+          const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
+          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+        });
+      }
+
+      // Restore library settings
+      const librarySettings = data.settings.Library || data.settings.library;
+      if (librarySettings) {
+        const keyMapping: { [key: string]: string } = {
+          refreshOnStart: 'RefreshOnStart',
+          confirmRemoveSeries: 'ConfirmRemoveSeries',
+          cropCoverImages: 'LibraryCropCovers',
+          customDownloadLocation: 'CustomDownloadsDir',
+          libraryColumns: 'LibraryColumns',
+          libraryView: 'LibraryView',
+          librarySort: 'LibrarySort',
+        };
+        const isLegacy = Object.keys(librarySettings).some((key) => key in keyMapping);
+        Object.entries(librarySettings).forEach(([key, value]) => {
+          const settingKey = isLegacy ? keyMapping[key] || key : key;
+          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+        });
+      }
+
+      // Restore reader settings
+      restoreGroup(data.settings.Reader || data.settings.reader, storeKeys.SETTINGS.READER_PREFIX);
+
+      // Restore keybinds settings
+      if (data.settings.Keybinds) {
+        restoreGroup(data.settings.Keybinds, storeKeys.SETTINGS.READER_PREFIX);
+      } else if (data.settings.keybinds) {
+        restoreGroup(data.settings.keybinds, storeKeys.SETTINGS.KEYBINDS_PREFIX || 'keybind-');
+      }
+
+      // Restore tracker settings
+      restoreGroup(data.settings.Trackers || data.settings.trackers, storeKeys.SETTINGS.TRACKER_PREFIX);
+
+      // Restore integration settings
+      restoreGroup(
+        data.settings.Integrations || data.settings.integrations,
+        storeKeys.SETTINGS.INTEGRATION_PREFIX,
+      );
+
+      // Restore sort/layout/filter button settings
+      restoreGroup(data.settings.Sort, storeKeys.SETTINGS.GENERAL_PREFIX);
+      restoreGroup(data.settings.Layout, storeKeys.SETTINGS.GENERAL_PREFIX);
+      restoreGroup(data.settings.Filters, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+      // Restore legacy layout/filter button settings (future)
+      restoreGroup(data.settings.layoutButton, 'layoutButton-');
+      restoreGroup(data.settings.filtersButton, 'filtersButton-');
+
+      // Reload the page to apply all settings
+      window.location.reload();
     }
 
-    // Restore extensions (optional - can be extended in future)
+    // Restore extensions
     if (data.extensions) {
-      console.info('Backup contains extension data. Extension restoration can be enabled if needed.');
+      Object.entries(data.extensions).forEach(([extId, settings]) => {
+        localStorage.setItem(`${storeKeys.EXTENSION_SETTINGS_PREFIX}${extId}`, settings);
+      });
     }
 
-    // Restore trackers (optional - can be extended in future)
+    // Restore trackers
     if (data.trackers) {
-      console.info('Backup contains tracker data. Tracker restoration can be enabled if needed.');
+      Object.entries(data.trackers).forEach(([trackerId, token]) => {
+        localStorage.setItem(`${storeKeys.TRACKER_ACCESS_TOKEN_PREFIX}${trackerId}`, token);
+      });
     }
   } else {
     // Legacy backup format - handle old localStorage format

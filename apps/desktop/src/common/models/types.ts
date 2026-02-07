@@ -82,6 +82,8 @@ export type Category = {
 
 export enum GeneralSetting {
   ApplicationTheme = 'ApplicationTheme',
+  ChapterCountBgColor = 'ChapterCountBgColor',
+  ScrollBarSliderColor = 'ScrollBarSliderColor',
   ChapterLanguages = 'ChapterLanguages',
   RefreshOnStart = 'RefreshOnStart',
   AutoCheckForUpdates = 'AutoCheckForUpdates',
@@ -92,6 +94,7 @@ export enum GeneralSetting {
   LibraryColumns = 'LibraryColumns',
   LibraryView = 'LibraryView',
   LibrarySort = 'LibrarySort',
+  LibraryDisplayMode = 'LibraryDisplayMode',
   LibraryFilterStatus = 'LibraryFilterStatus',
   LibraryFilterProgress = 'LibraryFilterProgress',
   LibraryFilterCategory = 'LibraryFilterCategory',
@@ -121,6 +124,8 @@ export enum LibrarySort {
   TitleDesc = 'TitleDesc',
   UnreadAsc = 'UnreadAsc',
   UnreadDesc = 'UnreadDesc',
+  DateLastRead = 'DateLastRead',
+  ChapterUpdate = 'ChapterUpdate',
 }
 
 export enum LibraryView {
@@ -128,6 +133,11 @@ export enum LibraryView {
   GridCoversOnly = 'GRID_COVERS_ONLY',
   GridComfortable = 'GRID_COMFORTABLE',
   List = 'LIST',
+}
+
+export enum LibraryDisplayMode {
+  All = 'All',
+  FilterByCategory = 'FilterByCategory',
 }
 
 export enum ReaderSetting {
@@ -202,6 +212,8 @@ export enum AppLoadStep {
 
 export const SettingTypes = {
   [GeneralSetting.ApplicationTheme]: SettingType.STRING,
+  [GeneralSetting.ChapterCountBgColor]: SettingType.STRING,
+  [GeneralSetting.ScrollBarSliderColor]: SettingType.STRING,
   [GeneralSetting.ChapterLanguages]: SettingType.STRING_ARRAY,
   [GeneralSetting.RefreshOnStart]: SettingType.BOOLEAN,
   [GeneralSetting.AutoCheckForUpdates]: SettingType.BOOLEAN,
@@ -212,6 +224,7 @@ export const SettingTypes = {
   [GeneralSetting.LibraryColumns]: SettingType.NUMBER,
   [GeneralSetting.LibraryView]: SettingType.STRING,
   [GeneralSetting.LibrarySort]: SettingType.STRING,
+  [GeneralSetting.LibraryDisplayMode]: SettingType.STRING,
   [GeneralSetting.LibraryFilterStatus]: SettingType.STRING,
   [GeneralSetting.LibraryFilterProgress]: SettingType.STRING,
   [GeneralSetting.LibraryFilterCategory]: SettingType.STRING,
@@ -264,6 +277,8 @@ export const SettingTypes = {
 
 export const DefaultSettings = {
   [GeneralSetting.ApplicationTheme]: ApplicationTheme.Dark,
+  [GeneralSetting.ChapterCountBgColor]: 'rgba(255, 165, 0, 1)',
+  [GeneralSetting.ScrollBarSliderColor]: 'rgba(0, 191, 252, 1)',
   [GeneralSetting.ChapterLanguages]: [LanguageKey.ENGLISH],
   [GeneralSetting.RefreshOnStart]: true,
   [GeneralSetting.AutoCheckForUpdates]: true,
@@ -274,6 +289,7 @@ export const DefaultSettings = {
   [GeneralSetting.LibraryColumns]: 4,
   [GeneralSetting.LibraryView]: LibraryView.GridCompact,
   [GeneralSetting.LibrarySort]: LibrarySort.TitleAsc,
+  [GeneralSetting.LibraryDisplayMode]: LibraryDisplayMode.All,
   [GeneralSetting.LibraryFilterStatus]: SeriesStatus.ONGOING,
   [GeneralSetting.LibraryFilterProgress]: ProgressFilter.All,
   [GeneralSetting.LibraryFilterCategory]: '',

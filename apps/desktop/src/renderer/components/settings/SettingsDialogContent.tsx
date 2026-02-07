@@ -7,6 +7,7 @@ import {
   SettingsIcon,
   ToyBrickIcon,
   FolderOpen,
+  Palette,
 } from 'lucide-react';
 
 import {
@@ -36,9 +37,11 @@ import { SettingsKeybinds } from './SettingsKeybinds';
 import { SettingsIntegrations } from './SettingsIntegrations';
 import { SettingsTrackers } from './SettingsTrackers';
 import { SettingsFolders } from './SettingsFolders';
+import { SettingsTheme } from './SettingsTheme';
 
 export enum SettingsPage {
   General = 'General',
+  Theme = 'Theme',
   Library = 'Library',
   Folders = 'Folders',
   Reader = 'Reader',
@@ -56,6 +59,7 @@ type SettingsPageProps = {
 
 const PAGES: { [key in SettingsPage]: SettingsPageProps } = {
   [SettingsPage.General]: { name: 'General', icon: SettingsIcon, component: SettingsGeneral },
+  [SettingsPage.Theme]: { name: 'Theme', icon: Palette, component: SettingsTheme },
   [SettingsPage.Folders]: { name: 'Folders', icon: FolderOpen, component: SettingsFolders },
   [SettingsPage.Library]: { name: 'Library', icon: LibraryBigIcon, component: SettingsLibrary },
   [SettingsPage.Reader]: { name: 'Reader', icon: BookOpenIcon, component: SettingsReader },

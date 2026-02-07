@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Series } from '@tiyo/common';
+import { Series, Chapter } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useLocation } from 'react-router-dom';
 import LibraryControlBar from './LibraryControlBar';
-import { LibrarySort, LibraryView, ProgressFilter } from '@/common/models/types';
+import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';
 import {
   activeSeriesListState,
   chapterListState,
@@ -19,12 +19,13 @@ import {
   librarySortState,
   libraryViewState,
   libraryFilterCategoryState,
+  libraryDisplayModeState,
 } from '@/renderer/state/settingStates';
 import LibraryGrid from './LibraryGrid';
 import LibraryList from './LibraryList';
 import library from '@/renderer/services/library';
 import LibraryControlBarMultiSelect from './LibraryControlBarMultiSelect';
-import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
+import { ScrollArea, ScrollBar } from '@houdoku/ui/components/ScrollArea';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
 
 type Props = unknown;
@@ -41,6 +42,7 @@ const Library: React.FC<Props> = () => {
   const libraryFilterProgress = useRecoilValue(libraryFilterProgressState);
   const libraryView = useRecoilValue(libraryViewState);
   const librarySort = useRecoilValue(librarySortState);
+  const libraryDisplayMode = useRecoilValue(libraryDisplayModeState);
   const setSeries = useSetRecoilState(seriesState);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setChapterList = useSetRecoilState(chapterListState);
@@ -127,6 +129,12 @@ const Library: React.FC<Props> = () => {
         if (!series.categories || !series.categories.includes(libraryFilterCategory)) return false;
       }
 
+      // Apply display mode filter
+      if (libraryDisplayMode === LibraryDisplayMode.FilterByCategory) {
+        // When FilterByCategory is selected, only show series without any categories
+        if (series.categories && series.categories.length > 0) return false;
+      }
+
       return true;
     });
 
@@ -139,6 +147,41 @@ const Library: React.FC<Props> = () => {
         return filteredList.sort((a: Series, b: Series) => a.title.localeCompare(b.title));
       case LibrarySort.TitleDesc:
         return filteredList.sort((a: Series, b: Series) => b.title.localeCompare(a.title));
+      case LibrarySort.DateLastRead:
+        return filteredList.sort((a: Series, b: Series) => {
+          // Sort by latest date first
+          const dateCompare = new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();
+          // If dates are equal, sort alphabetically A to Z
+          if (dateCompare === 0) {
+            return a.title.localeCompare(b.title);
+          }
+          return dateCompare;
+        });
+      case LibrarySort.ChapterUpdate:
+        return filteredList.sort((a: Series, b: Series) => {
+          // Get latest chapter added date for each series
+          const aChapters = a.id ? library.fetchChapters(a.id) : [];
+          const bChapters = b.id ? library.fetchChapters(b.id) : [];
+          
+          const getLatestChapterDate = (chapters: Chapter[]) => {
+            return chapters.reduce((latest: number, chapter: Chapter) => {
+              if (!chapter?.dateAdded) return latest;
+              const chapterDate = new Date(chapter.dateAdded).getTime();
+              return chapterDate > latest ? chapterDate : latest;
+            }, 0);
+          };
+          
+          const aLatestDate = getLatestChapterDate(aChapters);
+          const bLatestDate = getLatestChapterDate(bChapters);
+          
+          // Sort by latest chapter date first (latest first)
+          const dateCompare = bLatestDate - aLatestDate;
+          // If dates are equal, sort alphabetically A to Z
+          if (dateCompare === 0) {
+            return a.title.localeCompare(b.title);
+          }
+          return dateCompare;
+        });
       default:
         return filteredList;
     }
@@ -234,6 +277,7 @@ const Library: React.FC<Props> = () => {
         {activeSeriesList.length === 0 && renderEmptyMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}
+        <ScrollBar thumbClassName="custom-scrollbar-thumb" />
       </ScrollArea>
     </div>
   );
