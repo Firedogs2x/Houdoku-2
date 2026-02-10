@@ -309,184 +309,269 @@ export const createAutoBackup = async (Count = 1) => {
 };
 
 export const restoreBackup = (backupFileContent: string) => {
-  const data = JSON.parse(backupFileContent);
+  try {
+    console.log('[restoreBackup] Starting backup restoration...');
+    const data = JSON.parse(backupFileContent);
 
-  // Check if this is the new format
-  if (isNewBackupFormat(data)) {
-    // Restore series (supports inline chapters per series)
-    let hasInlineChapters = false;
-    if (data.series && Array.isArray(data.series)) {
-      data.series.forEach((seriesEntry: SeriesBackupEntry) => {
-        const { chapters: seriesChapters, ...seriesInfo } = seriesEntry as SeriesBackupEntry;
-        updateSeries(seriesInfo as Series);
+    // Check if this is the new format
+    if (isNewBackupFormat(data)) {
+      console.log(`[restoreBackup] Restoring ${data.series?.length || 0} series...`);
+      
+      // Restore series (supports inline chapters per series)
+      let hasInlineChapters = false;
+      if (data.series && Array.isArray(data.series)) {
+        // Step 1: Batch restore all series first (without downloading covers)
+        const seriesToRestore: Series[] = data.series.map((seriesEntry: SeriesBackupEntry) => {
+          const { chapters: seriesChapters, ...seriesInfo } = seriesEntry as SeriesBackupEntry;
+          return seriesInfo as Series;
+        });
+        
+        // Write all series at once to avoid O(N²) complexity
+        console.log('[restoreBackup] Writing all series to storage...');
+        persistantStore.write(
+          `${storeKeys.LIBRARY.SERIES_LIST}`,
+          JSON.stringify(seriesToRestore),
+        );
+        console.log('[restoreBackup] Series written successfully');
 
-        if (Array.isArray(seriesChapters)) {
-          hasInlineChapters = true;
-          const series = library.fetchSeries(seriesInfo.id);
-          if (!series) return;
+        // Step 2: Restore chapters for each series
+        console.log('[restoreBackup] Restoring chapters...');
+        let processedCount = 0;
+        data.series.forEach((seriesEntry: SeriesBackupEntry) => {
+          const { chapters: seriesChapters, id: seriesId } = seriesEntry as SeriesBackupEntry;
 
-          const existingChapters = library.fetchChapters(seriesInfo.id);
-          const chaptersToSave: Chapter[] = [];
-          seriesChapters.forEach((oldChapter) => {
+          if (Array.isArray(seriesChapters) && seriesChapters.length > 0) {
+            hasInlineChapters = true;
+            
+            // Get existing chapters only if they exist (to preserve read status)
+            const existingChapters = library.fetchChapters(seriesId);
+            const chaptersToSave: Chapter[] = seriesChapters.map((oldChapter) => {
+              const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
+              return {
+                ...oldChapter,
+                read: (existingChapter && existingChapter.read) || oldChapter.read,
+              } as Chapter;
+            });
+            
+            // Write chapters directly to localStorage (bypass library.upsertChapters to avoid calling upsertSeries again)
+            persistantStore.write(
+              `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
+              JSON.stringify(chaptersToSave),
+            );
+            
+            processedCount++;
+            if (processedCount % 50 === 0) {
+              console.log(`[restoreBackup] Processed ${processedCount}/${data.series.length} series...`);
+            }
+          }
+        });
+        console.log(`[restoreBackup] All chapters restored (${processedCount} series with chapters)`);
+      }
+
+      // Restore legacy chapters map if inline chapters were not present
+      if (!hasInlineChapters && data.chapters && typeof data.chapters === 'object') {
+        console.log('[restoreBackup] Restoring legacy format chapters...');
+        Object.entries(data.chapters).forEach(([seriesId, chapterList]: [string, unknown]) => {
+          const existingChapters = library.fetchChapters(seriesId);
+          const oldChapters = chapterList as Chapter[];
+
+          const chaptersToSave: Chapter[] = oldChapters.map((oldChapter) => {
             const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
-            chaptersToSave.push({
+            return {
               ...oldChapter,
               read: (existingChapter && existingChapter.read) || oldChapter.read,
-            } as Chapter);
+            };
           });
-          library.upsertChapters(chaptersToSave, series);
+          
+          // Write chapters directly to localStorage
+          persistantStore.write(
+            `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
+            JSON.stringify(chaptersToSave),
+          );
+        });
+        console.log('[restoreBackup] Legacy chapters restored');
+      }
+
+      // Restore settings
+      if (data.settings) {
+        console.log('[restoreBackup] Restoring settings...');
+        const restoreGroup = (group: BackupSettingsGroup | undefined, prefix: string) => {
+          if (!group) return;
+          Object.entries(group).forEach(([key, value]) => {
+            try {
+              localStorage.setItem(`${prefix}${key}`, String(value ?? ''));
+            } catch (error) {
+              console.error(`[restoreBackup] Error setting ${prefix}${key}:`, error);
+            }
+          });
+        };
+
+        try {
+          // Restore system settings (chapter list ordering)
+          restoreGroup(data.systemSettings, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+          // Restore general settings
+          restoreGroup(data.settings.General || data.settings.general, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+          // Restore theme settings
+          const themeSettings = data.settings.Theme || data.settings.theme;
+          if (themeSettings) {
+            const isLegacy = Object.keys(themeSettings).some((key) => key === 'theme');
+            Object.entries(themeSettings).forEach(([key, value]) => {
+              const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
+              localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+            });
+          }
+
+          // Restore folders settings
+          const folderSettings = data.settings.Folders || data.settings.folders;
+          if (folderSettings) {
+            const isLegacy = Object.keys(folderSettings).some((key) => key === 'masterFolder');
+            Object.entries(folderSettings).forEach(([key, value]) => {
+              const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
+              localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+            });
+          }
+
+          // Restore library settings
+          const librarySettings = data.settings.Library || data.settings.library;
+          if (librarySettings) {
+            const keyMapping: { [key: string]: string } = {
+              refreshOnStart: 'RefreshOnStart',
+              confirmRemoveSeries: 'ConfirmRemoveSeries',
+              cropCoverImages: 'LibraryCropCovers',
+              customDownloadLocation: 'CustomDownloadsDir',
+              libraryColumns: 'LibraryColumns',
+              libraryView: 'LibraryView',
+              librarySort: 'LibrarySort',
+            };
+            const isLegacy = Object.keys(librarySettings).some((key) => key in keyMapping);
+            Object.entries(librarySettings).forEach(([key, value]) => {
+              const settingKey = isLegacy ? keyMapping[key] || key : key;
+              localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
+            });
+          }
+
+          // Restore reader settings
+          restoreGroup(data.settings.Reader || data.settings.reader, storeKeys.SETTINGS.READER_PREFIX);
+
+          // Restore keybinds settings
+          if (data.settings.Keybinds) {
+            restoreGroup(data.settings.Keybinds, storeKeys.SETTINGS.READER_PREFIX);
+          } else if (data.settings.keybinds) {
+            restoreGroup(data.settings.keybinds, storeKeys.SETTINGS.KEYBINDS_PREFIX || 'keybind-');
+          }
+
+          // Restore tracker settings
+          restoreGroup(data.settings.Trackers || data.settings.trackers, storeKeys.SETTINGS.TRACKER_PREFIX);
+
+          // Restore integration settings
+          restoreGroup(
+            data.settings.Integrations || data.settings.integrations,
+            storeKeys.SETTINGS.INTEGRATION_PREFIX,
+          );
+
+          // Restore sort/layout/filter button settings
+          restoreGroup(data.settings.Sort, storeKeys.SETTINGS.GENERAL_PREFIX);
+          restoreGroup(data.settings.Layout, storeKeys.SETTINGS.GENERAL_PREFIX);
+          restoreGroup(data.settings.Filters, storeKeys.SETTINGS.GENERAL_PREFIX);
+
+          // Restore legacy layout/filter button settings (future)
+          restoreGroup(data.settings.layoutButton, 'layoutButton-');
+          restoreGroup(data.settings.filtersButton, 'filtersButton-');
+          
+          console.log('[restoreBackup] Settings restored successfully');
+        } catch (error) {
+          console.error('[restoreBackup] Error restoring settings:', error);
+        }
+      }
+
+      // Restore extensions
+      if (data.extensions) {
+        console.log('[restoreBackup] Restoring extension settings...');
+        try {
+          Object.entries(data.extensions).forEach(([extId, settings]) => {
+            localStorage.setItem(`${storeKeys.EXTENSION_SETTINGS_PREFIX}${extId}`, settings);
+          });
+          console.log('[restoreBackup] Extension settings restored');
+        } catch (error) {
+          console.error('[restoreBackup] Error restoring extensions:', error);
+        }
+      }
+
+      // Restore trackers
+      if (data.trackers) {
+        console.log('[restoreBackup] Restoring tracker tokens...');
+        try {
+          Object.entries(data.trackers).forEach(([trackerId, token]) => {
+            localStorage.setItem(`${storeKeys.TRACKER_ACCESS_TOKEN_PREFIX}${trackerId}`, token);
+          });
+          console.log('[restoreBackup] Tracker tokens restored');
+        } catch (error) {
+          console.error('[restoreBackup] Error restoring trackers:', error);
+        }
+      }
+      
+      console.log('[restoreBackup] Backup restoration complete! Reloading page...');
+      
+      // Reload the page to apply all settings
+      setTimeout(() => {
+        window.location.reload();
+      }, 500); // Small delay to ensure all writes complete
+    } else {
+      // Legacy backup format - handle old localStorage format
+      console.log('[restoreBackup] Restoring legacy backup format...');
+      
+      // Restore series from the backup into the library
+      if (storeKeys.LIBRARY.SERIES_LIST in data) {
+        console.log('[restoreBackup] Restoring series from legacy format...');
+        const oldSeriesList: Series[] = JSON.parse(data[storeKeys.LIBRARY.SERIES_LIST]);
+        
+        // Write all series at once instead of one at a time
+        persistantStore.write(
+          `${storeKeys.LIBRARY.SERIES_LIST}`,
+          JSON.stringify(oldSeriesList),
+        );
+        console.log(`[restoreBackup] Restored ${oldSeriesList.length} series from legacy backup`);
+      }
+
+      // Restore chapters from backup while maintaining progress from current & backup
+      console.log('[restoreBackup] Restoring chapters from legacy format...');
+      let chapterKeyCount = 0;
+      Object.entries(data).forEach(([key, value]: [string, unknown]) => {
+        if (key.startsWith(storeKeys.LIBRARY.CHAPTER_LIST_PREFIX)) {
+          const seriesId = key.split(storeKeys.LIBRARY.CHAPTER_LIST_PREFIX)[1];
+          
+          const existingChapters = library.fetchChapters(seriesId);
+          const oldChapters: Chapter[] = JSON.parse(value as string);
+
+          const chaptersToSave: Chapter[] = oldChapters.map((oldChapter) => {
+            const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
+            return {
+              ...oldChapter,
+              read: (existingChapter && existingChapter.read) || oldChapter.read,
+            };
+          });
+          
+          // Write chapters directly to localStorage
+          persistantStore.write(
+            `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
+            JSON.stringify(chaptersToSave),
+          );
+          chapterKeyCount++;
         }
       });
+      console.log(`[restoreBackup] Restored chapters for ${chapterKeyCount} series`);
+      console.log('[restoreBackup] Legacy backup restoration complete! Reloading page...');
+      
+      // Reload after a small delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     }
-
-    // Restore legacy chapters map if inline chapters were not present
-    if (!hasInlineChapters && data.chapters && typeof data.chapters === 'object') {
-      Object.entries(data.chapters).forEach(([seriesId, chapterList]: [string, unknown]) => {
-        const series = library.fetchSeries(seriesId);
-        if (!series) return;
-
-        const existingChapters = library.fetchChapters(seriesId);
-        const oldChapters = chapterList as Chapter[];
-
-        const chaptersToSave: Chapter[] = [];
-        oldChapters.forEach((oldChapter) => {
-          const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
-          chaptersToSave.push({
-            ...oldChapter,
-            read: (existingChapter && existingChapter.read) || oldChapter.read,
-          });
-        });
-        library.upsertChapters(chaptersToSave, series);
-      });
-    }
-
-    // Restore settings
-    if (data.settings) {
-      const restoreGroup = (group: BackupSettingsGroup | undefined, prefix: string) => {
-        if (!group) return;
-        Object.entries(group).forEach(([key, value]) => {
-          localStorage.setItem(`${prefix}${key}`, String(value ?? ''));
-        });
-      };
-
-      // Restore system settings (chapter list ordering)
-      restoreGroup(data.systemSettings, storeKeys.SETTINGS.GENERAL_PREFIX);
-
-      // Restore general settings
-      restoreGroup(data.settings.General || data.settings.general, storeKeys.SETTINGS.GENERAL_PREFIX);
-
-      // Restore theme settings
-      const themeSettings = data.settings.Theme || data.settings.theme;
-      if (themeSettings) {
-        const isLegacy = Object.keys(themeSettings).some((key) => key === 'theme');
-        Object.entries(themeSettings).forEach(([key, value]) => {
-          const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
-          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
-        });
-      }
-
-      // Restore folders settings
-      const folderSettings = data.settings.Folders || data.settings.folders;
-      if (folderSettings) {
-        const isLegacy = Object.keys(folderSettings).some((key) => key === 'masterFolder');
-        Object.entries(folderSettings).forEach(([key, value]) => {
-          const settingKey = isLegacy ? key.charAt(0).toUpperCase() + key.slice(1) : key;
-          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
-        });
-      }
-
-      // Restore library settings
-      const librarySettings = data.settings.Library || data.settings.library;
-      if (librarySettings) {
-        const keyMapping: { [key: string]: string } = {
-          refreshOnStart: 'RefreshOnStart',
-          confirmRemoveSeries: 'ConfirmRemoveSeries',
-          cropCoverImages: 'LibraryCropCovers',
-          customDownloadLocation: 'CustomDownloadsDir',
-          libraryColumns: 'LibraryColumns',
-          libraryView: 'LibraryView',
-          librarySort: 'LibrarySort',
-        };
-        const isLegacy = Object.keys(librarySettings).some((key) => key in keyMapping);
-        Object.entries(librarySettings).forEach(([key, value]) => {
-          const settingKey = isLegacy ? keyMapping[key] || key : key;
-          localStorage.setItem(`${storeKeys.SETTINGS.GENERAL_PREFIX}${settingKey}`, String(value ?? ''));
-        });
-      }
-
-      // Restore reader settings
-      restoreGroup(data.settings.Reader || data.settings.reader, storeKeys.SETTINGS.READER_PREFIX);
-
-      // Restore keybinds settings
-      if (data.settings.Keybinds) {
-        restoreGroup(data.settings.Keybinds, storeKeys.SETTINGS.READER_PREFIX);
-      } else if (data.settings.keybinds) {
-        restoreGroup(data.settings.keybinds, storeKeys.SETTINGS.KEYBINDS_PREFIX || 'keybind-');
-      }
-
-      // Restore tracker settings
-      restoreGroup(data.settings.Trackers || data.settings.trackers, storeKeys.SETTINGS.TRACKER_PREFIX);
-
-      // Restore integration settings
-      restoreGroup(
-        data.settings.Integrations || data.settings.integrations,
-        storeKeys.SETTINGS.INTEGRATION_PREFIX,
-      );
-
-      // Restore sort/layout/filter button settings
-      restoreGroup(data.settings.Sort, storeKeys.SETTINGS.GENERAL_PREFIX);
-      restoreGroup(data.settings.Layout, storeKeys.SETTINGS.GENERAL_PREFIX);
-      restoreGroup(data.settings.Filters, storeKeys.SETTINGS.GENERAL_PREFIX);
-
-      // Restore legacy layout/filter button settings (future)
-      restoreGroup(data.settings.layoutButton, 'layoutButton-');
-      restoreGroup(data.settings.filtersButton, 'filtersButton-');
-
-      // Reload the page to apply all settings
-      window.location.reload();
-    }
-
-    // Restore extensions
-    if (data.extensions) {
-      Object.entries(data.extensions).forEach(([extId, settings]) => {
-        localStorage.setItem(`${storeKeys.EXTENSION_SETTINGS_PREFIX}${extId}`, settings);
-      });
-    }
-
-    // Restore trackers
-    if (data.trackers) {
-      Object.entries(data.trackers).forEach(([trackerId, token]) => {
-        localStorage.setItem(`${storeKeys.TRACKER_ACCESS_TOKEN_PREFIX}${trackerId}`, token);
-      });
-    }
-  } else {
-    // Legacy backup format - handle old localStorage format
-    // add series' from the backup into the library
-    if (storeKeys.LIBRARY.SERIES_LIST in data) {
-      const oldSeriesList: Series[] = JSON.parse(data[storeKeys.LIBRARY.SERIES_LIST]);
-      Object.values(oldSeriesList).forEach((series: Series) => updateSeries(series));
-    }
-
-    // add chapters from backup while maintaining progress from current & backup
-    Object.entries(data).forEach(([key, value]: [string, unknown]) => {
-      if (key.startsWith(storeKeys.LIBRARY.CHAPTER_LIST_PREFIX)) {
-        const seriesId = key.split(storeKeys.LIBRARY.CHAPTER_LIST_PREFIX)[1];
-        const series = library.fetchSeries(seriesId);
-        if (!series) return;
-
-        const existingChapters = library.fetchChapters(seriesId);
-        const oldChapters: Chapter[] = JSON.parse(value as string);
-
-        const chaptersToSave: Chapter[] = [];
-        oldChapters.forEach((oldChapter) => {
-          const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
-          chaptersToSave.push({
-            ...oldChapter,
-            read: (existingChapter && existingChapter.read) || oldChapter.read,
-          });
-        });
-        library.upsertChapters(chaptersToSave, series);
-      }
-    });
+  } catch (error) {
+    console.error('[restoreBackup] Critical error during backup restoration:', error);
+    alert(`Failed to restore backup: ${error instanceof Error ? error.message : 'Unknown error'}\n\nThe backup file may be corrupted. Please check the console for more details.`);
+    throw error;
   }
 };

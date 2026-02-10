@@ -13,6 +13,7 @@ import { Label } from '@houdoku/ui/components/Label';
 import { Switch } from '@houdoku/ui/components/Switch';
 import { Input } from '@houdoku/ui/components/Input';
 import { Button } from '@houdoku/ui/components/Button';
+import { toast } from '@houdoku/ui/hooks/use-toast';
 
 export const SettingsGeneral: React.FC = () => {
   const [autoCheckForUpdates, setAutoCheckForUpdates] = useRecoilState(autoCheckForUpdatesState);
@@ -39,9 +40,36 @@ export const SettingsGeneral: React.FC = () => {
         return false;
       })
       .then((fileContent: string) => {
-        if (fileContent) restoreBackup(fileContent);
+        if (fileContent) {
+          const toastHandle = toast({
+            title: 'Restoring backup...',
+            description: 'This may take a few moments. Please wait...',
+            duration: 600000, // 10 minutes
+          });
+          
+          try {
+            restoreBackup(fileContent);
+            // Note: page will reload automatically after successful restore
+          } catch (error) {
+            toastHandle.dismiss();
+            toast({
+              title: 'Backup restore failed',
+              description: error instanceof Error ? error.message : 'Unknown error occurred',
+              variant: 'destructive',
+              duration: 10000,
+            });
+          }
+        }
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error('[SettingsGeneral] Error during backup restore:', error);
+        toast({
+          title: 'Failed to load backup file',
+          description: error instanceof Error ? error.message : 'Unknown error occurred',
+          variant: 'destructive',
+          duration: 10000,
+        });
+      });
   };
 
   return (
