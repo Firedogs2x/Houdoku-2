@@ -10,7 +10,7 @@ const path = require('path');
 import storeKeys from '@/common/constants/storeKeys.json';
 import { updateSeries } from '../features/library/utils';
 import library from '../services/library';
-import { persistantStore } from './persistantStore';
+import persistantStore from './persistantStore';
 
 type BackupSettingsGroup = { [key: string]: string };
 
