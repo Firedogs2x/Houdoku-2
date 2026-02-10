@@ -51,6 +51,12 @@ export const SettingsGeneral: React.FC = () => {
             restoreBackup(fileContent);
             // Note: page will reload automatically after successful restore
           } catch (error) {
+            // If error is RELOAD_TRIGGERED, page is reloading - don't show error toast
+            if (error instanceof Error && error.message === 'RELOAD_TRIGGERED') {
+              console.log('[SettingsGeneral] Backup restore triggered page reload');
+              return; // Exit without showing error
+            }
+            // Real error - show toast
             toastHandle.dismiss();
             toast({
               title: 'Backup restore failed',

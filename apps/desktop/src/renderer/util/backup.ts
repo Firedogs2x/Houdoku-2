@@ -377,20 +377,12 @@ export const restoreBackup = (backupFileContent: string) => {
           if (Array.isArray(seriesChapters) && seriesChapters.length > 0) {
             hasInlineChapters = true;
             
-            // Get existing chapters only if they exist (to preserve read status)
-            const existingChapters = library.fetchChapters(seriesId);
-            const chaptersToSave: Chapter[] = seriesChapters.map((oldChapter) => {
-              const existingChapter = existingChapters.find((c) => c.id === oldChapter.id);
-              return {
-                ...oldChapter,
-                read: (existingChapter && existingChapter.read) || oldChapter.read,
-              } as Chapter;
-            });
-            
+            // Restore chapters as-is from backup (they already contain read status)
+            // Don't call library.fetchChapters() to avoid triggering 460+ localStorage reads during restore
             // Write chapters directly to localStorage (bypass library.upsertChapters to avoid calling upsertSeries again)
             persistantStore.write(
               `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
-              JSON.stringify(chaptersToSave),
+              JSON.stringify(seriesChapters),
             );
             
             processedCount++;
@@ -548,9 +540,10 @@ export const restoreBackup = (backupFileContent: string) => {
       
       console.log('[restoreBackup] Backup restoration complete! Reloading page...');
       
-      // Reload immediately without setTimeout to prevent any React updates from triggering
-      // This stops JavaScript execution and prevents error #185 from cascading updates
+      // Reload immediately to prevent any React updates from triggering
+      // After calling reload, throw to stop execution and prevent the Promise chain from continuing
       window.location.reload();
+      throw new Error('RELOAD_TRIGGERED'); // This stops execution and prevents React from processing
     } else {
       // Legacy backup format - handle old localStorage format
       console.log('[restoreBackup] Restoring legacy backup format...');

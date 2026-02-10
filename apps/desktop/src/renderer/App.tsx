@@ -98,11 +98,23 @@ export default function App() {
       // field 'tags'.
       migrateSeriesTags();
 
-      // Remove any preview series.
-      library
-        .fetchSeriesList()
-        .filter((series) => series.preview)
-        .forEach((series) => (series.id ? library.removeSeries(series.id, false) : undefined));
+      // Fetch series list once and remove any preview series before setting state
+      // This prevents multiple fetchSeriesList() calls and potential update cascades
+      const allSeries = library.fetchSeriesList();
+      const previewSeries = allSeries.filter((series) => series.preview);
+      if (previewSeries.length > 0) {
+        console.log(`[App] Removing ${previewSeries.length} preview series`);
+        previewSeries.forEach((series) => {
+          if (series.id) {
+            library.removeSeries(series.id, false);
+          }
+        });
+        // Fetch again after removing preview series
+        setSeriesList(library.fetchSeriesList());
+      } else {
+        // No preview series, use the list we already fetched
+        setSeriesList(allSeries);
+      }
 
       // If AutoCheckForUpdates setting is enabled, check for client updates now
       if (autoCheckForUpdates) {
@@ -111,7 +123,6 @@ export default function App() {
         console.debug('Skipping update check, autoCheckForUpdates is disabled');
       }
 
-      setSeriesList(library.fetchSeriesList());
       setCategoryList(library.fetchCategoryList());
       setLoading(false);
     }
