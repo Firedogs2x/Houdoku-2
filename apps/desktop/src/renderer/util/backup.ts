@@ -596,6 +596,12 @@ export const restoreBackup = (backupFileContent: string) => {
       }, 500);
     }
   } catch (error) {
+    // If error is RELOAD_TRIGGERED, the restore succeeded and page is reloading - don't show error
+    if (error instanceof Error && error.message === 'RELOAD_TRIGGERED') {
+      console.log('[restoreBackup] Backup restore completed successfully, page reloading...');
+      return; // Exit silently, let the reload happen
+    }
+    // Real error - log and alert
     console.error('[restoreBackup] Critical error during backup restoration:', error);
     alert(`Failed to restore backup: ${error instanceof Error ? error.message : 'Unknown error'}\n\nThe backup file may be corrupted. Please check the console for more details.`);
     throw error;

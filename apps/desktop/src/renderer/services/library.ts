@@ -9,15 +9,26 @@ const BACKFILL_DATE = '2026-01-09T00:00:00Z';
 // Cache to prevent repeated reads from localStorage and infinite loops
 let seriesListCache: Series[] | null = null;
 let seriesListCacheTime = 0;
-const CACHE_DURATION_MS = 1000; // 1 second cache
+const CACHE_DURATION_MS = 30000; // 30 second cache (increased from 1s to prevent rapid successive calls)
 let fetchInProgress = false;
+let lastCallTime = 0;
+const MIN_CALL_INTERVAL_MS = 100; // Minimum 100ms between calls to prevent cascades
 
 const fetchSeriesList = (): Series[] => {
   // Prevent infinite loops - track call frequency
   const now = Date.now();
   const callsSinceCache = now - seriesListCacheTime;
+  const timeSinceLastCall = now - lastCallTime;
   
-  console.log(`[fetchSeriesList] Called (cache age: ${callsSinceCache}ms, fetchInProgress: ${fetchInProgress})`);
+  console.log(`[fetchSeriesList] Called (cache age: ${callsSinceCache}ms, fetchInProgress: ${fetchInProgress}, timeSinceLastCall: ${timeSinceLastCall}ms)`);
+  
+  // Rate limiting: If called too rapidly (within 100ms), return cached data to prevent cascade
+  if (timeSinceLastCall < MIN_CALL_INTERVAL_MS && seriesListCache) {
+    console.warn(`[fetchSeriesList] Called too rapidly (${timeSinceLastCall}ms < ${MIN_CALL_INTERVAL_MS}ms), returning cached data to prevent cascade`);
+    return seriesListCache;
+  }
+  
+  lastCallTime = now;
   
   // If fetch is already in progress, return cached data or empty array
   if (fetchInProgress) {
@@ -90,6 +101,7 @@ const clearSeriesListCache = () => {
   console.log('[library] Clearing series list cache');
   seriesListCache = null;
   seriesListCacheTime = 0;
+  lastCallTime = 0;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {
