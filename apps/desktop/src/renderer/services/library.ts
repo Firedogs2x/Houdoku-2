@@ -7,23 +7,46 @@ import { Category } from '@/common/models/types';
 const BACKFILL_DATE = '2026-01-09T00:00:00Z';
 
 const fetchSeriesList = (): Series[] => {
-  const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
-  let series: Series[] = val === null ? [] : JSON.parse(val);
-
-  let changed = false;
-  series = series.map((s) => {
-    if (!s.lastReadDate) {
-      changed = true;
-      return { ...s, lastReadDate: BACKFILL_DATE };
+  try {
+    const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
+    if (val === null) {
+      return [];
     }
-    return s;
-  });
+    
+    // Check size before parsing
+    const sizeMB = new Blob([val]).size / (1024 * 1024);
+    if (sizeMB > 5) {
+      console.warn(`[fetchSeriesList] Large series list detected (${sizeMB.toFixed(2)} MB). This may cause performance issues.`);
+    }
+    
+    let series: Series[] = JSON.parse(val);
 
-  if (changed) {
-    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+    let changed = false;
+    series = series.map((s) => {
+      if (!s.lastReadDate) {
+        changed = true;
+        return { ...s, lastReadDate: BACKFILL_DATE };
+      }
+      return s;
+    });
+
+    if (changed) {
+      try {
+        persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+      } catch (writeError) {
+        console.error('[fetchSeriesList] Failed to write updated series list:', writeError);
+        // Continue anyway - don't block on backfill write failure
+      }
+    }
+
+    console.log(`[fetchSeriesList] Loaded ${series.length} series from storage`);
+    return series;
+  } catch (error) {
+    console.error('[fetchSeriesList] CRITICAL ERROR: Failed to load series list from localStorage:', error);
+    console.error('[fetchSeriesList] Your library data may be corrupted or too large. Try clearing localStorage and restoring from a smaller backup.');
+    // Return empty array to prevent app crash - let ErrorBoundary handle it
+    throw new Error(`Failed to load library: ${error instanceof Error ? error.message : 'Unknown error'}. Your library may be too large or corrupted.`);
   }
-
-  return series;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {

@@ -311,11 +311,31 @@ export const createAutoBackup = async (Count = 1) => {
 export const restoreBackup = (backupFileContent: string) => {
   try {
     console.log('[restoreBackup] Starting backup restoration...');
+    
+    // Check backup file size
+    const backupSizeMB = new Blob([backupFileContent]).size / (1024 * 1024);
+    console.log(`[restoreBackup] Backup size: ${backupSizeMB.toFixed(2)} MB`);
+    
+    if (backupSizeMB > 10) {
+      console.warn(`[restoreBackup] WARNING: Large backup file (${backupSizeMB.toFixed(2)} MB). This may take a while and could approach localStorage limits.`);
+    }
+    
     const data = JSON.parse(backupFileContent);
 
     // Check if this is the new format
     if (isNewBackupFormat(data)) {
       console.log(`[restoreBackup] Restoring ${data.series?.length || 0} series...`);
+      
+      // Count total chapters for logging
+      let totalChapters = 0;
+      if (data.series && Array.isArray(data.series)) {
+        data.series.forEach((s: SeriesBackupEntry) => {
+          if (s.chapters && Array.isArray(s.chapters)) {
+            totalChapters += s.chapters.length;
+          }
+        });
+      }
+      console.log(`[restoreBackup] Total chapters to restore: ${totalChapters}`);
       
       // Restore series (supports inline chapters per series)
       let hasInlineChapters = false;
@@ -328,11 +348,19 @@ export const restoreBackup = (backupFileContent: string) => {
         
         // Write all series at once to avoid O(N²) complexity
         console.log('[restoreBackup] Writing all series to storage...');
-        persistantStore.write(
-          `${storeKeys.LIBRARY.SERIES_LIST}`,
-          JSON.stringify(seriesToRestore),
-        );
-        console.log('[restoreBackup] Series written successfully');
+        try {
+          persistantStore.write(
+            `${storeKeys.LIBRARY.SERIES_LIST}`,
+            JSON.stringify(seriesToRestore),
+          );
+          console.log('[restoreBackup] Series written successfully');
+        } catch (error) {
+          console.error('[restoreBackup] CRITICAL ERROR: Failed to write series to localStorage', error);
+          if (error instanceof Error && error.name === 'QuotaExceededError') {
+            throw new Error(`localStorage quota exceeded. Your backup contains ${data.series.length} series which is too large for localStorage. Consider reducing the number of series or clearing old data.`);
+          }
+          throw error;
+        }
 
         // Step 2: Restore chapters for each series
         console.log('[restoreBackup] Restoring chapters...');
