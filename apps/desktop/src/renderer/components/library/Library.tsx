@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Series, Chapter } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { useLocation } from 'react-router-dom';
 import LibraryControlBar from './LibraryControlBar';
 import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';
 import {
@@ -31,7 +30,6 @@ import { RemoveSeriesDialog } from './RemoveSeriesDialog';
 type Props = unknown;
 
 const Library: React.FC<Props> = () => {
-  const location = useLocation();
   const [removeModalShowing, setRemoveModalShowing] = useState(false);
   const [removeModalSeries, setRemoveModalSeries] = useState<Series | null>(null);
   const activeSeriesList = useRecoilValue(activeSeriesListState);
@@ -44,7 +42,6 @@ const Library: React.FC<Props> = () => {
   const librarySort = useRecoilValue(librarySortState);
   const libraryDisplayMode = useRecoilValue(libraryDisplayModeState);
   const setSeries = useSetRecoilState(seriesState);
-  const setSeriesList = useSetRecoilState(seriesListState);
   const setChapterList = useSetRecoilState(chapterListState);
   const [scrollPosition, setScrollPosition] = useRecoilState(libraryScrollPositionState);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
