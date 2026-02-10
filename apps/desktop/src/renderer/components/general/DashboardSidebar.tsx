@@ -68,8 +68,6 @@ import {
 } from '@houdoku/ui/components/ContextMenu';
 import { EditCategoryDialog } from './EditCategoryDialog';
 import { RemoveCategoryDialog } from './RemoveCategoryDialog';
-import library from '@/renderer/services/library';
-import { seriesListState, activeSeriesListState } from '@/renderer/state/libraryStates';
 
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
@@ -80,8 +78,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const categories = useRecoilValue(categoryListState);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
-  const setSeriesList = useSetRecoilState(seriesListState);
-
 
   const handleUpdateCheck = () => {
     if (!checkingForUpdate) {
@@ -135,7 +131,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         className="cursor-pointer"
                         onClick={() => {
                           setLibraryFilterCategory('');
-                          setSeriesList(library.fetchSeriesList());
                           navigate(routes.LIBRARY);
                         }}
                       >
@@ -150,7 +145,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                               className="cursor-pointer"
                               onClick={() => {
                                 setLibraryFilterCategory(category.id);
-                                setSeriesList(library.fetchSeriesList());
                                 navigate(routes.LIBRARY);
                               }}
                             >
