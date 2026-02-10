@@ -16,6 +16,7 @@ interface Props {
 interface State {
   error: Error | null;
   logsDir: string | null;
+  errorInfo: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,6 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.state = {
       error: null,
       logsDir: null,
+      errorInfo: null,
     };
     
     // Fetch logs directory asynchronously
@@ -35,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({ error });
+    this.setState({ error, errorInfo });
     console.debug('Caught error in ErrorBoundary, relaying details below...');
     console.error(error, errorInfo);
   }
@@ -105,7 +107,16 @@ export class ErrorBoundary extends Component<Props, State> {
                 <AccordionTrigger>
                   {this.state.error.name}: {this.state.error.message}
                 </AccordionTrigger>
-                <AccordionContent>{this.state.error.stack}</AccordionContent>
+                <AccordionContent>
+                  <pre className="whitespace-pre-wrap">
+                    {this.state.error.stack}
+                  </pre>
+                  {this.state.errorInfo?.componentStack && (
+                    <pre className="whitespace-pre-wrap mt-4">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  )}
+                </AccordionContent>
               </AccordionItem>
             </Accordion>
           </div>
