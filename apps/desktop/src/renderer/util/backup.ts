@@ -542,6 +542,9 @@ export const restoreBackup = (backupFileContent: string) => {
       
       console.log('[restoreBackup] Backup restoration complete! Reloading page...');
       
+      // Clear series list cache to force fresh load after restore
+      library.clearSeriesListCache();
+      
       // Reload the page to apply all settings
       setTimeout(() => {
         window.location.reload();

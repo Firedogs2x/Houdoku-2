@@ -262,7 +262,8 @@ const Library: React.FC<Props> = () => {
       console.log(`[Library] Sample series: title="${freshList[0]?.title}", numberUnread=${freshList[0]?.numberUnread}`);
       setSeriesList(freshList);
     }
-  }, [location.pathname, setSeriesList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]); // Removed setSeriesList from deps - Recoil setter is stable
 
   return (
     <div className="h-full flex flex-col">

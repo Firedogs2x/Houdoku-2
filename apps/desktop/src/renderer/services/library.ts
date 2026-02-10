@@ -6,10 +6,39 @@ import { Category } from '@/common/models/types';
 
 const BACKFILL_DATE = '2026-01-09T00:00:00Z';
 
+// Cache to prevent repeated reads from localStorage and infinite loops
+let seriesListCache: Series[] | null = null;
+let seriesListCacheTime = 0;
+const CACHE_DURATION_MS = 1000; // 1 second cache
+let fetchInProgress = false;
+
 const fetchSeriesList = (): Series[] => {
+  // Prevent infinite loops - track call frequency
+  const now = Date.now();
+  const callsSinceCache = now - seriesListCacheTime;
+  
+  console.log(`[fetchSeriesList] Called (cache age: ${callsSinceCache}ms, fetchInProgress: ${fetchInProgress})`);
+  
+  // If fetch is already in progress, return cached data or empty array
+  if (fetchInProgress) {
+    console.warn('[fetchSeriesList] Fetch already in progress, returning cached data to prevent loop');
+    return seriesListCache || [];
+  }
+  
+  // Return cached data if fresh enough
+  if (seriesListCache && callsSinceCache < CACHE_DURATION_MS) {
+    console.log(`[fetchSeriesList] Returning cached data (${seriesListCache.length} series)`);
+    return seriesListCache;
+  }
+  
+  fetchInProgress = true;
+  
   try {
     const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
     if (val === null) {
+      seriesListCache = [];
+      seriesListCacheTime = now;
+      fetchInProgress = false;
       return [];
     }
     
@@ -40,13 +69,27 @@ const fetchSeriesList = (): Series[] => {
     }
 
     console.log(`[fetchSeriesList] Loaded ${series.length} series from storage`);
+    
+    // Update cache
+    seriesListCache = series;
+    seriesListCacheTime = now;
+    fetchInProgress = false;
+    
     return series;
   } catch (error) {
+    fetchInProgress = false;
     console.error('[fetchSeriesList] CRITICAL ERROR: Failed to load series list from localStorage:', error);
     console.error('[fetchSeriesList] Your library data may be corrupted or too large. Try clearing localStorage and restoring from a smaller backup.');
     // Return empty array to prevent app crash - let ErrorBoundary handle it
     throw new Error(`Failed to load library: ${error instanceof Error ? error.message : 'Unknown error'}. Your library may be too large or corrupted.`);
   }
+};
+
+// Function to clear cache (call after restore or when series list changes)
+const clearSeriesListCache = () => {
+  console.log('[library] Clearing series list cache');
+  seriesListCache = null;
+  seriesListCacheTime = 0;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {
@@ -219,4 +262,5 @@ export default {
   fetchCategoryList,
   upsertCategory,
   removeCategory,
+  clearSeriesListCache,
 };
