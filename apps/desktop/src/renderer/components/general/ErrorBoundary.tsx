@@ -9,14 +9,13 @@ import {
   AccordionTrigger,
 } from '@houdoku/ui/components/Accordion';
 
-const LOGS_DIR = await ipcRenderer.invoke(ipcChannels.GET_PATH.LOGS_DIR);
-
 interface Props {
   children: ReactNode;
 }
 
 interface State {
   error: Error | null;
+  logsDir: string | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,7 +23,15 @@ export class ErrorBoundary extends Component<Props, State> {
     super(props);
     this.state = {
       error: null,
+      logsDir: null,
     };
+    
+    // Fetch logs directory asynchronously
+    ipcRenderer.invoke(ipcChannels.GET_PATH.LOGS_DIR).then((logsDir: string) => {
+      this.setState({ logsDir });
+    }).catch((err: Error) => {
+      console.error('Failed to fetch logs directory:', err);
+    });
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -79,17 +86,19 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
             <h4 className="font-bold text-xl pt-2">Error details</h4>
-            <p>
-              Additional logs in{' '}
-              <a
-                className="underline"
-                href={`file:///${LOGS_DIR}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {LOGS_DIR}
-              </a>
-            </p>
+            {this.state.logsDir && (
+              <p>
+                Additional logs in{' '}
+                <a
+                  className="underline"
+                  href={`file:///${this.state.logsDir}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {this.state.logsDir}
+                </a>
+              </p>
+            )}
 
             <Accordion type="single">
               <AccordionItem value="details">
