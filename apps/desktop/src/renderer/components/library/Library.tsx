@@ -249,21 +249,10 @@ const Library: React.FC<Props> = () => {
     );
   };
 
-  // Fetch fresh series list whenever we navigate to/from the series details page
-  // This ensures that any chapter read/unread status changes are reflected
-  useEffect(() => {
-    console.log(`[Library] Navigation detected: pathname=${location.pathname}`);
-    
-    // Only refresh if we're viewing the library (not on a series page)
-    if (!location.pathname.includes('/series/')) {
-      console.log(`[Library] Not on series page. Fetching fresh series list from storage...`);
-      const freshList = library.fetchSeriesList();
-      console.log(`[Library] Fetched ${freshList.length} series. Updating seriesListState...`);
-      console.log(`[Library] Sample series: title="${freshList[0]?.title}", numberUnread=${freshList[0]?.numberUnread}`);
-      setSeriesList(freshList);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]); // Removed setSeriesList from deps - Recoil setter is stable
+  // NOTE: Removed automatic series list refresh on navigation.
+  // The series list is already loaded by App.tsx on startup and stored in Recoil state.
+  // Other components (ReaderPage, ChapterTable) update the series list when chapters are marked read.
+  // Fetching 460+ series on every navigation was triggering React's "maximum update depth" protection.
 
   return (
     <div className="h-full flex flex-col">
