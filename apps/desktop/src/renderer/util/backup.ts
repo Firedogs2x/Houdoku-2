@@ -341,9 +341,15 @@ export const restoreBackup = (backupFileContent: string) => {
       let hasInlineChapters = false;
       if (data.series && Array.isArray(data.series)) {
         // Step 1: Batch restore all series first (without downloading covers)
+        const BACKFILL_DATE = '2026-01-09T00:00:00Z';
         const seriesToRestore: Series[] = data.series.map((seriesEntry: SeriesBackupEntry) => {
           const { chapters: seriesChapters, ...seriesInfo } = seriesEntry as SeriesBackupEntry;
-          return seriesInfo as Series;
+          const series = seriesInfo as Series;
+          // Ensure lastReadDate is set to prevent fetchSeriesList from triggering backfill writes
+          if (!series.lastReadDate) {
+            series.lastReadDate = BACKFILL_DATE;
+          }
+          return series;
         });
         
         // Write all series at once to avoid O(N²) complexity
@@ -542,12 +548,9 @@ export const restoreBackup = (backupFileContent: string) => {
       
       console.log('[restoreBackup] Backup restoration complete! Reloading page...');
       
-      // Reload the page immediately to apply all settings and prevent React update loops
-      // Using minimal delay (10ms) to allow microtasks to complete but stop React from cascading updates
-      // Note: No need to clear cache since page will reload and reset everything
-      setTimeout(() => {
-        window.location.reload();
-      }, 10);
+      // Reload immediately without setTimeout to prevent any React updates from triggering
+      // This stops JavaScript execution and prevents error #185 from cascading updates
+      window.location.reload();
     } else {
       // Legacy backup format - handle old localStorage format
       console.log('[restoreBackup] Restoring legacy backup format...');
