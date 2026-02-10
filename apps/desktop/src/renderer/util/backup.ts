@@ -542,13 +542,12 @@ export const restoreBackup = (backupFileContent: string) => {
       
       console.log('[restoreBackup] Backup restoration complete! Reloading page...');
       
-      // Clear series list cache to force fresh load after restore
-      library.clearSeriesListCache();
-      
-      // Reload the page to apply all settings
+      // Reload the page immediately to apply all settings and prevent React update loops
+      // Using minimal delay (10ms) to allow microtasks to complete but stop React from cascading updates
+      // Note: No need to clear cache since page will reload and reset everything
       setTimeout(() => {
         window.location.reload();
-      }, 500); // Small delay to ensure all writes complete
+      }, 10);
     } else {
       // Legacy backup format - handle old localStorage format
       console.log('[restoreBackup] Restoring legacy backup format...');
