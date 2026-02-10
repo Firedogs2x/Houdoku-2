@@ -77,8 +77,7 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
 
   return (
     <>
-      <style>{`.settings-dialog * { border-color: rgba(255, 90, 0, 0.4) !important; } .settings-dialog .border { border-color: rgba(255, 90, 0, 0.4) !important; }`}</style>
-      <DialogContent className="settings-dialog overflow-hidden !p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] text-foreground">
+      <DialogContent className="overflow-hidden !p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px] text-foreground">
         <DialogTitle className="sr-only">Settings</DialogTitle>
       <SidebarProvider className="items-start">
         <Sidebar collapsible="none">
@@ -86,18 +85,6 @@ export function SettingsDialogContent(props: SettingsDialogContentProps) {
             <SidebarGroup>
               <SidebarGroupContent>
                   <SidebarMenu>
-
-                   {/* Diagnostic logging of pages (will appear in renderer console) */}
-                   
-                    {console.log(
-                      'SettingsDialogContent: pages',
-                      Object.entries(PAGES).map(([page, pageProps]) => ({
-                        page,
-                        componentType: typeof pageProps.component,
-                        isElement: React.isValidElement(pageProps.component),
-                        iconType: typeof pageProps.icon,
-                      })),
-                    )}
                     {Object.entries(PAGES).map(([page, pageProps]) => {
                       const pageKey: SettingsPage = page as SettingsPage;
                       const Icon = pageProps.icon;
