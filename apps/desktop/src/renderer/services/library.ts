@@ -3,18 +3,20 @@ import { v4 as uuidv4 } from 'uuid';
 import persistantStore from '../util/persistantStore';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { Category } from '@/common/models/types';
+import { getLocalDateStampMMDDYYYY } from '@/renderer/util/date';
 
-const BACKFILL_DATE = '2026-01-09T00:00:00Z';
+const getBackfillDate = (): string => getLocalDateStampMMDDYYYY();
 
 const fetchSeriesList = (): Series[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
   let series: Series[] = val === null ? [] : JSON.parse(val);
 
   let changed = false;
+  const backfillDate = getBackfillDate();
   series = series.map((s) => {
     if (!s.lastReadDate) {
       changed = true;
-      return { ...s, lastReadDate: BACKFILL_DATE };
+      return { ...s, lastReadDate: backfillDate };
     }
     return s;
   });
@@ -35,8 +37,8 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
   const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
 
-  // Backfill missing dateAdded with current date (ISO)
-  const CHAPTER_BACKFILL_DATE = new Date().toISOString();
+  // Backfill missing dateAdded with current local date
+  const CHAPTER_BACKFILL_DATE = getBackfillDate();
   let changed = false;
   chapters.forEach((c) => {
     if (!c.dateAdded) {
@@ -71,7 +73,7 @@ const upsertSeries = (series: Series): Series => {
 
   // Set lastReadDate to backfill date if still missing
   if (!newSeries.lastReadDate) {
-    newSeries.lastReadDate = BACKFILL_DATE;
+    newSeries.lastReadDate = getBackfillDate();
   }
 
   // Calculate unread status based on chapters if the caller didn't explicitly
@@ -116,7 +118,7 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
   chapters.forEach((chapter) => {
     const chapterId: string = chapter.id ? chapter.id : uuidv4();
     // ensure dateAdded exists for new/upserted chapters
-    const dateAdded = chapter.dateAdded ? chapter.dateAdded : new Date().toISOString();
+    const dateAdded = chapter.dateAdded ? chapter.dateAdded : getBackfillDate();
     chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 

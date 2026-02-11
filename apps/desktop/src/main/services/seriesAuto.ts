@@ -29,6 +29,13 @@ interface SeriesAutoLog {
 
 const SPECIAL_CHARS = ['#', '$'];
 
+const getLocalDateStampMMDDYYYY = (date: Date = new Date()): string => {
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const yyyy = String(date.getFullYear());
+  return `${mm}/${dd}/${yyyy}`;
+};
+
 const shouldSkipFolder = (folderName: string): boolean => {
   return SPECIAL_CHARS.some((char) => folderName.startsWith(char));
 };
@@ -132,7 +139,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
         seriesAdded: 0,
         foldersSkipped: 0,
         skippedFolderNames: [],
-        timestamp: new Date().toISOString(),
+        timestamp: getLocalDateStampMMDDYYYY(),
       };
 
       try {
