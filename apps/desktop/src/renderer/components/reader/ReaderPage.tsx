@@ -13,6 +13,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import routes from '@/common/constants/routes.json';
 import { ReadingDirection, PageStyle, OffsetPages } from '@/common/models/types';
 import { selectMostSimilarChapter } from '@/renderer/util/comparison';
+import { getLocalDateStampMMDDYYYY } from '@/renderer/util/date';
 import { markChapters } from '@/renderer/features/library/utils';
 import ReaderViewer from './ReaderViewer';
 import ReaderLoader from './ReaderLoader';
@@ -569,7 +570,7 @@ const ReaderPage: React.FC = () => {
       setReaderChapter({ ...(readerChapter as any), read: true });
 
       // Update series lastReadDate and unread status when chapter is read to completion
-      const nowIso = new Date().toISOString();
+      const nowStamp = getLocalDateStampMMDDYYYY();
       
       // Fetch the fresh series data from storage (which has the updated numberUnread from markChapters)
       // and add the lastReadDate update
@@ -577,7 +578,7 @@ const ReaderPage: React.FC = () => {
       if (freshSeries) {
         const updatedSeries = {
           ...freshSeries,
-          lastReadDate: nowIso,
+          lastReadDate: nowStamp,
           unread: false,
         };
         library.upsertSeries(updatedSeries);

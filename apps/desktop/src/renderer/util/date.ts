@@ -8,3 +8,14 @@ export function formatDateToMMDDYYYY(dateStr?: string): string | undefined {
   const yyyy = String(d.getFullYear());
   return `${mm}/${dd}/${yyyy}`;
 }
+
+export function getLocalDateStampMMDDYYYY(date: Date = new Date()): string {
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const yyyy = String(date.getFullYear());
+  return `${mm}/${dd}/${yyyy}`;
+}
+
+export function getLocalDateStampForFilename(date: Date = new Date()): string {
+  return getLocalDateStampMMDDYYYY(date).replace(/\//g, '-');
+}

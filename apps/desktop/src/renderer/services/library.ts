@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import persistantStore from '../util/persistantStore';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { Category } from '@/common/models/types';
+import { getLocalDateStampMMDDYYYY } from '@/renderer/util/date';
 
-const BACKFILL_DATE = '2026-01-09T00:00:00Z';
+const getBackfillDate = (): string => getLocalDateStampMMDDYYYY();
 
 // Cache to prevent repeated reads from localStorage and infinite loops
 let seriesListCache: Series[] | null = null;
@@ -15,6 +16,7 @@ let lastCallTime = 0;
 const MIN_CALL_INTERVAL_MS = 100; // Minimum 100ms between calls to prevent cascades
 
 const fetchSeriesList = (): Series[] => {
+<<<<<<< HEAD
   // Prevent infinite loops - track call frequency
   const now = Date.now();
   const callsSinceCache = now - seriesListCacheTime;
@@ -26,6 +28,23 @@ const fetchSeriesList = (): Series[] => {
   if (timeSinceLastCall < MIN_CALL_INTERVAL_MS && seriesListCache) {
     console.warn(`[fetchSeriesList] Called too rapidly (${timeSinceLastCall}ms < ${MIN_CALL_INTERVAL_MS}ms), returning cached data to prevent cascade`);
     return seriesListCache;
+=======
+  const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
+  let series: Series[] = val === null ? [] : JSON.parse(val);
+
+  let changed = false;
+  const backfillDate = getBackfillDate();
+  series = series.map((s) => {
+    if (!s.lastReadDate) {
+      changed = true;
+      return { ...s, lastReadDate: backfillDate };
+    }
+    return s;
+  });
+
+  if (changed) {
+    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+>>>>>>> Backup_Restore
   }
   
   lastCallTime = now;
@@ -113,8 +132,8 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
   const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
 
-  // Backfill missing dateAdded with current date (ISO)
-  const CHAPTER_BACKFILL_DATE = new Date().toISOString();
+  // Backfill missing dateAdded with current local date
+  const CHAPTER_BACKFILL_DATE = getBackfillDate();
   let changed = false;
   chapters.forEach((c) => {
     if (!c.dateAdded) {
@@ -149,7 +168,7 @@ const upsertSeries = (series: Series): Series => {
 
   // Set lastReadDate to backfill date if still missing
   if (!newSeries.lastReadDate) {
-    newSeries.lastReadDate = BACKFILL_DATE;
+    newSeries.lastReadDate = getBackfillDate();
   }
 
   // Calculate unread status based on chapters if the caller didn't explicitly
@@ -194,7 +213,7 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
   chapters.forEach((chapter) => {
     const chapterId: string = chapter.id ? chapter.id : uuidv4();
     // ensure dateAdded exists for new/upserted chapters
-    const dateAdded = chapter.dateAdded ? chapter.dateAdded : new Date().toISOString();
+    const dateAdded = chapter.dateAdded ? chapter.dateAdded : getBackfillDate();
     chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 

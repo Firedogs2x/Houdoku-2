@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
 } from '@houdoku/ui/components/AlertDialog';
 import { UpdateInfo } from 'electron-updater';
+import { formatDateToMMDDYYYY } from './util/date';
 
 loadStoredExtensionSettings();
 loadStoredTrackerTokens();
@@ -149,7 +150,7 @@ export default function App() {
           {updateInfo && (
             <p>
               Houdoku v{updateInfo?.version} was released on{' '}
-              {new Date(updateInfo.releaseDate).toLocaleDateString()}.
+              {formatDateToMMDDYYYY(updateInfo.releaseDate) ?? 'Unknown date'}.
             </p>
           )}
           <AlertDialogFooter>
