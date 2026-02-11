@@ -2,7 +2,6 @@ import { IpcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { Series, SeriesStatus, LanguageKey } from '@tiyo/common';
-import { pathToFileURL } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';
@@ -205,8 +204,8 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
           };
 
           if (coverImagePath) {
-            // Use pathToFileURL to create a proper file:// URL for the cover
-            newSeries.remoteCoverUrl = pathToFileURL(coverImagePath).toString();
+            // Use the file path directly (Windows format: D:\path\to\cover.jpg)
+            newSeries.remoteCoverUrl = coverImagePath;
             console.info(`Series Auto: found cover for ${item} at ${coverImagePath} -> ${newSeries.remoteCoverUrl}`);
           }
 
