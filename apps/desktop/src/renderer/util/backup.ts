@@ -192,7 +192,7 @@ const buildBackupPayload = () => {
 
 export const createBackup = async () => {
   const payload = buildBackupPayload();
-  const blob = new Blob([JSON.stringify(payload)], {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: 'application/json',
   });
 
