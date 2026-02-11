@@ -16,7 +16,6 @@ let lastCallTime = 0;
 const MIN_CALL_INTERVAL_MS = 100; // Minimum 100ms between calls to prevent cascades
 
 const fetchSeriesList = (): Series[] => {
-<<<<<<< HEAD
   // Prevent infinite loops - track call frequency
   const now = Date.now();
   const callsSinceCache = now - seriesListCacheTime;
@@ -28,23 +27,6 @@ const fetchSeriesList = (): Series[] => {
   if (timeSinceLastCall < MIN_CALL_INTERVAL_MS && seriesListCache) {
     console.warn(`[fetchSeriesList] Called too rapidly (${timeSinceLastCall}ms < ${MIN_CALL_INTERVAL_MS}ms), returning cached data to prevent cascade`);
     return seriesListCache;
-=======
-  const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
-  let series: Series[] = val === null ? [] : JSON.parse(val);
-
-  let changed = false;
-  const backfillDate = getBackfillDate();
-  series = series.map((s) => {
-    if (!s.lastReadDate) {
-      changed = true;
-      return { ...s, lastReadDate: backfillDate };
-    }
-    return s;
-  });
-
-  if (changed) {
-    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
->>>>>>> Backup_Restore
   }
   
   lastCallTime = now;
