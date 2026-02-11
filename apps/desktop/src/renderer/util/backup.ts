@@ -207,16 +207,18 @@ export const createBackup = async () => {
 
 export const createAutoBackup = async (Count = 1) => {
   if (!fs.existsSync('backups')) {
-    fs.mkdir('backups');
+    fs.mkdir('backups', { recursive: true });
   }
   const payload = buildBackupPayload();
   const fileName = `houdoku_backup_${payload.backupDate}.json`;
-  if (!fs.existsSync(`backups/${fileName}`)) {
-    await fs.writeJson(`backups/${fileName}`, payload);
+  const filePath = path.join('backups', fileName);
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
   }
   fs.readdir('backups', (err: Error, files: string[]) => {
     if (err) {
       console.error(`Unable to scan directory: ${err}`);
+      return;
     }
     if (files.length > Count) {
       fs.unlinkSync(path.join('backups', files[0]));
