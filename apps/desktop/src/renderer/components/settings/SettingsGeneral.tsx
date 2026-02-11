@@ -13,10 +13,10 @@ import { Label } from '@houdoku/ui/components/Label';
 import { Switch } from '@houdoku/ui/components/Switch';
 import { Input } from '@houdoku/ui/components/Input';
 import { Button } from '@houdoku/ui/components/Button';
-<<<<<<< HEAD
+
 import { toast } from '@houdoku/ui/hooks/use-toast';
-=======
->>>>>>> Backup_Restore
+
+
 
 export const SettingsGeneral: React.FC = () => {
   const [autoCheckForUpdates, setAutoCheckForUpdates] = useRecoilState(autoCheckForUpdatesState);
@@ -136,3 +136,4 @@ export const SettingsGeneral: React.FC = () => {
     </>
   );
 };
+
