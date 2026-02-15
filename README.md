@@ -6,14 +6,14 @@ Download Houdoku from [GitHub releases page](https://github.com/Firedogs2x/houdo
 ![Home Page 2026-01-14](https://github.com/user-attachments/assets/6d91d0e0-b54e-4399-8469-e47b8064597c)
 
 ## Series Card
-![Series Card Mod 2026-01-14](https://github.com/user-attachments/assets/adb03bb9-8fbc-42ba-afe4-64739c660146)
+![Series Card Mod 2026-02-14](https://github.com/user-attachments/assets/3102b8b6-b1b6-4feb-89ef-ecf738ce4d74)
 
 The Series card has some new features.
 In the upper right corner the number of unread chapters and the total numbers are shown (unread chapters only was visible in older version) (See note below).
 Indicator positioned just below the total number of chapters has two functions.
   1) Shows that no chapters have been read in that series.
   2) Shows new chapters have been added after the last time a chapter was read in that series.
-Below the title is the date showing the last time a chapter in that series was read.
+Below the title is the date showing the last time a chapter in that series was read and the date showing the last time a new chapter was added.
 NOTE: The total number of chapters may show up wrong. This is because some websites allow multiple chapters with the same number to be upload to website.
 (Example: Currently the program sees Vol. 1 Ch. 1 the same as Ch 1).
 
