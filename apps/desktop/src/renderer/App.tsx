@@ -59,17 +59,23 @@ export default function App() {
   useEffect(() => {
     const chapterColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ChapterCountBgColor}`;
     const scrollbarColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ScrollBarSliderColor}`;
+    const starRatingColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.StarRatingFillColor}`;
     const storedChapterColor = localStorage.getItem(chapterColorKey);
     const storedScrollbarColor = localStorage.getItem(scrollbarColorKey);
+    const storedStarRatingColor = localStorage.getItem(starRatingColorKey);
     const chapterColor = storedChapterColor?.length
       ? storedChapterColor
       : DefaultSettings[GeneralSetting.ChapterCountBgColor];
     const scrollbarColor = storedScrollbarColor?.length
       ? storedScrollbarColor
       : DefaultSettings[GeneralSetting.ScrollBarSliderColor];
+    const starRatingColor = storedStarRatingColor?.length
+      ? storedStarRatingColor
+      : DefaultSettings[GeneralSetting.StarRatingFillColor];
 
     document.documentElement.style.setProperty('--chapter-count-bg-color', chapterColor);
     document.documentElement.style.setProperty('--scrollbar-slider-color', scrollbarColor);
+    document.documentElement.style.setProperty('--star-rating-fill-color', starRatingColor);
   }, []);
 
   useEffect(() => {

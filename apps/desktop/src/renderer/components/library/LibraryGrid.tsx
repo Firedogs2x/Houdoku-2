@@ -30,6 +30,7 @@ import library from '@/renderer/services/library';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
 import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
+import { Star } from 'lucide-react';
 
 const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
 if (!fs.existsSync(thumbnailsDir)) {
@@ -152,6 +153,22 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                       </svg>
                     </div>
                   )}
+
+                  {(series as any).rating ? (
+                    <div className="absolute flex items-center justify-center" style={{ bottom: 10, left: 10, width: 32, height: 32 }}>
+                      <Star
+                        size={32}
+                        fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                        stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                        strokeWidth={0}
+                        className="absolute"
+                        style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
+                      />
+                      <span className="absolute text-center font-semibold text-white" style={{ fontSize: '12px', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
+                        {(series as any).rating}
+                      </span>
+                    </div>
+                  ) : null}
 
                   {libraryView === LibraryView.GridCompact && (
                     <div

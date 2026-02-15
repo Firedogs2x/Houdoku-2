@@ -71,6 +71,7 @@ const buildBackupPayload = () => {
       ApplicationTheme: getSettingValue<string>(GeneralSetting.ApplicationTheme),
       ChapterCountBgColor: getSettingValue<string>(GeneralSetting.ChapterCountBgColor),
       ScrollBarSliderColor: getSettingValue<string>(GeneralSetting.ScrollBarSliderColor),
+      StarRatingFillColor: getSettingValue<string>(GeneralSetting.StarRatingFillColor),
     },
     Folders: {
       MasterFolder: getSettingValue<string>(GeneralSetting.MasterFolder),
@@ -264,6 +265,7 @@ export const restoreBackup = (backupFileContent: string) => {
         saveGeneralSetting(GeneralSetting.ApplicationTheme, settings.Theme.ApplicationTheme);
         saveGeneralSetting(GeneralSetting.ChapterCountBgColor, settings.Theme.ChapterCountBgColor);
         saveGeneralSetting(GeneralSetting.ScrollBarSliderColor, settings.Theme.ScrollBarSliderColor);
+        saveGeneralSetting(GeneralSetting.StarRatingFillColor, settings.Theme.StarRatingFillColor);
       }
 
       if (settings.Folders) {

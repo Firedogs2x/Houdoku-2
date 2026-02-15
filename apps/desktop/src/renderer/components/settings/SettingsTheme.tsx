@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { ApplicationTheme } from '@/common/models/types';
-import { themeState, chapterCountBgColorState, scrollBarSliderColorState } from '@/renderer/state/settingStates';
+import { themeState, chapterCountBgColorState, scrollBarSliderColorState, starRatingFillColorState } from '@/renderer/state/settingStates';
 import { RadioGroup } from '@houdoku/ui/components/RadioGroup';
 import { Slider } from '@houdoku/ui/components/Slider';
 import { Button } from '@houdoku/ui/components/Button';
@@ -15,7 +15,7 @@ import {
 import { cn } from '@houdoku/ui/util';
 
 type ColorMode = 'RGB' | 'HSB';
-type ColorVariableType = 'chapterCountBg' | 'scrollBarSlider' | null;
+type ColorVariableType = 'chapterCountBg' | 'scrollBarSlider' | 'starRatingFill' | null;
 
 // Helper functions for color conversions
 function rgbToHsb(r: number, g: number, b: number): { h: number; s: number; b: number } {
@@ -102,6 +102,7 @@ export const SettingsTheme: React.FC = () => {
   // Color Variables - using persisted state
   const [chapterCountBgColor, setChapterCountBgColor] = useRecoilState(chapterCountBgColorState);
   const [scrollBarSliderColor, setScrollBarSliderColor] = useRecoilState(scrollBarSliderColorState);
+  const [starRatingFillColor, setStarRatingFillColor] = useRecoilState(starRatingFillColorState);
 
   // Dialog state
   const [selectedVariable, setSelectedVariable] = useState<ColorVariableType>(null);
@@ -110,7 +111,8 @@ export const SettingsTheme: React.FC = () => {
   useEffect(() => {
     document.documentElement.style.setProperty('--chapter-count-bg-color', chapterCountBgColor);
     document.documentElement.style.setProperty('--scrollbar-slider-color', scrollBarSliderColor);
-  }, [chapterCountBgColor, scrollBarSliderColor]);
+    document.documentElement.style.setProperty('--star-rating-fill-color', starRatingFillColor);
+  }, [chapterCountBgColor, scrollBarSliderColor, starRatingFillColor]);
 
   const handleRgbChange = (r: number, g: number, b: number) => {
     setRed(r);
@@ -143,6 +145,8 @@ export const SettingsTheme: React.FC = () => {
       setChapterCountBgColor(currentColor);
     } else if (selectedVariable === 'scrollBarSlider') {
       setScrollBarSliderColor(currentColor);
+    } else if (selectedVariable === 'starRatingFill') {
+      setStarRatingFillColor(currentColor);
     }
     setSelectedVariable(null);
   };
@@ -422,6 +426,17 @@ export const SettingsTheme: React.FC = () => {
             onClick={() => handleColorVariableClick('scrollBarSlider')}
             className="w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
             style={{ backgroundColor: scrollBarSliderColor }}
+            title="Click to change color"
+          />
+        </div>
+
+        {/* Color Variable: Star Rating Fill */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Star Rating Fill</span>
+          <button
+            onClick={() => handleColorVariableClick('starRatingFill')}
+            className="w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            style={{ backgroundColor: starRatingFillColor }}
             title="Click to change color"
           />
         </div>
