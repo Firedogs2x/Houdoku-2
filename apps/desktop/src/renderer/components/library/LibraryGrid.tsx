@@ -145,7 +145,13 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   />
 
                   {series.numberUnread > 0 && (
-                    <div className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-white text-center" style={{ backgroundColor: 'var(--chapter-count-bg-color, #fc5603)' }}>
+                    <div
+                      className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-center"
+                      style={{
+                        backgroundColor: 'var(--chapter-count-bg-color, #fc5603)',
+                        color: 'var(--chapter-count-font-color, rgba(255, 255, 255, 1))',
+                      }}
+                    >
                       {`${series.numberUnread} : ${totalChapters}`}
                     </div>
                   )}
@@ -158,10 +164,10 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                       </svg>
                     </div>
                   )}
-
+                  {/* Star rating indicator in bottom left corner of cover */}
                   <div
                     className="absolute flex items-center justify-center pointer-events-none"
-                    style={{ bottom: 10, left: 10, width: 36, height: 36 }}
+                    style={{ bottom: 5, left: 5, width: 40, height: 40 }}
                   >
                     <Star
                       size={36}
@@ -171,7 +177,10 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                       className="absolute"
                       style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
                     />
-                    <span className="absolute text-center font-semibold text-white">
+                    <span
+                      className="absolute text-center font-semibold"
+                      style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
+                    >
                       {ratingValue}
                     </span>
                   </div>

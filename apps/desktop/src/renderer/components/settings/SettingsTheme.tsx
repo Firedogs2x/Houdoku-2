@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { ApplicationTheme } from '@/common/models/types';
-import { themeState, chapterCountBgColorState, scrollBarSliderColorState, starRatingFillColorState } from '@/renderer/state/settingStates';
+import {
+  themeState,
+  chapterCountBgColorState,
+  chapterCountFontColorState,
+  scrollBarSliderColorState,
+  starRatingFillColorState,
+  starRatingFontColorState,
+} from '@/renderer/state/settingStates';
 import { RadioGroup } from '@houdoku/ui/components/RadioGroup';
 import { Slider } from '@houdoku/ui/components/Slider';
 import { Button } from '@houdoku/ui/components/Button';
@@ -15,7 +22,13 @@ import {
 import { cn } from '@houdoku/ui/util';
 
 type ColorMode = 'RGB' | 'HSB';
-type ColorVariableType = 'chapterCountBg' | 'scrollBarSlider' | 'starRatingFill' | null;
+type ColorVariableType =
+  | 'chapterCountBg'
+  | 'chapterCountFont'
+  | 'scrollBarSlider'
+  | 'starRatingFill'
+  | 'starRatingFont'
+  | null;
 
 // Helper functions for color conversions
 function rgbToHsb(r: number, g: number, b: number): { h: number; s: number; b: number } {
@@ -101,8 +114,14 @@ export const SettingsTheme: React.FC = () => {
 
   // Color Variables - using persisted state
   const [chapterCountBgColor, setChapterCountBgColor] = useRecoilState(chapterCountBgColorState);
+  const [chapterCountFontColor, setChapterCountFontColor] = useRecoilState(
+    chapterCountFontColorState,
+  );
   const [scrollBarSliderColor, setScrollBarSliderColor] = useRecoilState(scrollBarSliderColorState);
   const [starRatingFillColor, setStarRatingFillColor] = useRecoilState(starRatingFillColorState);
+  const [starRatingFontColor, setStarRatingFontColor] = useRecoilState(
+    starRatingFontColorState,
+  );
 
   // Dialog state
   const [selectedVariable, setSelectedVariable] = useState<ColorVariableType>(null);
@@ -110,9 +129,17 @@ export const SettingsTheme: React.FC = () => {
   // Apply colors to CSS variables whenever they change
   useEffect(() => {
     document.documentElement.style.setProperty('--chapter-count-bg-color', chapterCountBgColor);
+    document.documentElement.style.setProperty('--chapter-count-font-color', chapterCountFontColor);
     document.documentElement.style.setProperty('--scrollbar-slider-color', scrollBarSliderColor);
     document.documentElement.style.setProperty('--star-rating-fill-color', starRatingFillColor);
-  }, [chapterCountBgColor, scrollBarSliderColor, starRatingFillColor]);
+    document.documentElement.style.setProperty('--star-rating-font-color', starRatingFontColor);
+  }, [
+    chapterCountBgColor,
+    chapterCountFontColor,
+    scrollBarSliderColor,
+    starRatingFillColor,
+    starRatingFontColor,
+  ]);
 
   const handleRgbChange = (r: number, g: number, b: number) => {
     setRed(r);
@@ -143,10 +170,14 @@ export const SettingsTheme: React.FC = () => {
   const handleConfirmColorChange = () => {
     if (selectedVariable === 'chapterCountBg') {
       setChapterCountBgColor(currentColor);
+    } else if (selectedVariable === 'chapterCountFont') {
+      setChapterCountFontColor(currentColor);
     } else if (selectedVariable === 'scrollBarSlider') {
       setScrollBarSliderColor(currentColor);
     } else if (selectedVariable === 'starRatingFill') {
       setStarRatingFillColor(currentColor);
+    } else if (selectedVariable === 'starRatingFont') {
+      setStarRatingFontColor(currentColor);
     }
     setSelectedVariable(null);
   };
@@ -409,34 +440,56 @@ export const SettingsTheme: React.FC = () => {
         </div>
 
         {/* Color Variable: Chapter Count BG */}
-        <div className="flex items-center gap-2 mt-2">
+        <div className="relative flex items-center w-full pr-[240px] mt-2">
           <span className="text-sm font-medium">Chapter Count BG</span>
           <button
             onClick={() => handleColorVariableClick('chapterCountBg')}
-            className="w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
             style={{ backgroundColor: chapterCountBgColor }}
             title="Click to change color"
           />
         </div>
 
+        {/* Color Variable: Chapter Count Font */}
+        <div className="relative flex items-center w-full pr-[240px]">
+          <span className="text-sm font-medium">Chapter Count Font</span>
+          <button
+            onClick={() => handleColorVariableClick('chapterCountFont')}
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            style={{ backgroundColor: chapterCountFontColor }}
+            title="Click to change color"
+          />
+        </div>
+
         {/* Color Variable: Scroll Bar Slider */}
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center w-full pr-[240px]">
           <span className="text-sm font-medium">Scroll Bar Slider</span>
           <button
             onClick={() => handleColorVariableClick('scrollBarSlider')}
-            className="w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
             style={{ backgroundColor: scrollBarSliderColor }}
             title="Click to change color"
           />
         </div>
 
         {/* Color Variable: Star Rating Fill */}
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center w-full pr-[240px]">
           <span className="text-sm font-medium">Star Rating Fill</span>
           <button
             onClick={() => handleColorVariableClick('starRatingFill')}
-            className="w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
             style={{ backgroundColor: starRatingFillColor }}
+            title="Click to change color"
+          />
+        </div>
+
+        {/* Color Variable: Star Rating Font */}
+        <div className="relative flex items-center w-full pr-[240px]">
+          <span className="text-sm font-medium">Star Rating Font</span>
+          <button
+            onClick={() => handleColorVariableClick('starRatingFont')}
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            style={{ backgroundColor: starRatingFontColor }}
             title="Click to change color"
           />
         </div>
