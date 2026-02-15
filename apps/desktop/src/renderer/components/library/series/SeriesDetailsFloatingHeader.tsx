@@ -18,7 +18,7 @@ const SeriesDetailsFloatingHeader: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className="absolute top-[29px] left-[205px] z-10">
+      <div className="absolute top-[29px] left-[15px] z-10">
         {props.series.preview ? (
           <Link to={routes.SEARCH}>
             <Button size="sm">
