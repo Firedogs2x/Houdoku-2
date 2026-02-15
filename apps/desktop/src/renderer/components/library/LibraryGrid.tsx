@@ -105,6 +105,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const hasNewDate =
           series.lastReadDate && chapters.some((c: Chapter) => c.dateAdded && new Date(c.dateAdded) > new Date(series.lastReadDate));
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
+        const ratingValue = (series as SeriesWithRating).rating ?? 0;
         const latestChapterAddedDate = chapters.reduce((latest: string | undefined, chapter: Chapter) => {
           if (!chapter?.dateAdded) return latest;
           if (!latest) return chapter.dateAdded;
@@ -158,21 +159,22 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     </div>
                   )}
 
-                  {(series as SeriesWithRating).rating ? (
-                    <div className="absolute flex items-center justify-center" style={{ bottom: 10, left: 10, width: 32, height: 32 }}>
-                      <Star
-                        size={32}
-                        fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                        stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                        strokeWidth={0}
-                        className="absolute"
-                        style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
-                      />
-                      <span className="absolute text-center font-semibold text-white" style={{ fontSize: '12px', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
-                        {(series as SeriesWithRating).rating}
-                      </span>
-                    </div>
-                  ) : null}
+                  <div
+                    className="absolute flex items-center justify-center pointer-events-none"
+                    style={{ bottom: 10, left: 10, width: 36, height: 36 }}
+                  >
+                    <Star
+                      size={36}
+                      fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      strokeWidth={0}
+                      className="absolute"
+                      style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
+                    />
+                    <span className="absolute text-center font-semibold text-white">
+                      {ratingValue}
+                    </span>
+                  </div>
 
                   {libraryView === LibraryView.GridCompact && (
                     <div
