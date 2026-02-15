@@ -167,7 +167,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   {/* Star rating indicator in bottom left corner of cover */}
                   <div
                     className="absolute flex items-center justify-center pointer-events-none"
-                    style={{ bottom: 5, left: 5, width: 45, height: 45 }}
+                    style={{ bottom: 2, left: 2, width: 60, height: 60 }}
                   >
                     <Star
                       size={36}
