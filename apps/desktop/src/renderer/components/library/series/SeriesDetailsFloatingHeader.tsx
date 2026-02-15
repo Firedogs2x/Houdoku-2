@@ -18,7 +18,7 @@ const SeriesDetailsFloatingHeader: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div className="absolute top-[29px] left-[15px] z-10">
+      <div className="absolute top-[10px] left-[10px] z-10">
         {props.series.preview ? (
           <Link to={routes.SEARCH}>
             <Button size="sm">
@@ -37,7 +37,7 @@ const SeriesDetailsFloatingHeader: React.FC<Props> = (props: Props) => {
       </div>
 
       {props.series.preview && (
-        <div className="absolute top-[29px] right-[15px] z-10">
+        <div className="absolute top-[10px] right-[10px] z-10">
           <Button
             className="text-neutral-50 bg-emerald-600 hover:bg-emerald-700"
             size="sm"
