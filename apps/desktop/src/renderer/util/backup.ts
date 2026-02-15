@@ -30,6 +30,10 @@ import {
 } from '@/common/models/types';
 import { getLocalDateStampForFilename } from '@/renderer/util/date';
 
+type SeriesWithRating = Series & {
+  rating?: number;
+};
+
 // Exact backup format matching the specification
 const getBackupDateStamp = (date: Date = new Date()): string => {
   const yyyy = String(date.getFullYear());
@@ -137,6 +141,7 @@ const buildBackupPayload = () => {
 
   // Series with inline chapters - exact order preserved
   const series = library.fetchSeriesList().map((s: Series) => {
+    const rating = (s as SeriesWithRating).rating;
     const seriesEntry: Record<string, unknown> = {
       title: s.title,
       sourceId: s.sourceId,
@@ -155,6 +160,7 @@ const buildBackupPayload = () => {
       numberUnread: s.numberUnread,
       lastReadDate: s.lastReadDate,
       unread: s.unread,
+      rating: rating ?? 0,
     };
 
     // Add any extra fields not in the standard order
