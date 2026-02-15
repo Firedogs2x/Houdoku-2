@@ -69,13 +69,13 @@ export function ChapterTablePagination({ table }: ChapterTablePagination) {
               setChapterListPageSize(pageSize);
             }}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-8 w-[85px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 50, 100].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}/page
+                  {pageSize} chs
                 </SelectItem>
               ))}
             </SelectContent>
