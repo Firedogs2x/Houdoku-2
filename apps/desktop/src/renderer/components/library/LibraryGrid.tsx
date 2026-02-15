@@ -167,10 +167,10 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   {/* Star rating indicator in bottom left corner of cover */}
                   <div
                     className="absolute flex items-center justify-center pointer-events-none"
-                    style={{ bottom: 2, left: 2, width: 60, height: 60 }}
+                    style={{ bottom: 2, left: 2, width: 48, height: 48 }}
                   >
                     <Star
-                      size={36}
+                      size={45}
                       fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
                       stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
                       strokeWidth={0}
