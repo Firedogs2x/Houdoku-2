@@ -7,6 +7,10 @@ const { ipcRenderer } = require('electron');
 type Series = any;
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Chapter = any;
+// Series extended with optional rating property for star rating feature
+interface SeriesWithRating extends Record<string, unknown> {
+  rating?: number;
+}
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import blankCover from '@/renderer/img/blank_cover.png';
@@ -154,7 +158,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     </div>
                   )}
 
-                  {(series as any).rating ? (
+                  {(series as SeriesWithRating).rating ? (
                     <div className="absolute flex items-center justify-center" style={{ bottom: 10, left: 10, width: 32, height: 32 }}>
                       <Star
                         size={32}
@@ -165,7 +169,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                         style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
                       />
                       <span className="absolute text-center font-semibold text-white" style={{ fontSize: '12px', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
-                        {(series as any).rating}
+                        {(series as SeriesWithRating).rating}
                       </span>
                     </div>
                   ) : null}
