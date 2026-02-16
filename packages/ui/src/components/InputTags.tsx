@@ -23,7 +23,6 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
   ({ className, value, onChange, showContextMenu = true, ...props }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
     const [targetElement, setTargetElement] = React.useState<HTMLInputElement | null>(null);
-    const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
 
     React.useEffect(() => {
       if (pendingDataPoint.includes(',')) {
@@ -47,9 +46,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent<HTMLInputElement>) => {
         if (!showContextMenu || props.disabled) return;
-        e.preventDefault();
         setTargetElement(e.currentTarget);
-        setContextMenuOpen(true);
       },
       [showContextMenu, props.disabled],
     );
@@ -110,7 +107,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
     }
 
     return (
-      <ContextMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+      <ContextMenu>
         <ContextMenuTrigger asChild>{inputContent}</ContextMenuTrigger>
         <ContextMenuContent className="w-40">
           <ContextMenuItem

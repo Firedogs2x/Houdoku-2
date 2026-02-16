@@ -19,14 +19,11 @@ type InputProps = React.ComponentProps<'input'> & {
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, showContextMenu = true, ...props }, ref) => {
     const [targetElement, setTargetElement] = React.useState<HTMLInputElement | null>(null);
-    const [contextMenuOpen, setContextMenuOpen] = React.useState(false);
 
     const handleContextMenu = React.useCallback(
       (e: React.MouseEvent<HTMLInputElement>) => {
         if (!showContextMenu || props.disabled) return;
-        e.preventDefault();
         setTargetElement(e.currentTarget);
-        setContextMenuOpen(true);
       },
       [showContextMenu, props.disabled],
     );
@@ -54,7 +51,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }
 
     return (
-      <ContextMenu open={contextMenuOpen} onOpenChange={setContextMenuOpen}>
+      <ContextMenu>
         <ContextMenuTrigger asChild>{inputElement}</ContextMenuTrigger>
         <ContextMenuContent className="w-40">
           <ContextMenuItem
