@@ -58,6 +58,24 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
           </Badge>
         </div>
         <ScrollArea className="h-[60px] md:h-[90px]">{props.series.description}</ScrollArea>
+        {(props.series.altTitles && props.series.altTitles.length > 0 && 
+          (props.series.altTitles[0] || props.series.altTitles[1])) ? (
+          <div className="mt-2">
+            <div className="text-base font-bold text-white">Alternate Titles:</div>
+            {props.series.altTitles[0] && (
+              <div className="text-sm text-white ml-2">
+                <span className="font-bold">Alt 1:</span>
+                <span className="ml-1">{props.series.altTitles[0]}</span>
+              </div>
+            )}
+            {props.series.altTitles[1] && (
+              <div className="text-sm text-white ml-2">
+                <span className="font-bold">Alt 2:</span>
+                <span className="ml-1">{props.series.altTitles[1]}</span>
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
