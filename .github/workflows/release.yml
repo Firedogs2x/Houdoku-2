@@ -85,10 +85,24 @@ jobs:
         with:
           node-version: 20
 
-      - name: Enable pnpm
+      - name: Install pnpm (latest, with retry)
+        shell: bash
         run: |
+          set -euo pipefail
           corepack enable
-          corepack prepare pnpm@latest --activate
+
+          for attempt in 1 2 3; do
+            echo "Attempt ${attempt}: corepack prepare pnpm@latest --activate"
+            if corepack prepare pnpm@latest --activate; then
+              pnpm --version
+              exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+
+          echo "corepack failed after retries; falling back to npm global install"
+          npm install -g pnpm@latest
+          pnpm --version
 
       - name: Install dependencies
         run: pnpm install
