@@ -41,6 +41,7 @@ import { Separator } from '@houdoku/ui/components/Separator';
 
 interface Props {
   filterOptions: FilterOption[];
+  onFilterChange?: () => void;
   onClose?: (wasChanged: boolean) => void;
 }
 
@@ -58,10 +59,13 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   };
 
   const setOptionValue = (optionId: string, value: unknown) => {
-    const filterValues = filterValuesMap[searchExtension] || {};
-    const newFilterValues = { ...filterValues, [optionId]: value };
-    setFilterValuesMap({ ...filterValuesMap, [searchExtension]: newFilterValues });
+    setFilterValuesMap((prev) => {
+      const filterValues = prev[searchExtension] || {};
+      const newFilterValues = { ...filterValues, [optionId]: value };
+      return { ...prev, [searchExtension]: newFilterValues };
+    });
     setWasChanged(true);
+    props.onFilterChange?.();
   };
 
   const renderCheckbox = (option: FilterCheckbox) => {
@@ -107,8 +111,8 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   const renderSelect = (option: FilterSelect) => {
     return (
       <Select
-        value={getOptionValue(option) as string}
-        defaultValue={(option.defaultValue as string) || undefined}
+        key={option.id}
+        value={(getOptionValue(option) as string) ?? undefined}
         onValueChange={(value) => setOptionValue(option.id, value || '')}
       >
         <SelectTrigger>

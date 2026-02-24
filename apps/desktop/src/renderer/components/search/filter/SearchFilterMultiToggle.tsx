@@ -11,12 +11,6 @@ import {
 import { CheckIcon, XIcon } from 'lucide-react';
 import { Badge } from '@houdoku/ui/components/Badge';
 
-const TRISTATE_VALUE_MAP = {
-  [TriState.IGNORE]: 'ignore',
-  [TriState.INCLUDE]: 'include',
-  [TriState.EXCLUDE]: 'exclude',
-};
-
 type Props = {
   label: string;
   canExclude?: boolean;
@@ -44,8 +38,15 @@ const SearchFilterMultiToggle: React.FC<Props> = (props: Props) => {
     0,
   );
 
+  const handleValueChange = (fieldKey: string) => {
+    const currentValue = Object.keys(props.values).includes(fieldKey)
+      ? props.values[fieldKey]
+      : TriState.IGNORE;
+    toggleValue(fieldKey, currentValue);
+  };
+
   return (
-    <Select value="placeholder">
+    <Select onValueChange={handleValueChange}>
       <SelectTrigger>
         <SelectValue onContextMenu={() => props.onChange({})}>
           <div className="flex space-x-2">
@@ -69,12 +70,8 @@ const SearchFilterMultiToggle: React.FC<Props> = (props: Props) => {
             return (
               <SelectItem
                 key={field.key}
-                value={TRISTATE_VALUE_MAP[value]}
+                value={field.key}
                 data-value={value}
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleValue(field.key, value);
-                }}
                 onContextMenu={() => setValue(field.key, TriState.IGNORE)}
               >
                 <div className="flex space-x-2 items-center">
