@@ -109,19 +109,31 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   };
 
   const renderSelect = (option: FilterSelect) => {
+    const selectedValue = (getOptionValue(option) as string) ?? '';
+    const defaultValue = (option.defaultValue as string) ?? '';
+
     return (
       <Select
         key={option.id}
-        value={(getOptionValue(option) as string) ?? undefined}
+        value={selectedValue || undefined}
         onValueChange={(value) => setOptionValue(option.id, value || '')}
       >
         <SelectTrigger>
-          <SelectValue />
+          <SelectValue placeholder={option.label} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {option.options.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                onSelect={(event) => {
+                  if (opt.value === selectedValue) {
+                    event.preventDefault();
+                    setOptionValue(option.id, defaultValue);
+                  }
+                }}
+              >
                 {opt.label}
               </SelectItem>
             ))}

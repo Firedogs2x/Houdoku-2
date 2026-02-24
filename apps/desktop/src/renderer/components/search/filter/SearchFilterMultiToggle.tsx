@@ -25,11 +25,8 @@ const SearchFilterMultiToggle: React.FC<Props> = (props: Props) => {
   };
 
   const toggleValue = (key: string, currentValue: TriState) => {
-    const newValue = {
-      [TriState.IGNORE]: TriState.INCLUDE,
-      [TriState.INCLUDE]: props.canExclude ? TriState.EXCLUDE : TriState.IGNORE,
-      [TriState.EXCLUDE]: TriState.IGNORE,
-    }[currentValue];
+    const newValue =
+      currentValue === TriState.IGNORE ? TriState.INCLUDE : TriState.IGNORE;
     setValue(key, newValue);
   };
 
