@@ -7,102 +7,25 @@ import { getLocalDateStampMMDDYYYY } from '@/renderer/util/date';
 
 const getBackfillDate = (): string => getLocalDateStampMMDDYYYY();
 
-// Cache to prevent repeated reads from localStorage and infinite loops
-let seriesListCache: Series[] | null = null;
-let seriesListCacheTime = 0;
-const CACHE_DURATION_MS = 30000; // 30 second cache (increased from 1s to prevent rapid successive calls)
-let fetchInProgress = false;
-let lastCallTime = 0;
-const MIN_CALL_INTERVAL_MS = 100; // Minimum 100ms between calls to prevent cascades
-
 const fetchSeriesList = (): Series[] => {
-  // Prevent infinite loops - track call frequency
-  const now = Date.now();
-  const callsSinceCache = now - seriesListCacheTime;
-  const timeSinceLastCall = now - lastCallTime;
-  
-  console.log(`[fetchSeriesList] Called (cache age: ${callsSinceCache}ms, fetchInProgress: ${fetchInProgress}, timeSinceLastCall: ${timeSinceLastCall}ms)`);
-  
-  // Rate limiting: If called too rapidly (within 100ms), return cached data to prevent cascade
-  if (timeSinceLastCall < MIN_CALL_INTERVAL_MS && seriesListCache) {
-    console.warn(`[fetchSeriesList] Called too rapidly (${timeSinceLastCall}ms < ${MIN_CALL_INTERVAL_MS}ms), returning cached data to prevent cascade`);
-    return seriesListCache;
-  }
-  
-  lastCallTime = now;
-  
-  // If fetch is already in progress, return cached data or empty array
-  if (fetchInProgress) {
-    console.warn('[fetchSeriesList] Fetch already in progress, returning cached data to prevent loop');
-    return seriesListCache || [];
-  }
-  
-  // Return cached data if fresh enough
-  if (seriesListCache && callsSinceCache < CACHE_DURATION_MS) {
-    console.log(`[fetchSeriesList] Returning cached data (${seriesListCache.length} series)`);
-    return seriesListCache;
-  }
-  
-  fetchInProgress = true;
-  
-  try {
-    const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
-    if (val === null) {
-      seriesListCache = [];
-      seriesListCacheTime = now;
-      fetchInProgress = false;
-      return [];
+  const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
+  let series: Series[] = val === null ? [] : JSON.parse(val);
+
+  let changed = false;
+  const backfillDate = getBackfillDate();
+  series = series.map((s) => {
+    if (!s.lastReadDate) {
+      changed = true;
+      return { ...s, lastReadDate: backfillDate };
     }
-    
-    // Check size before parsing
-    const sizeMB = new Blob([val]).size / (1024 * 1024);
-    if (sizeMB > 5) {
-      console.warn(`[fetchSeriesList] Large series list detected (${sizeMB.toFixed(2)} MB). This may cause performance issues.`);
-    }
-    
-    let series: Series[] = JSON.parse(val);
+    return s;
+  });
 
-    let changed = false;
-    series = series.map((s) => {
-      if (!s.lastReadDate) {
-        changed = true;
-        return { ...s, lastReadDate: BACKFILL_DATE };
-      }
-      return s;
-    });
-
-    if (changed) {
-      try {
-        persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
-      } catch (writeError) {
-        console.error('[fetchSeriesList] Failed to write updated series list:', writeError);
-        // Continue anyway - don't block on backfill write failure
-      }
-    }
-
-    console.log(`[fetchSeriesList] Loaded ${series.length} series from storage`);
-    
-    // Update cache
-    seriesListCache = series;
-    seriesListCacheTime = now;
-    fetchInProgress = false;
-    
-    return series;
-  } catch (error) {
-    fetchInProgress = false;
-    console.error('[fetchSeriesList] CRITICAL ERROR: Failed to load series list from localStorage:', error);
-    console.error('[fetchSeriesList] Your library data may be corrupted or too large. Try clearing localStorage and restoring from a smaller backup.');
-    // Return empty array to prevent app crash - let ErrorBoundary handle it
-    throw new Error(`Failed to load library: ${error instanceof Error ? error.message : 'Unknown error'}. Your library may be too large or corrupted.`);
+  if (changed) {
+    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
   }
-};
 
-// Function to clear cache (call after restore or when series list changes)
-const clearSeriesListCache = () => {
-  console.log('[library] Clearing series list cache');
-  seriesListCache = null;
-  seriesListCacheTime = 0;
-  lastCallTime = 0;
+  return series;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {
@@ -275,5 +198,4 @@ export default {
   fetchCategoryList,
   upsertCategory,
   removeCategory,
-  clearSeriesListCache,
 };

@@ -35,12 +35,12 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@houdoku/ui/components/Select';
 import { Separator } from '@houdoku/ui/components/Separator';
 
 interface Props {
   filterOptions: FilterOption[];
+  onFilterChange?: () => void;
   onClose?: (wasChanged: boolean) => void;
 }
 
@@ -58,10 +58,13 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   };
 
   const setOptionValue = (optionId: string, value: unknown) => {
-    const filterValues = filterValuesMap[searchExtension] || {};
-    const newFilterValues = { ...filterValues, [optionId]: value };
-    setFilterValuesMap({ ...filterValuesMap, [searchExtension]: newFilterValues });
+    setFilterValuesMap((prev) => {
+      const filterValues = prev[searchExtension] || {};
+      const newFilterValues = { ...filterValues, [optionId]: value };
+      return { ...prev, [searchExtension]: newFilterValues };
+    });
     setWasChanged(true);
+    props.onFilterChange?.();
   };
 
   const renderCheckbox = (option: FilterCheckbox) => {
@@ -105,19 +108,35 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   };
 
   const renderSelect = (option: FilterSelect) => {
+    const selectedValue = (getOptionValue(option) as string) ?? '';
+    const defaultValue = (option.defaultValue as string) ?? '';
+    const selectedLabel = option.options.find(
+      (opt: { value: string; label: string }) => opt.value === selectedValue,
+    )?.label;
+
     return (
       <Select
-        value={getOptionValue(option) as string}
-        defaultValue={(option.defaultValue as string) || undefined}
+        key={option.id}
+        value={selectedValue || undefined}
         onValueChange={(value) => setOptionValue(option.id, value || '')}
       >
         <SelectTrigger>
-          <SelectValue />
+          <span>{selectedLabel ? `${option.label}: ${selectedLabel}` : option.label}</span>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {option.options.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
+            {option.options.map((opt: { value: string; label: string }) => (
+              <SelectItem
+                key={opt.value}
+                value={opt.value}
+                onPointerDown={(event) => {
+                  if (opt.value === selectedValue) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setOptionValue(option.id, defaultValue);
+                  }
+                }}
+              >
                 {opt.label}
               </SelectItem>
             ))}

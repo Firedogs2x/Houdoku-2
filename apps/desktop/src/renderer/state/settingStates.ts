@@ -100,7 +100,10 @@ export const chapterListDateOrderState = atm<TableColumnSortOrder>(GeneralSettin
 export const chapterListPageSizeState = atm<number>(GeneralSetting.ChapterListPageSize);
 export const themeState = atm<ApplicationTheme>(GeneralSetting.ApplicationTheme);
 export const chapterCountBgColorState = atm<string>(GeneralSetting.ChapterCountBgColor);
+export const chapterCountFontColorState = atm<string>(GeneralSetting.ChapterCountFontColor);
 export const scrollBarSliderColorState = atm<string>(GeneralSetting.ScrollBarSliderColor);
+export const starRatingFillColorState = atm<string>(GeneralSetting.StarRatingFillColor);
+export const starRatingFontColorState = atm<string>(GeneralSetting.StarRatingFontColor);
 
 export const fitContainToWidthState = atm<boolean>(ReaderSetting.FitContainToWidth);
 export const fitContainToHeightState = atm<boolean>(ReaderSetting.FitContainToHeight);

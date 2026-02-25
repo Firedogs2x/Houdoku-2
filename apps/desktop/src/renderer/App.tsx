@@ -58,18 +58,36 @@ export default function App() {
 
   useEffect(() => {
     const chapterColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ChapterCountBgColor}`;
+    const chapterFontColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ChapterCountFontColor}`;
     const scrollbarColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.ScrollBarSliderColor}`;
+    const starRatingColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.StarRatingFillColor}`;
+    const starRatingFontColorKey = `${storeKeys.SETTINGS.GENERAL_PREFIX}${GeneralSetting.StarRatingFontColor}`;
     const storedChapterColor = localStorage.getItem(chapterColorKey);
+    const storedChapterFontColor = localStorage.getItem(chapterFontColorKey);
     const storedScrollbarColor = localStorage.getItem(scrollbarColorKey);
+    const storedStarRatingColor = localStorage.getItem(starRatingColorKey);
+    const storedStarRatingFontColor = localStorage.getItem(starRatingFontColorKey);
     const chapterColor = storedChapterColor?.length
       ? storedChapterColor
       : DefaultSettings[GeneralSetting.ChapterCountBgColor];
+    const chapterFontColor = storedChapterFontColor?.length
+      ? storedChapterFontColor
+      : DefaultSettings[GeneralSetting.ChapterCountFontColor];
     const scrollbarColor = storedScrollbarColor?.length
       ? storedScrollbarColor
       : DefaultSettings[GeneralSetting.ScrollBarSliderColor];
+    const starRatingColor = storedStarRatingColor?.length
+      ? storedStarRatingColor
+      : DefaultSettings[GeneralSetting.StarRatingFillColor];
+    const starRatingFontColor = storedStarRatingFontColor?.length
+      ? storedStarRatingFontColor
+      : DefaultSettings[GeneralSetting.StarRatingFontColor];
 
     document.documentElement.style.setProperty('--chapter-count-bg-color', chapterColor);
+    document.documentElement.style.setProperty('--chapter-count-font-color', chapterFontColor);
     document.documentElement.style.setProperty('--scrollbar-slider-color', scrollbarColor);
+    document.documentElement.style.setProperty('--star-rating-fill-color', starRatingColor);
+    document.documentElement.style.setProperty('--star-rating-font-color', starRatingFontColor);
   }, []);
 
   useEffect(() => {
@@ -99,23 +117,11 @@ export default function App() {
       // field 'tags'.
       migrateSeriesTags();
 
-      // Fetch series list once and remove any preview series before setting state
-      // This prevents multiple fetchSeriesList() calls and potential update cascades
-      const allSeries = library.fetchSeriesList();
-      const previewSeries = allSeries.filter((series) => series.preview);
-      if (previewSeries.length > 0) {
-        console.log(`[App] Removing ${previewSeries.length} preview series`);
-        previewSeries.forEach((series) => {
-          if (series.id) {
-            library.removeSeries(series.id, false);
-          }
-        });
-        // Fetch again after removing preview series
-        setSeriesList(library.fetchSeriesList());
-      } else {
-        // No preview series, use the list we already fetched
-        setSeriesList(allSeries);
-      }
+      // Remove any preview series.
+      library
+        .fetchSeriesList()
+        .filter((series) => series.preview)
+        .forEach((series) => (series.id ? library.removeSeries(series.id, false) : undefined));
 
       // If AutoCheckForUpdates setting is enabled, check for client updates now
       if (autoCheckForUpdates) {
@@ -124,6 +130,7 @@ export default function App() {
         console.debug('Skipping update check, autoCheckForUpdates is disabled');
       }
 
+      setSeriesList(library.fetchSeriesList());
       setCategoryList(library.fetchCategoryList());
       setLoading(false);
     }

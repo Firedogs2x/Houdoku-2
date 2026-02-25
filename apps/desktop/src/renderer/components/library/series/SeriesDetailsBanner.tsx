@@ -49,7 +49,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
       <SeriesDetailsBannerBackground>
         <div className="flex justify-end h-full">
           <div className="flex flex-col justify-between">
-            <div className="flex justify-end m-2">
+            <div className="flex justify-end mt-2 mr-4 mb-2 ml-2">
               {!props.series.preview && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -74,7 +74,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
                 </DropdownMenu>
               )}
             </div>
-            <div className="flex flex-col m-2 space-y-1">
+            <div className="flex flex-col mt-2 mr-4 mb-2 ml-2 space-y-1">
               {props.series.lastReadDate && (
                 <p className="text-xs text-neutral-50">
                   Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}

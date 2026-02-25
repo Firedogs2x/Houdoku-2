@@ -3,17 +3,26 @@
 import * as React from 'react';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { Button } from '@houdoku/ui/components/Button';
-import { XIcon } from 'lucide-react';
+import { Clipboard, Copy, Scissors, Trash2, Type, XIcon } from 'lucide-react';
 import { cn } from '@houdoku/ui/util';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@houdoku/ui/components/ContextMenu';
+import { createInputContextMenuOperations } from '@houdoku/ui/hooks/use-input-context-menu';
 
 type InputTagsProps = Omit<React.ComponentProps<'input'>, 'value' | 'onChange'> & {
   value: string[];
   onChange: (value: ReadonlyArray<string>) => void;
+  showContextMenu?: boolean;
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value, onChange, ...props }, ref) => {
+  ({ className, value, onChange, showContextMenu = true, ...props }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
+    const [targetElement, setTargetElement] = React.useState<HTMLInputElement | null>(null);
 
     React.useEffect(() => {
       if (pendingDataPoint.includes(',')) {
@@ -34,13 +43,21 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
       }
     };
 
-    return (
+    const handleContextMenu = React.useCallback(
+      (e: React.MouseEvent<HTMLInputElement>) => {
+        if (!showContextMenu || props.disabled) return;
+        setTargetElement(e.currentTarget);
+      },
+      [showContextMenu, props.disabled],
+    );
+
+    const operations = React.useMemo(
+      () => createInputContextMenuOperations(targetElement, props.disabled),
+      [targetElement, props.disabled],
+    );
+
+    const inputContent = (
       <div
-        // className={cn(
-        //   // ' has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-neutral-950 has-[:focus-visible]:ring-offset-2 dark:has-[:focus-visible]:ring-neutral-300 min-h-10 flex w-full flex-wrap gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white  disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800 dark:bg-neutral-950 dark:ring-offset-neutral-950',
-        //   ' min-h-10 flex w-full flex-wrap gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 ring-offset-white dark:border-neutral-800 dark:bg-neutral-950 dark:ring-offset-neutral-950',
-        //   className,
-        // )}
         className={cn(
           'flex flex-wrap min-h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 gap-2 shadow-sm transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
           className,
@@ -78,10 +95,55 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
               onChange(value.slice(0, -1));
             }
           }}
+          onContextMenu={handleContextMenu}
           {...props}
           ref={ref}
         />
       </div>
+    );
+
+    if (!showContextMenu) {
+      return inputContent;
+    }
+
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>{inputContent}</ContextMenuTrigger>
+        <ContextMenuContent className="w-40">
+          <ContextMenuItem
+            onClick={operations.cut}
+            disabled={props.disabled || !targetElement || targetElement.value.length === 0}
+          >
+            <Scissors className="h-4 w-4 mr-2" />
+            Cut
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={operations.copy}
+            disabled={!targetElement || targetElement.value.length === 0}
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copy
+          </ContextMenuItem>
+          <ContextMenuItem onClick={operations.paste} disabled={props.disabled || !targetElement}>
+            <Clipboard className="h-4 w-4 mr-2" />
+            Paste
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={operations.selectAll}
+            disabled={!targetElement || targetElement.value.length === 0}
+          >
+            <Type className="h-4 w-4 mr-2" />
+            Select All
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={operations.delete}
+            disabled={props.disabled || !targetElement || targetElement.value.length === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
     );
   },
 );

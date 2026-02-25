@@ -7,6 +7,10 @@ const { ipcRenderer } = require('electron');
 type Series = any;
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Chapter = any;
+// Series extended with optional rating property for star rating feature
+interface SeriesWithRating extends Record<string, unknown> {
+  rating?: number;
+}
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import blankCover from '@/renderer/img/blank_cover.png';
@@ -30,6 +34,7 @@ import library from '@/renderer/services/library';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
 import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
+import { Star } from 'lucide-react';
 
 const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
 if (!fs.existsSync(thumbnailsDir)) {
@@ -100,6 +105,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const hasNewDate =
           series.lastReadDate && chapters.some((c: Chapter) => c.dateAdded && new Date(c.dateAdded) > new Date(series.lastReadDate));
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
+        const ratingValue = (series as SeriesWithRating).rating ?? 0;
         const latestChapterAddedDate = chapters.reduce((latest: string | undefined, chapter: Chapter) => {
           if (!chapter?.dateAdded) return latest;
           if (!latest) return chapter.dateAdded;
@@ -139,7 +145,13 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   />
 
                   {series.numberUnread > 0 && (
-                    <div className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-white text-center" style={{ backgroundColor: 'var(--chapter-count-bg-color, #fc5603)' }}>
+                    <div
+                      className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-center"
+                      style={{
+                        backgroundColor: 'var(--chapter-count-bg-color, #fc5603)',
+                        color: 'var(--chapter-count-font-color, rgba(255, 255, 255, 1))',
+                      }}
+                    >
                       {`${series.numberUnread} : ${totalChapters}`}
                     </div>
                   )}
@@ -152,6 +164,26 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                       </svg>
                     </div>
                   )}
+                  {/* Star rating indicator in bottom left corner of cover */}
+                  <div
+                    className="absolute flex items-center justify-center pointer-events-none"
+                    style={{ bottom: 2, left: 2, width: 48, height: 48 }}
+                  >
+                    <Star
+                      size={45}
+                      fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      strokeWidth={0}
+                      className="absolute"
+                      style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
+                    />
+                    <span
+                      className="absolute text-center font-semibold"
+                      style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
+                    >
+                      {ratingValue}
+                    </span>
+                  </div>
 
                   {libraryView === LibraryView.GridCompact && (
                     <div
