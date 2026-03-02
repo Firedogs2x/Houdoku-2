@@ -35,6 +35,7 @@ import {
   SelectGroup,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from '@houdoku/ui/components/Select';
 import { Separator } from '@houdoku/ui/components/Separator';
 
@@ -110,9 +111,6 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
   const renderSelect = (option: FilterSelect) => {
     const selectedValue = (getOptionValue(option) as string) ?? '';
     const defaultValue = (option.defaultValue as string) ?? '';
-    const selectedLabel = option.options.find(
-      (opt: { value: string; label: string }) => opt.value === selectedValue,
-    )?.label;
 
     return (
       <Select
@@ -121,18 +119,17 @@ const SearchFilterDrawer: React.FC<Props> = (props: Props) => {
         onValueChange={(value) => setOptionValue(option.id, value || '')}
       >
         <SelectTrigger>
-          <span>{selectedLabel ? `${option.label}: ${selectedLabel}` : option.label}</span>
+          <SelectValue placeholder={option.label} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {option.options.map((opt: { value: string; label: string }) => (
+            {option.options.map((opt) => (
               <SelectItem
                 key={opt.value}
                 value={opt.value}
-                onPointerDown={(event) => {
+                onSelect={(event) => {
                   if (opt.value === selectedValue) {
                     event.preventDefault();
-                    event.stopPropagation();
                     setOptionValue(option.id, defaultValue);
                   }
                 }}
