@@ -49,14 +49,14 @@ const Plugins: React.FC = () => {
 
   const handleInstall = (pkgName: string, version: string) => {
     console.info(`Installing plugin ${pkgName}@${version}`);
-    setInstallingPlugins([...installingPlugins, pkgName]);
+    setInstallingPlugins((current) => [...current, pkgName]);
 
     ipcRenderer
       .invoke(ipcChannels.EXTENSION_MANAGER.INSTALL, pkgName, version)
       .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
       .then(() => refreshMetadata())
       .catch((e) => console.error(e))
-      .finally(() => setInstallingPlugins(installingPlugins.filter((item) => item !== pkgName)))
+      .finally(() => setInstallingPlugins((current) => current.filter((item) => item !== pkgName)))
       .catch((e) => console.error(e));
   };
 

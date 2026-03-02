@@ -298,23 +298,50 @@ function getFilterOptions(extensionId: string): FilterOption[] {
 export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: BrowserWindow) => {
   console.debug('Creating extension IPC handlers in main...');
 
+  const runAkiOperation = (operation: (done: (error?: unknown) => void) => unknown) => {
+    return new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const settle = (error?: unknown) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        if (error) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+          return;
+        }
+        resolve();
+      };
+
+      const timeoutHandle = setTimeout(() => {
+        settle(new Error('Plugin operation timed out.'));
+      }, 60_000);
+
+      const done = (error?: unknown) => {
+        clearTimeout(timeoutHandle);
+        settle(error);
+      };
+
+      try {
+        const maybePromise = operation(done);
+        if (maybePromise && typeof (maybePromise as Promise<unknown>).then === 'function') {
+          (maybePromise as Promise<unknown>).then(() => done()).catch(done);
+        }
+      } catch (error) {
+        done(error);
+      }
+    });
+  };
+
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.RELOAD, async (event) => {
     await loadPlugins(spoofWindow);
     return event.sender.send(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL, (_event, name: string, version: string) => {
-    return new Promise<void>((resolve) => {
-      aki.install(name, version, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
+    return runAkiOperation((done) => aki.install(name, version, PLUGINS_DIR, done));
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.UNINSTALL, (_event, name: string) => {
-    return new Promise<void>((resolve) => {
-      aki.uninstall(name, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
+    return runAkiOperation((done) => aki.uninstall(name, PLUGINS_DIR, done));
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.LIST, async () => {
     return aki.list(PLUGINS_DIR);
