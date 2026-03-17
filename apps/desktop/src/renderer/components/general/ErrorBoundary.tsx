@@ -9,14 +9,14 @@ import {
   AccordionTrigger,
 } from '@houdoku/ui/components/Accordion';
 
-const LOGS_DIR = await ipcRenderer.invoke(ipcChannels.GET_PATH.LOGS_DIR);
-
 interface Props {
   children: ReactNode;
 }
 
 interface State {
   error: Error | null;
+  logsDir: string | null;
+  errorInfo: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,11 +24,20 @@ export class ErrorBoundary extends Component<Props, State> {
     super(props);
     this.state = {
       error: null,
+      logsDir: null,
+      errorInfo: null,
     };
+    
+    // Fetch logs directory asynchronously
+    ipcRenderer.invoke(ipcChannels.GET_PATH.LOGS_DIR).then((logsDir: string) => {
+      this.setState({ logsDir });
+    }).catch((err: Error) => {
+      console.error('Failed to fetch logs directory:', err);
+    });
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({ error });
+    this.setState({ error, errorInfo });
     console.debug('Caught error in ErrorBoundary, relaying details below...');
     console.error(error, errorInfo);
   }
@@ -79,24 +88,35 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
             <h4 className="font-bold text-xl pt-2">Error details</h4>
-            <p>
-              Additional logs in{' '}
-              <a
-                className="underline"
-                href={`file:///${LOGS_DIR}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {LOGS_DIR}
-              </a>
-            </p>
+            {this.state.logsDir && (
+              <p>
+                Additional logs in{' '}
+                <a
+                  className="underline"
+                  href={`file:///${this.state.logsDir}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {this.state.logsDir}
+                </a>
+              </p>
+            )}
 
             <Accordion type="single">
               <AccordionItem value="details">
                 <AccordionTrigger>
                   {this.state.error.name}: {this.state.error.message}
                 </AccordionTrigger>
-                <AccordionContent>{this.state.error.stack}</AccordionContent>
+                <AccordionContent>
+                  <pre className="whitespace-pre-wrap">
+                    {this.state.error.stack}
+                  </pre>
+                  {this.state.errorInfo?.componentStack && (
+                    <pre className="whitespace-pre-wrap mt-4">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  )}
+                </AccordionContent>
               </AccordionItem>
             </Accordion>
           </div>

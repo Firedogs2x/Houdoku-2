@@ -2,7 +2,6 @@ import { IpcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { Series, SeriesStatus, LanguageKey } from '@tiyo/common';
-import { pathToFileURL } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';
@@ -28,6 +27,13 @@ interface SeriesAutoLog {
 }
 
 const SPECIAL_CHARS = ['#', '$'];
+
+const getLocalDateStampMMDDYYYY = (date: Date = new Date()): string => {
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const yyyy = String(date.getFullYear());
+  return `${mm}/${dd}/${yyyy}`;
+};
 
 const shouldSkipFolder = (folderName: string): boolean => {
   return SPECIAL_CHARS.some((char) => folderName.startsWith(char));
@@ -132,7 +138,7 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
         seriesAdded: 0,
         foldersSkipped: 0,
         skippedFolderNames: [],
-        timestamp: new Date().toISOString(),
+        timestamp: getLocalDateStampMMDDYYYY(),
       };
 
       try {
@@ -198,8 +204,8 @@ export const createSeriesAutoIpcHandlers = (ipcMain: IpcMain, appPath: string) =
           };
 
           if (coverImagePath) {
-            // Use pathToFileURL to create a proper file:// URL for the cover
-            newSeries.remoteCoverUrl = pathToFileURL(coverImagePath).toString();
+            // Use the file path directly (Windows format: D:\path\to\cover.jpg)
+            newSeries.remoteCoverUrl = coverImagePath;
             console.info(`Series Auto: found cover for ${item} at ${coverImagePath} -> ${newSeries.remoteCoverUrl}`);
           }
 

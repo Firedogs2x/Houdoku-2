@@ -24,6 +24,7 @@ import {
   createRendererIpcHandlers,
   loadStoredExtensionSettings,
   loadStoredTrackerTokens,
+  UpdateStatusPayload,
 } from './services/ipc';
 import { DefaultSettings, GeneralSetting } from '@/common/models/types';
 import {
@@ -37,6 +38,7 @@ import {
   AlertDialogTitle,
 } from '@houdoku/ui/components/AlertDialog';
 import { UpdateInfo } from 'electron-updater';
+import { formatDateToMMDDYYYY } from './util/date';
 
 loadStoredExtensionSettings();
 loadStoredTrackerTokens();
@@ -47,6 +49,7 @@ export default function App() {
   const [showUpdateAvailableDialog, setShowUpdateAvailableDialog] = useState(false);
   const [showUpdateDownloadedDialog, setShowUpdateDownloadedDialog] = useState(false);
   const [showNoUpdateAvailableDialog, setShowNoUpdateAvailableDialog] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatusPayload | undefined>(undefined);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setCategoryList = useSetRecoilState(categoryListState);
   const setRunning = useSetRecoilState(runningState);
@@ -80,12 +83,16 @@ export default function App() {
        */
 
       createRendererIpcHandlers(
-        (updateInfo) => {
+        (updateInfo, status) => {
           setUpdateInfo(updateInfo);
+          setUpdateStatus(status);
           setShowUpdateAvailableDialog(true);
         },
         () => setShowUpdateDownloadedDialog(true),
-        () => setShowNoUpdateAvailableDialog(true),
+        (status) => {
+          setUpdateStatus(status);
+          setShowNoUpdateAvailableDialog(true);
+        },
       );
 
       // Give the downloader client access to the state modifiers
@@ -98,11 +105,23 @@ export default function App() {
       // field 'tags'.
       migrateSeriesTags();
 
-      // Remove any preview series.
-      library
-        .fetchSeriesList()
-        .filter((series) => series.preview)
-        .forEach((series) => (series.id ? library.removeSeries(series.id, false) : undefined));
+      // Fetch series list once and remove any preview series before setting state
+      // This prevents multiple fetchSeriesList() calls and potential update cascades
+      const allSeries = library.fetchSeriesList();
+      const previewSeries = allSeries.filter((series) => series.preview);
+      if (previewSeries.length > 0) {
+        console.log(`[App] Removing ${previewSeries.length} preview series`);
+        previewSeries.forEach((series) => {
+          if (series.id) {
+            library.removeSeries(series.id, false);
+          }
+        });
+        // Fetch again after removing preview series
+        setSeriesList(library.fetchSeriesList());
+      } else {
+        // No preview series, use the list we already fetched
+        setSeriesList(allSeries);
+      }
 
       // If AutoCheckForUpdates setting is enabled, check for client updates now
       if (autoCheckForUpdates) {
@@ -111,7 +130,6 @@ export default function App() {
         console.debug('Skipping update check, autoCheckForUpdates is disabled');
       }
 
-      setSeriesList(library.fetchSeriesList());
       setCategoryList(library.fetchCategoryList());
       setLoading(false);
     }
@@ -134,11 +152,16 @@ export default function App() {
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Update available</AlertDialogTitle>
+            {updateStatus?.tiyoUpdateAvailable ? (
+              <AlertDialogDescription>
+                A new Tiyo version is available. Open the Plugins page to update Tiyo.
+              </AlertDialogDescription>
+            ) : undefined}
           </AlertDialogHeader>
           {updateInfo && (
             <p>
               Houdoku v{updateInfo?.version} was released on{' '}
-              {new Date(updateInfo.releaseDate).toLocaleDateString()}.
+              {formatDateToMMDDYYYY(updateInfo.releaseDate) ?? 'Unknown date'}.
             </p>
           )}
           <AlertDialogFooter>
@@ -174,10 +197,36 @@ export default function App() {
       <AlertDialog open={showNoUpdateAvailableDialog} onOpenChange={setShowNoUpdateAvailableDialog}>
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">
-              You are using the latest version of Houdoku software.
-            </AlertDialogTitle>
+            <AlertDialogTitle className="text-center">Version check results</AlertDialogTitle>
+            {updateStatus?.houdokuUpToDate !== false ? (
+              <AlertDialogDescription className="text-center">
+                You are using the most current version of Houdoku.
+              </AlertDialogDescription>
+            ) : (
+              <AlertDialogDescription className="text-center">
+                Unable to confirm that you are using the most current version of Houdoku. Please
+                run Check for updates again.
+              </AlertDialogDescription>
+            )}
+            {updateStatus?.tiyoChecked && updateStatus.tiyoUpToDate ? (
+              <AlertDialogDescription className="text-center">
+                You are using the most current version of Tiyo.
+              </AlertDialogDescription>
+            ) : updateStatus?.tiyoUpdateAvailable ? (
+              <AlertDialogDescription className="text-center">
+                A new version of Tiyo is available. Open the Plugins page to update Tiyo.
+              </AlertDialogDescription>
+            ) : updateStatus?.tiyoInstalled === false ? (
+              <AlertDialogDescription className="text-center">
+                Tiyo is not installed. Open the Plugins page to install Tiyo.
+              </AlertDialogDescription>
+            ) : (
+              <AlertDialogDescription className="text-center">
+                Unable to confirm Tiyo version status right now.
+              </AlertDialogDescription>
+            )}
           </AlertDialogHeader>
+
         </AlertDialogContent>
       </AlertDialog>
 

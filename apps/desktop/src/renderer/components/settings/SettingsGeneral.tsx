@@ -14,6 +14,10 @@ import { Switch } from '@houdoku/ui/components/Switch';
 import { Input } from '@houdoku/ui/components/Input';
 import { Button } from '@houdoku/ui/components/Button';
 
+import { toast } from '@houdoku/ui/hooks/use-toast';
+
+
+
 export const SettingsGeneral: React.FC = () => {
   const [autoCheckForUpdates, setAutoCheckForUpdates] = useRecoilState(autoCheckForUpdatesState);
   const [autoBackup, setAutoBackup] = useRecoilState(autoBackupState);
@@ -39,9 +43,42 @@ export const SettingsGeneral: React.FC = () => {
         return false;
       })
       .then((fileContent: string) => {
-        if (fileContent) restoreBackup(fileContent);
+        if (fileContent) {
+          const toastHandle = toast({
+            title: 'Restoring backup...',
+            description: 'This may take a few moments. Please wait...',
+            duration: 600000, // 10 minutes
+          });
+          
+          try {
+            restoreBackup(fileContent);
+            // Note: page will reload automatically after successful restore
+          } catch (error) {
+            // If error is RELOAD_TRIGGERED, page is reloading - don't show error toast
+            if (error instanceof Error && error.message === 'RELOAD_TRIGGERED') {
+              console.log('[SettingsGeneral] Backup restore triggered page reload');
+              return; // Exit without showing error
+            }
+            // Real error - show toast
+            toastHandle.dismiss();
+            toast({
+              title: 'Backup restore failed',
+              description: error instanceof Error ? error.message : 'Unknown error occurred',
+              variant: 'destructive',
+              duration: 10000,
+            });
+          }
+        }
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error('[SettingsGeneral] Error during backup restore:', error);
+        toast({
+          title: 'Failed to load backup file',
+          description: error instanceof Error ? error.message : 'Unknown error occurred',
+          variant: 'destructive',
+          duration: 10000,
+        });
+      });
   };
 
   return (
@@ -99,3 +136,4 @@ export const SettingsGeneral: React.FC = () => {
     </>
   );
 };
+

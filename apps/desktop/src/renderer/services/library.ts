@@ -3,27 +3,106 @@ import { v4 as uuidv4 } from 'uuid';
 import persistantStore from '../util/persistantStore';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { Category } from '@/common/models/types';
+import { getLocalDateStampMMDDYYYY } from '@/renderer/util/date';
 
-const BACKFILL_DATE = '2026-01-09T00:00:00Z';
+const getBackfillDate = (): string => getLocalDateStampMMDDYYYY();
+
+// Cache to prevent repeated reads from localStorage and infinite loops
+let seriesListCache: Series[] | null = null;
+let seriesListCacheTime = 0;
+const CACHE_DURATION_MS = 30000; // 30 second cache (increased from 1s to prevent rapid successive calls)
+let fetchInProgress = false;
+let lastCallTime = 0;
+const MIN_CALL_INTERVAL_MS = 100; // Minimum 100ms between calls to prevent cascades
 
 const fetchSeriesList = (): Series[] => {
-  const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
-  let series: Series[] = val === null ? [] : JSON.parse(val);
-
-  let changed = false;
-  series = series.map((s) => {
-    if (!s.lastReadDate) {
-      changed = true;
-      return { ...s, lastReadDate: BACKFILL_DATE };
-    }
-    return s;
-  });
-
-  if (changed) {
-    persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+  // Prevent infinite loops - track call frequency
+  const now = Date.now();
+  const callsSinceCache = now - seriesListCacheTime;
+  const timeSinceLastCall = now - lastCallTime;
+  
+  console.log(`[fetchSeriesList] Called (cache age: ${callsSinceCache}ms, fetchInProgress: ${fetchInProgress}, timeSinceLastCall: ${timeSinceLastCall}ms)`);
+  
+  // Rate limiting: If called too rapidly (within 100ms), return cached data to prevent cascade
+  if (timeSinceLastCall < MIN_CALL_INTERVAL_MS && seriesListCache) {
+    console.warn(`[fetchSeriesList] Called too rapidly (${timeSinceLastCall}ms < ${MIN_CALL_INTERVAL_MS}ms), returning cached data to prevent cascade`);
+    return seriesListCache;
   }
+  
+  lastCallTime = now;
+  
+  // If fetch is already in progress, return cached data or empty array
+  if (fetchInProgress) {
+    console.warn('[fetchSeriesList] Fetch already in progress, returning cached data to prevent loop');
+    return seriesListCache || [];
+  }
+  
+  // Return cached data if fresh enough
+  if (seriesListCache && callsSinceCache < CACHE_DURATION_MS) {
+    console.log(`[fetchSeriesList] Returning cached data (${seriesListCache.length} series)`);
+    return seriesListCache;
+  }
+  
+  fetchInProgress = true;
+  
+  try {
+    const val = persistantStore.read(`${storeKeys.LIBRARY.SERIES_LIST}`);
+    if (val === null) {
+      seriesListCache = [];
+      seriesListCacheTime = now;
+      fetchInProgress = false;
+      return [];
+    }
+    
+    // Check size before parsing
+    const sizeMB = new Blob([val]).size / (1024 * 1024);
+    if (sizeMB > 5) {
+      console.warn(`[fetchSeriesList] Large series list detected (${sizeMB.toFixed(2)} MB). This may cause performance issues.`);
+    }
+    
+    let series: Series[] = JSON.parse(val);
 
-  return series;
+    let changed = false;
+    series = series.map((s) => {
+      if (!s.lastReadDate) {
+        changed = true;
+        return { ...s, lastReadDate: BACKFILL_DATE };
+      }
+      return s;
+    });
+
+    if (changed) {
+      try {
+        persistantStore.write(`${storeKeys.LIBRARY.SERIES_LIST}`, JSON.stringify(series));
+      } catch (writeError) {
+        console.error('[fetchSeriesList] Failed to write updated series list:', writeError);
+        // Continue anyway - don't block on backfill write failure
+      }
+    }
+
+    console.log(`[fetchSeriesList] Loaded ${series.length} series from storage`);
+    
+    // Update cache
+    seriesListCache = series;
+    seriesListCacheTime = now;
+    fetchInProgress = false;
+    
+    return series;
+  } catch (error) {
+    fetchInProgress = false;
+    console.error('[fetchSeriesList] CRITICAL ERROR: Failed to load series list from localStorage:', error);
+    console.error('[fetchSeriesList] Your library data may be corrupted or too large. Try clearing localStorage and restoring from a smaller backup.');
+    // Return empty array to prevent app crash - let ErrorBoundary handle it
+    throw new Error(`Failed to load library: ${error instanceof Error ? error.message : 'Unknown error'}. Your library may be too large or corrupted.`);
+  }
+};
+
+// Function to clear cache (call after restore or when series list changes)
+const clearSeriesListCache = () => {
+  console.log('[library] Clearing series list cache');
+  seriesListCache = null;
+  seriesListCacheTime = 0;
+  lastCallTime = 0;
 };
 
 const fetchSeries = (seriesId: string): Series | null => {
@@ -35,8 +114,8 @@ const fetchChapters = (seriesId: string): Chapter[] => {
   const val = persistantStore.read(`${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`);
   const chapters: Chapter[] = val === null ? [] : JSON.parse(val);
 
-  // Backfill missing dateAdded with current date (ISO)
-  const CHAPTER_BACKFILL_DATE = new Date().toISOString();
+  // Backfill missing dateAdded with current local date
+  const CHAPTER_BACKFILL_DATE = getBackfillDate();
   let changed = false;
   chapters.forEach((c) => {
     if (!c.dateAdded) {
@@ -71,7 +150,7 @@ const upsertSeries = (series: Series): Series => {
 
   // Set lastReadDate to backfill date if still missing
   if (!newSeries.lastReadDate) {
-    newSeries.lastReadDate = BACKFILL_DATE;
+    newSeries.lastReadDate = getBackfillDate();
   }
 
   // Calculate unread status based on chapters if the caller didn't explicitly
@@ -116,7 +195,7 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
   chapters.forEach((chapter) => {
     const chapterId: string = chapter.id ? chapter.id : uuidv4();
     // ensure dateAdded exists for new/upserted chapters
-    const dateAdded = chapter.dateAdded ? chapter.dateAdded : new Date().toISOString();
+    const dateAdded = chapter.dateAdded ? chapter.dateAdded : getBackfillDate();
     chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 
@@ -196,4 +275,5 @@ export default {
   fetchCategoryList,
   upsertCategory,
   removeCategory,
+  clearSeriesListCache,
 };

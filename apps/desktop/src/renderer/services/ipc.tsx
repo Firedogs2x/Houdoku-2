@@ -7,6 +7,19 @@ import { TrackerMetadata } from '@/common/models/types';
 import { UpdateInfo } from 'electron-updater';
 import { toast } from '@houdoku/ui/hooks/use-toast';
 
+export type UpdateStatusPayload = {
+  houdokuChecked: boolean;
+  houdokuUpToDate: boolean;
+  houdokuCurrentVersion?: string;
+  houdokuLatestVersion?: string;
+  tiyoChecked: boolean;
+  tiyoInstalled: boolean;
+  tiyoUpToDate: boolean;
+  tiyoUpdateAvailable: boolean;
+  tiyoCurrentVersion?: string;
+  tiyoLatestVersion?: string;
+};
+
 export const loadStoredExtensionSettings = () => {
   console.info('Loading stored extension settings...');
   return ipcRenderer
@@ -48,9 +61,9 @@ export const loadStoredTrackerTokens = () => {
 };
 
 export const createRendererIpcHandlers = (
-  showUpdateAvailableDialog: (updateInfo: UpdateInfo) => void,
+  showUpdateAvailableDialog: (updateInfo: UpdateInfo, status?: UpdateStatusPayload) => void,
   showUpdateDownloadedDialog: () => void,
-  showNoUpdateAvailableDialog: () => void,
+  showNoUpdateAvailableDialog: (status?: UpdateStatusPayload) => void,
 ) => {
   console.debug('Creating renderer IPC handlers...');
 
@@ -73,15 +86,21 @@ export const createRendererIpcHandlers = (
     },
   );
 
-  ipcRenderer.on(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, (_event, updateInfo: UpdateInfo) => {
-    showUpdateAvailableDialog(updateInfo);
-  });
+  ipcRenderer.on(
+    ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG,
+    (_event, updateInfo: UpdateInfo, status?: UpdateStatusPayload) => {
+      showUpdateAvailableDialog(updateInfo, status);
+    },
+  );
 
   ipcRenderer.on(ipcChannels.APP.SHOW_RESTART_UPDATE_DIALOG, () => {
     showUpdateDownloadedDialog();
   });
 
-  ipcRenderer.on(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG, () => {
-    showNoUpdateAvailableDialog();
-  });
+  ipcRenderer.on(
+    ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG,
+    (_event, status?: UpdateStatusPayload) => {
+      showNoUpdateAvailableDialog(status);
+    },
+  );
 };

@@ -24,6 +24,7 @@ const Plugins: React.FC = () => {
   const [installingPlugins, setInstallingPlugins] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [reloading, setReloading] = useState(false);
+  const [installingFromRelease, setInstallingFromRelease] = useState(false);
   const location = useLocation();
 
   const refreshMetadata = async () => {
@@ -49,14 +50,14 @@ const Plugins: React.FC = () => {
 
   const handleInstall = (pkgName: string, version: string) => {
     console.info(`Installing plugin ${pkgName}@${version}`);
-    setInstallingPlugins([...installingPlugins, pkgName]);
+    setInstallingPlugins((current) => [...current, pkgName]);
 
     ipcRenderer
       .invoke(ipcChannels.EXTENSION_MANAGER.INSTALL, pkgName, version)
       .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
       .then(() => refreshMetadata())
       .catch((e) => console.error(e))
-      .finally(() => setInstallingPlugins(installingPlugins.filter((item) => item !== pkgName)))
+      .finally(() => setInstallingPlugins((current) => current.filter((item) => item !== pkgName)))
       .catch((e) => console.error(e));
   };
 
@@ -75,6 +76,16 @@ const Plugins: React.FC = () => {
     await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD).catch((e) => console.error(e));
     setReloading(false);
     refreshMetadata();
+  };
+
+  const installFromReleaseZip = async () => {
+    setInstallingFromRelease(true);
+    await ipcRenderer
+      .invoke(ipcChannels.EXTENSION_MANAGER.INSTALL_FROM_RELEASE_ZIP)
+      .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
+      .then(() => refreshMetadata())
+      .catch((e) => console.error(e));
+    setInstallingFromRelease(false);
   };
 
   const renderInstallOrUninstallButton = () => {
@@ -123,6 +134,10 @@ const Plugins: React.FC = () => {
         >
           {reloading && <Loader2 className="animate-spin" />}
           Reload Installed Plugins
+        </Button>
+        <Button disabled={installingFromRelease} onClick={() => installFromReleaseZip()}>
+          {installingFromRelease && <Loader2 className="animate-spin" />}
+          Install/Update from Release ZIP
         </Button>
       </div>
 

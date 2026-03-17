@@ -1,7 +1,7 @@
 /**
- * Format an ISO date string to MM/DD/YYYY format.
+ * Format a date string to MM/DD/YYYY format using local time.
  * If no date is provided, returns an empty string.
- * @param isoDate ISO date string (e.g., 2026-01-09T00:00:00Z)
+ * @param isoDate Date string (e.g., 2026-01-09T00:00:00Z)
  * @returns formatted date string (e.g., 01/09/2026) or empty string
  */
 export const formatDateMMDDYYYY = (isoDate?: string): string => {
@@ -9,9 +9,10 @@ export const formatDateMMDDYYYY = (isoDate?: string): string => {
 
   try {
     const date = new Date(isoDate);
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const year = date.getUTCFullYear();
+    if (Number.isNaN(date.getTime())) return '';
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
     return `${month}/${day}/${year}`;
   } catch {
     return '';

@@ -10,16 +10,161 @@ import {
   TiyoClientInterface,
 } from '@tiyo/common';
 const aki = require('aki-plugin-manager');
+import fs from 'fs';
+import https from 'https';
+import path from 'path';
 import { BrowserWindow, IpcMain } from 'electron';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { FSExtensionClient } from './extensions/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { EXTRACT_DIR, PLUGINS_DIR } from '../util/appdata';
+import { installPluginFromLatestReleaseZip } from '../util/pluginReleaseInstaller';
 
 const TIYO_PACKAGE_NAME = '@tiyo/core';
+const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
+const INSTALL_TIMEOUT_MS = 60_000;
 
 let TIYO_CLIENT: TiyoClientInterface | null = null;
 let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
+
+type NpmManifest = {
+  name: string;
+  version: string;
+  dependencies?: Record<string, string>;
+  dist: {
+    tarball: string;
+  };
+};
+
+const cleanVersion = (version: string): string => {
+  if (version === 'latest') {
+    return version;
+  }
+  return version.replace(/^\D/, '');
+};
+
+const fetchJson = <T>(url: string): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, (response) => {
+      if ((response.statusCode ?? 500) >= 400) {
+        response.resume();
+        reject(new Error(`HTTP ${response.statusCode} for ${url}`));
+        return;
+      }
+
+      let body = '';
+      response.on('data', (chunk) => {
+        body += chunk;
+      });
+      response.on('error', (error) => {
+        reject(error);
+      });
+      response.on('end', () => {
+        try {
+          resolve(JSON.parse(body) as T);
+        } catch {
+          reject(new Error(`Invalid JSON response from ${url}`));
+        }
+      });
+    });
+
+    request.setTimeout(INSTALL_TIMEOUT_MS, () => {
+      request.destroy(new Error(`Request timeout for ${url}`));
+    });
+    request.on('error', (error) => {
+      reject(error);
+    });
+  });
+};
+
+const getTarExtractor = () => {
+  const dynamicRequire = eval('require') as NodeRequire;
+  const tarModule = dynamicRequire('tar') as {
+    x: (opts: { C: string; strip: number }) => NodeJS.WritableStream;
+  };
+  return tarModule;
+};
+
+const downloadAndExtractTarball = (url: string, destinationDir: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    fs.mkdirSync(destinationDir, { recursive: true });
+
+    const request = https.get(url, (response) => {
+      if ((response.statusCode ?? 500) >= 400) {
+        response.resume();
+        reject(new Error(`HTTP ${response.statusCode} while downloading ${url}`));
+        return;
+      }
+
+      const extractStream = getTarExtractor().x({
+        C: destinationDir,
+        strip: 1,
+      });
+
+      extractStream.on('error', (error) => {
+        reject(error);
+      });
+      extractStream.on('close', () => {
+        resolve();
+      });
+
+      response.on('error', (error) => {
+        reject(error);
+      });
+      response.pipe(extractStream);
+    });
+
+    request.setTimeout(INSTALL_TIMEOUT_MS, () => {
+      request.destroy(new Error(`Download timeout for ${url}`));
+    });
+    request.on('error', (error) => {
+      reject(error);
+    });
+  });
+};
+
+const fetchManifest = (name: string, version: string): Promise<NpmManifest> => {
+  const encodedName = name
+    .split('/')
+    .map((segment) => encodeURIComponent(segment))
+    .join('/');
+  const url = `${NPM_REGISTRY_URL}/${encodedName}/${cleanVersion(version)}`;
+  return fetchJson<NpmManifest>(url);
+};
+
+const installPackageRecursive = async (
+  name: string,
+  version: string,
+  baseDir: string,
+): Promise<void> => {
+  const manifest = await fetchManifest(name, version);
+  const installDir = path.join(baseDir, name);
+
+  await downloadAndExtractTarball(manifest.dist.tarball, installDir);
+
+  const dependencies = Object.entries(manifest.dependencies ?? {});
+  for (const [dependencyName, dependencyVersion] of dependencies) {
+    const dependencyBaseDir = path.join(installDir, 'node_modules');
+    await installPackageRecursive(dependencyName, dependencyVersion, dependencyBaseDir);
+  }
+};
+
+const installExtensionPackage = async (name: string, version: string): Promise<void> => {
+  console.info(`Installing extension ${name}@${version} into ${PLUGINS_DIR}`);
+  fs.mkdirSync(PLUGINS_DIR, { recursive: true });
+  await installPackageRecursive(name, version, PLUGINS_DIR);
+
+  const installedNames = aki.list(PLUGINS_DIR).map((item: [string, string]) => item[0]);
+  if (!installedNames.includes(name)) {
+    throw new Error(`Extension ${name} was not found after install.`);
+  }
+};
+
+const uninstallExtensionPackage = async (name: string): Promise<void> => {
+  const targetDir = path.join(PLUGINS_DIR, name);
+  console.info(`Uninstalling extension ${name} from ${targetDir}`);
+  await fs.promises.rm(targetDir, { recursive: true, force: true });
+};
 
 export async function loadPlugins(spoofWindow: BrowserWindow) {
   if (TIYO_CLIENT !== null) {
@@ -298,23 +443,49 @@ function getFilterOptions(extensionId: string): FilterOption[] {
 export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: BrowserWindow) => {
   console.debug('Creating extension IPC handlers in main...');
 
+  const runOperationWithTimeout = (operation: () => Promise<void>) => {
+    return new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const settle = (error?: unknown) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        if (error) {
+          reject(error instanceof Error ? error : new Error(String(error)));
+          return;
+        }
+        resolve();
+      };
+
+      const timeoutHandle = setTimeout(() => {
+        settle(new Error('Plugin operation timed out.'));
+      }, 60_000);
+
+      operation()
+        .then(() => {
+          clearTimeout(timeoutHandle);
+          settle();
+        })
+        .catch((error) => {
+          clearTimeout(timeoutHandle);
+          settle(error);
+        });
+    });
+  };
+
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.RELOAD, async (event) => {
     await loadPlugins(spoofWindow);
     return event.sender.send(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL, (_event, name: string, version: string) => {
-    return new Promise<void>((resolve) => {
-      aki.install(name, version, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
+    return runOperationWithTimeout(() => installExtensionPackage(name, version));
+  });
+  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL_FROM_RELEASE_ZIP, async () => {
+    return installPluginFromLatestReleaseZip(PLUGINS_DIR, TIYO_PACKAGE_NAME);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.UNINSTALL, (_event, name: string) => {
-    return new Promise<void>((resolve) => {
-      aki.uninstall(name, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
+    return runOperationWithTimeout(() => uninstallExtensionPackage(name));
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.LIST, async () => {
     return aki.list(PLUGINS_DIR);
