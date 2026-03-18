@@ -4,7 +4,11 @@
 
 # Fixing remoteCoverUrl formatting issue (2026-02-11 04:38Z)
 
+<<<<<<< HEAD
+_**User (2026-02-11 04:39Z)**_
+=======
 _**User (2026-02-11 04:38Z)**_
+>>>>>>> Backup_Restore
 
 When I use the Series Auto button to add series it sets the "remoteCoverUrl" is formatted wrong. Causing the program to improperly handle the Cover page properly.
 When the Series Auto button is used the "remoteCoverUrl" looks like this: "remoteCoverUrl": "file:///D:/Manga/A%2029%20Year%20Old%20Bachelor,%20Transported%20to%20a%20New%20World%20to%20Live%20Freely...%20at%20Least%20He%20Wanted%20To/cover.jpg",

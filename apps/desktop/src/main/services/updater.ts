@@ -1,8 +1,27 @@
 import { IpcMain, app } from 'electron';
 import { autoUpdater, UpdateCheckResult } from 'electron-updater';
 import semver from 'semver';
+import fs from 'fs';
+import path from 'path';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../../package.json';
+import { PLUGINS_DIR } from '../util/appdata';
+import { getLatestReleaseZipInfo } from '../util/pluginReleaseInstaller';
+
+const TIYO_PACKAGE_NAME = '@tiyo/core';
+
+type UpdateStatusPayload = {
+  houdokuChecked: boolean;
+  houdokuUpToDate: boolean;
+  houdokuCurrentVersion?: string;
+  houdokuLatestVersion?: string;
+  tiyoChecked: boolean;
+  tiyoInstalled: boolean;
+  tiyoUpToDate: boolean;
+  tiyoUpdateAvailable: boolean;
+  tiyoCurrentVersion?: string;
+  tiyoLatestVersion?: string;
+};
 
 /**
  * Normalizes version strings by removing leading version prefixes (V, v).
@@ -27,6 +46,70 @@ const normalizeVersion = (version: string): string => {
 const getLocalVersion = (): string => {
   const appVersion = app.getVersion();
   return appVersion?.trim() ? appVersion : packageJson.version;
+};
+
+const getInstalledTiyoVersion = (): string | undefined => {
+  const packagePath = path.join(PLUGINS_DIR, ...TIYO_PACKAGE_NAME.split('/'), 'package.json');
+  if (!fs.existsSync(packagePath)) return undefined;
+
+  try {
+    const packageJsonText = fs.readFileSync(packagePath, 'utf8');
+    const pluginPackage = JSON.parse(packageJsonText) as { version?: string };
+    return pluginPackage.version?.trim() || undefined;
+  } catch (error) {
+    console.error('Failed to parse installed Tiyo package.json:', error);
+    return undefined;
+  }
+};
+
+const getTiyoUpdateStatus = async (): Promise<Omit<UpdateStatusPayload, 'houdokuChecked' | 'houdokuUpToDate' | 'houdokuCurrentVersion' | 'houdokuLatestVersion'>> => {
+  const currentVersionRaw = getInstalledTiyoVersion();
+  const currentVersion = currentVersionRaw ? semver.clean(normalizeVersion(currentVersionRaw)) : undefined;
+
+  try {
+    const latestRelease = await getLatestReleaseZipInfo();
+    const latestVersion = semver.clean(normalizeVersion(latestRelease.versionTag));
+
+    if (!latestVersion) {
+      return {
+        tiyoChecked: true,
+        tiyoInstalled: currentVersionRaw !== undefined,
+        tiyoUpToDate: false,
+        tiyoUpdateAvailable: false,
+        tiyoCurrentVersion: currentVersionRaw,
+      };
+    }
+
+    if (!currentVersion) {
+      return {
+        tiyoChecked: true,
+        tiyoInstalled: false,
+        tiyoUpToDate: false,
+        tiyoUpdateAvailable: true,
+        tiyoCurrentVersion: currentVersionRaw,
+        tiyoLatestVersion: latestVersion,
+      };
+    }
+
+    const updateAvailable = semver.gt(latestVersion, currentVersion);
+    return {
+      tiyoChecked: true,
+      tiyoInstalled: true,
+      tiyoUpToDate: !updateAvailable,
+      tiyoUpdateAvailable: updateAvailable,
+      tiyoCurrentVersion: currentVersion,
+      tiyoLatestVersion: latestVersion,
+    };
+  } catch (error) {
+    console.error('Failed to check Tiyo release version:', error);
+    return {
+      tiyoChecked: false,
+      tiyoInstalled: currentVersionRaw !== undefined,
+      tiyoUpToDate: false,
+      tiyoUpdateAvailable: false,
+      tiyoCurrentVersion: currentVersionRaw,
+    };
+  }
 };
 
 /**
@@ -59,11 +142,24 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
     console.debug('Handling check for updates request...');
     const localVersion = getLocalVersion();
     console.info(`Current application version: ${localVersion}`);
+    const tiyoStatusPromise = getTiyoUpdateStatus();
     
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
       console.info('Skipping update check because we are in dev environment');
-      event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
-      return;
+      return tiyoStatusPromise.then((tiyoStatus) => {
+        const statusPayload: UpdateStatusPayload = {
+          houdokuChecked: false,
+          houdokuUpToDate: true,
+          houdokuCurrentVersion: localVersion,
+          tiyoChecked: tiyoStatus.tiyoChecked,
+          tiyoInstalled: tiyoStatus.tiyoInstalled,
+          tiyoUpToDate: tiyoStatus.tiyoUpToDate,
+          tiyoUpdateAvailable: tiyoStatus.tiyoUpdateAvailable,
+          tiyoCurrentVersion: tiyoStatus.tiyoCurrentVersion,
+          tiyoLatestVersion: tiyoStatus.tiyoLatestVersion,
+        };
+        event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG, statusPayload);
+      });
     }
 
     autoUpdater.logger = console;
@@ -71,23 +167,53 @@ export const createUpdaterIpcHandlers = (ipcMain: IpcMain) => {
 
     return autoUpdater
       .checkForUpdates()
-      .then((result: UpdateCheckResult) => {
+      .then(async (result: UpdateCheckResult) => {
+        const tiyoStatus = await tiyoStatusPromise;
         console.info(`Remote version from electron-updater: ${result.updateInfo.version}`);
         const hasUpdate = isUpdateAvailable(result.updateInfo.version, localVersion);
+        const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version));
+
+        const statusPayload: UpdateStatusPayload = {
+          houdokuChecked: true,
+          houdokuUpToDate: !hasUpdate,
+          houdokuCurrentVersion: localVersion,
+          houdokuLatestVersion: remoteVersion || result.updateInfo.version,
+          tiyoChecked: tiyoStatus.tiyoChecked,
+          tiyoInstalled: tiyoStatus.tiyoInstalled,
+          tiyoUpToDate: tiyoStatus.tiyoUpToDate,
+          tiyoUpdateAvailable: tiyoStatus.tiyoUpdateAvailable,
+          tiyoCurrentVersion: tiyoStatus.tiyoCurrentVersion,
+          tiyoLatestVersion: tiyoStatus.tiyoLatestVersion,
+        };
 
         if (hasUpdate) {
-          const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version));
           console.info(`Update available! Remote: ${remoteVersion}, Local: ${localVersion}`);
-          event.sender.send(ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG, result.updateInfo);
+          event.sender.send(
+            ipcChannels.APP.SHOW_PERFORM_UPDATE_DIALOG,
+            result.updateInfo,
+            statusPayload,
+          );
         } else {
-          const remoteVersion = semver.clean(normalizeVersion(result.updateInfo.version)) || result.updateInfo.version;
-          console.info(`Already up-to-date. Remote: ${remoteVersion}, Local: ${localVersion}`);
-          event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
+          const cleanRemoteVersion = remoteVersion || result.updateInfo.version;
+          console.info(`Already up-to-date. Remote: ${cleanRemoteVersion}, Local: ${localVersion}`);
+          event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG, statusPayload);
         }
       })
-      .catch((e) => {
+      .catch(async (e) => {
         console.error('Update check failed:', e);
-        event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG);
+        const tiyoStatus = await tiyoStatusPromise;
+        const statusPayload: UpdateStatusPayload = {
+          houdokuChecked: false,
+          houdokuUpToDate: false,
+          houdokuCurrentVersion: localVersion,
+          tiyoChecked: tiyoStatus.tiyoChecked,
+          tiyoInstalled: tiyoStatus.tiyoInstalled,
+          tiyoUpToDate: tiyoStatus.tiyoUpToDate,
+          tiyoUpdateAvailable: tiyoStatus.tiyoUpdateAvailable,
+          tiyoCurrentVersion: tiyoStatus.tiyoCurrentVersion,
+          tiyoLatestVersion: tiyoStatus.tiyoLatestVersion,
+        };
+        event.sender.send(ipcChannels.APP.SHOW_NO_UPDATE_AVAILABLE_DIALOG, statusPayload);
       });
   });
 

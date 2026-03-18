@@ -82,7 +82,7 @@ const AddSeriesModal: React.FC<Props> = (props: Props) => {
 
   return (
     <Dialog open={props.showing} onOpenChange={props.setShowing}>
-      <DialogContent className="overflow-y-scroll max-h-screen [@media(min-height:600px)]:max-h-[600px] md:max-w-[700px] lg:max-w-[800px]">
+      <DialogContent className="overflow-y-scroll max-h-screen [@media(min-height:500px)]:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Add series</DialogTitle>
         </DialogHeader>

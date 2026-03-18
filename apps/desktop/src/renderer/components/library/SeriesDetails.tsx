@@ -81,7 +81,7 @@ const SeriesDetails: React.FC<Props> = () => {
     );
   }
   return (
-    <div className="relative pb-4 overflow-auto h-full">
+    <div className="pb-4 overflow-auto h-full">
       <>
         <SeriesTrackerDialog
           series={series}

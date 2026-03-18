@@ -41,40 +41,23 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
   };
 
   return (
-    <div>
-      <div className="flex">
-        <div className="max-w-[140px] md:max-w-[180px]">
-          <ExtensionImage
-            url={getThumbnailPath().replaceAll('\\', '/')}
-            series={props.series}
-            alt={props.series.title}
-            className="w-auto h-auto -mt-[70%] aspect-[70/100] object-cover rounded-sm"
-          />
-        </div>
-        <div className="w-full py-2 px-2">
-          <div className="flex justify-between">
-            <h2 className="text-lg font-bold line-clamp-1">{props.series.title}</h2>
-            <Badge variant={'secondary'} className="cursor-default text-xs">
-              {currentExtensionMetadata?.name}
-            </Badge>
-          </div>
-          <ScrollArea className="h-[60px] md:h-[90px]">{props.series.description}</ScrollArea>
-        </div>
+    <div className="flex">
+      <div className="max-w-[140px] md:max-w-[180px]">
+        <ExtensionImage
+          url={getThumbnailPath().replaceAll('\\', '/')}
+          series={props.series}
+          alt={props.series.title}
+          className="w-auto h-auto -mt-[70%] aspect-[70/100] object-cover rounded-sm"
+        />
       </div>
-      <div className="mt-2 px-2">
-        <div className="text-base font-bold text-white">Alternate Titles:</div>
-        <div className="text-sm text-white ml-2">
-          <div>
-            <span className="font-bold">Alt 1:</span>
-            <span className="ml-1">{props.series.altTitles?.[0] || ''}</span>
-          </div>
+      <div className="w-full py-2 px-2">
+        <div className="flex justify-between">
+          <h2 className="text-lg font-bold line-clamp-1">{props.series.title}</h2>
+          <Badge variant={'secondary'} className="cursor-default text-xs">
+            {currentExtensionMetadata?.name}
+          </Badge>
         </div>
-        <div className="text-sm text-white ml-2">
-          <div>
-            <span className="font-bold">Alt 2:</span>
-            <span className="ml-1">{props.series.altTitles?.[1] || ''}</span>
-          </div>
-        </div>
+        <ScrollArea className="h-[60px] md:h-[90px]">{props.series.description}</ScrollArea>
       </div>
     </div>
   );

@@ -19,6 +19,9 @@ export default defineConfig({
     },
   },
   renderer: {
+    build: {
+      sourcemap: true, // Enable source maps for better error traces
+    },
     plugins: [
       nodePolyfills({
         include: ['path', 'fs', 'constants', 'stream', 'util', 'zlib'],

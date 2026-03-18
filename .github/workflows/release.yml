@@ -3,10 +3,18 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      release_type:
+        description: Release type
+        type: choice
+        required: true
+        default: official
+        options:
+          - official
+          - nightly
       bump:
         description: Version bump type
         type: choice
-        required: true
+        required: false
         default: patch
         options:
           - patch
@@ -21,6 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      release_name: ${{ steps.version.outputs.release_name }}
+      app_version: ${{ steps.version.outputs.app_version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,35 +39,52 @@ jobs:
           fetch-depth: 0
 
       - id: version
-        name: Calculate next version
+        name: Calculate release metadata
         shell: bash
         run: |
           git fetch --tags
-          latest=$(git tag -l 'V*' --sort=-v:refname | head -n 1)
+          latest_official=$(git tag -l 'V*' --sort=-v:refname | head -n 1)
 
-          if [ -z "$latest" ]; then
-            latest="V0.0.0"
+          if [ -z "$latest_official" ]; then
+            latest_official="V0.0.0"
           fi
 
-          latest=${latest#V}
-          IFS='.' read -r major minor patch <<< "$latest"
+          if [ "${{ inputs.release_type }}" = "nightly" ]; then
+            timestamp_tag=$(date -u +"%Y%m%d-%H%M")
+            timestamp_label=$(date -u +"%d/%m/%Y %I:%M %p")
 
-          case "${{ inputs.bump }}" in
-            major)
-              major=$((major+1))
-              minor=0
-              patch=0
-              ;;
-            minor)
-              minor=$((minor+1))
-              patch=0
-              ;;
-            patch)
-              patch=$((patch+1))
-              ;;
-          esac
+            base_version=${latest_official#V}
+            app_version="${base_version}-nightly.${timestamp_tag//-/}"
 
-          echo "version=V$major.$minor.$patch" >> "$GITHUB_OUTPUT"
+            echo "version=nightly-${timestamp_tag}" >> "$GITHUB_OUTPUT"
+            echo "release_name=Nightly – ${timestamp_label} UTC" >> "$GITHUB_OUTPUT"
+            echo "app_version=${app_version}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            latest=${latest_official#V}
+            IFS='.' read -r major minor patch <<< "$latest"
+
+            case "${{ inputs.bump }}" in
+              major)
+                major=$((major+1))
+                minor=0
+                patch=0
+                ;;
+              minor)
+                minor=$((minor+1))
+                patch=0
+                ;;
+              patch)
+                patch=$((patch+1))
+                ;;
+            esac
+
+            version="V$major.$minor.$patch"
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
+            echo "release_name=Houdoku ${version}" >> "$GITHUB_OUTPUT"
+            echo "app_version=${version#V}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Create and push tag
         run: |
@@ -67,7 +95,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          name: Houdoku ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.release_name }}
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
 
   build:
     needs: tag
@@ -85,24 +114,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install pnpm (latest, with retry)
-        shell: bash
+      - name: Enable pnpm
         run: |
-          set -euo pipefail
           corepack enable
-
-          for attempt in 1 2 3; do
-            echo "Attempt ${attempt}: corepack prepare pnpm@latest --activate"
-            if corepack prepare pnpm@latest --activate; then
-              pnpm --version
-              exit 0
-            fi
-            sleep $((attempt * 5))
-          done
-
-          echo "corepack failed after retries; falling back to npm global install"
-          npm install -g pnpm@latest
-          pnpm --version
+          corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
         run: pnpm install
@@ -111,8 +126,7 @@ jobs:
       - name: Sync app version to release tag
         shell: bash
         run: |
-          VERSION="${{ needs.tag.outputs.version }}"
-          VERSION="${VERSION#V}"
+          VERSION="${{ needs.tag.outputs.app_version }}"
           
           # Update apps/desktop/package.json using Node.js directly
           # This is more reliable in pnpm monorepos than using npm version
@@ -145,7 +159,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.tag.outputs.version }}
-          name: Houdoku ${{ needs.tag.outputs.version }}
+          name: ${{ needs.tag.outputs.release_name }}
+          prerelease: ${{ needs.tag.outputs.prerelease == 'true' }}
           overwrite_files: true
           files: |
             apps/desktop/release/*.AppImage

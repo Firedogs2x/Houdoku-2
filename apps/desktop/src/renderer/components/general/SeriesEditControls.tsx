@@ -96,42 +96,6 @@ export const SeriesEditControls: React.FC<Props> = (props: Props) => {
           />
         </div>
         <div className="flex space-x-2 items-center">
-          <Label className="min-w-20 text-right">Alt. 1</Label>
-          <Input
-            className="w-full"
-            title={props.series.altTitles?.[0] || ''}
-            value={props.series.altTitles?.[0] || ''}
-            placeholder={'Alternate Title 1'}
-            onChange={(e) => {
-              const newAltTitles = [...(props.series.altTitles || [])];
-              newAltTitles[0] = e.target.value;
-              props.setSeries({
-                ...props.series,
-                altTitles: newAltTitles,
-              });
-            }}
-            disabled={!props.editable}
-          />
-        </div>
-        <div className="flex space-x-2 items-center">
-          <Label className="min-w-20 text-right">Alt. 2</Label>
-          <Input
-            className="w-full"
-            title={props.series.altTitles?.[1] || ''}
-            value={props.series.altTitles?.[1] || ''}
-            placeholder={'Alternate Title 2'}
-            onChange={(e) => {
-              const newAltTitles = [...(props.series.altTitles || [])];
-              newAltTitles[1] = e.target.value;
-              props.setSeries({
-                ...props.series,
-                altTitles: newAltTitles,
-              });
-            }}
-            disabled={!props.editable}
-          />
-        </div>
-        <div className="flex space-x-2 items-center">
           <Label className="min-w-20 text-right">Description</Label>
           <Input
             className="w-full"

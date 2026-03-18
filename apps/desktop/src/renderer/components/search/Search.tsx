@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ExtensionMetadata, FilterOption, Series, SeriesListResponse } from '@tiyo/common';
 const { ipcRenderer } = require('electron');
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -31,59 +31,42 @@ const Search: React.FC = () => {
   const [addModalEditable, setAddModalEditable] = useRecoilState(addModalEditableState);
   const [showingAddModal, setShowingAddModal] = useRecoilState(showingAddModalState);
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([]);
-  const loadingRef = useRef(false);
-  const pendingFreshSearchRef = useRef(false);
 
   const handleSearch = async (fresh = false) => {
-    if (loadingRef.current) {
-      if (fresh) pendingFreshSearchRef.current = true;
-      return;
+    if (!loading) {
+      setLoading(true);
+
+      const page = fresh ? 1 : nextSourcePage;
+      const curSeriesList = fresh ? [] : searchResult.seriesList;
+      if (fresh) setSearchResult({ seriesList: [], hasMore: false });
+
+      const respPromise =
+        searchText.length === 0
+          ? ipcRenderer.invoke(
+              ipcChannels.EXTENSION.DIRECTORY,
+              searchExtension,
+              page,
+              filterValuesMap[searchExtension] || {},
+            )
+          : ipcRenderer.invoke(
+              ipcChannels.EXTENSION.SEARCH,
+              searchExtension,
+              searchText,
+              page,
+              filterValuesMap[searchExtension] || {},
+            );
+
+      await respPromise
+        .then((resp: SeriesListResponse) => {
+          setSearchResult({
+            seriesList: curSeriesList.concat(resp.seriesList),
+            hasMore: resp.hasMore,
+          });
+          setNextSourcePage(page + 1);
+        })
+        .finally(() => setLoading(false))
+        .catch((e) => console.error(e));
     }
-
-    loadingRef.current = true;
-    setLoading(true);
-
-    const page = fresh ? 1 : nextSourcePage;
-    const curSeriesList = fresh ? [] : searchResult.seriesList;
-    if (fresh) {
-      pendingFreshSearchRef.current = false;
-      setSearchResult({ seriesList: [], hasMore: false });
-    }
-
-    const respPromise =
-      searchText.length === 0
-        ? ipcRenderer.invoke(
-            ipcChannels.EXTENSION.DIRECTORY,
-            searchExtension,
-            page,
-            filterValuesMap[searchExtension] || {},
-          )
-        : ipcRenderer.invoke(
-            ipcChannels.EXTENSION.SEARCH,
-            searchExtension,
-            searchText,
-            page,
-            filterValuesMap[searchExtension] || {},
-          );
-
-    await respPromise
-      .then((resp: SeriesListResponse) => {
-        setSearchResult({
-          seriesList: curSeriesList.concat(resp.seriesList),
-          hasMore: resp.hasMore,
-        });
-        setNextSourcePage(page + 1);
-      })
-      .catch((e) => console.error(e))
-      .finally(() => {
-        loadingRef.current = false;
-        setLoading(false);
-
-        if (pendingFreshSearchRef.current) {
-          pendingFreshSearchRef.current = false;
-          void handleSearch(true);
-        }
-      });
   };
 
   const handleSearchFilesystem = async (searchPaths: string[]) => {
@@ -113,13 +96,13 @@ const Search: React.FC = () => {
       .then((list: ExtensionMetadata[]) => setExtensionList(list))
       .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION.GET_FILTER_OPTIONS, searchExtension))
       .then((opts: FilterOption[]) => {
-        setFilterValuesMap((prev) => ({
-          ...prev,
+        setFilterValuesMap({
+          ...filterValuesMap,
           [searchExtension]: {
             ...Object.fromEntries(opts.map((opt) => [opt.id, opt.defaultValue])),
-            ...prev[searchExtension],
+            ...filterValuesMap[searchExtension],
           },
-        }));
+        });
         setFilterOptions(opts);
       })
       .then(() => handleSearch(true))
@@ -129,7 +112,7 @@ const Search: React.FC = () => {
   if (extensionList.length === 0) return <></>;
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full min-h-0 flex flex-col overflow-hidden">
       <AddSeriesModal
         showing={showingAddModal}
         setShowing={(showing) => {
@@ -141,9 +124,6 @@ const Search: React.FC = () => {
       />
       <SearchFilterDrawer
         filterOptions={filterOptions}
-        onFilterChange={() => {
-          handleSearch(true);
-        }}
         onClose={(wasChanged) => {
           if (wasChanged) handleSearch(true);
         }}

@@ -58,7 +58,7 @@ const SearchFilterSort: React.FC<Props> = (props: Props) => {
             return (
               <DropdownMenuItem
                 key={field.key}
-                onSelect={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   toggleValue(field.key);
                 }}

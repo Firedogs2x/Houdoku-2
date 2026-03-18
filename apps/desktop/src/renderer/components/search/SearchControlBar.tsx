@@ -347,7 +347,7 @@ const SearchControlBar: React.FC<Props> = (props: Props) => {
   };
 
   return (
-    <div className="flex space-x-2 py-3">
+    <div className="flex space-x-2 py-3 flex-shrink-0">
       <Select
         defaultValue={searchExtension}
         onValueChange={(value) => setSearchExtension(value || searchExtension)}
