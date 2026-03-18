@@ -50,6 +50,9 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
   const [maxPageWidth, setMaxPageWidth] = useRecoilState(maxPageWidthState);
   const pageWidthMetric = useRecoilValue(pageWidthMetricState);
   const optimizeContrast = useRecoilValue(optimizeContrastState);
+  const usesInternalScrollViewport = pageStyle === PageStyle.LongStrip || !fitContainToHeight;
+
+  const getScrollContainer = () => viewerContainer.current ?? document.getElementById(ROOT_ID);
 
   const viewerContainerClickHandler = (e: React.MouseEvent) => {
     if (pageStyle === PageStyle.LongStrip) {
@@ -185,42 +188,46 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
    * Only updates the page number when on the LongStrip style.
    */
   useEffect(() => {
+    const scrollContainer = getScrollContainer();
     const root = document.getElementById(ROOT_ID);
     const readerPage = root?.firstElementChild;
 
-    if (root && readerPage) {
-      if (pageStyle === PageStyle.LongStrip) {
-        root.onscroll = () => {
-          if (viewerContainer.current) {
-            let imageHeightSum = 0;
-
-            let childNum = 0;
-            for (
-              childNum = 0;
-              childNum < viewerContainer.current.children.length &&
-              imageHeightSum <
-                root.scrollTop +
-                  root.clientHeight -
-                  parseInt(getComputedStyle(readerPage).marginTop, 10);
-              childNum += 1
-            ) {
-              imageHeightSum += viewerContainer.current.children[childNum].clientHeight;
-            }
-
-            if (pageNumber !== childNum && childNum <= lastPageNumber && childNum > 0) {
-              // TODO: force ignore automatic batching. Prefer to replace this with
-              // detection from ScrollArea
-              flushSync(() => {
-                setSkipChangePageNumEffect(true);
-                setPageNumber(childNum);
-              });
-            }
-          }
-        };
-      } else {
-        root.onscroll = () => true;
-      }
+    if (!scrollContainer || !readerPage || pageStyle !== PageStyle.LongStrip) {
+      return;
     }
+
+    const onScroll = () => {
+      if (viewerContainer.current) {
+        let imageHeightSum = 0;
+
+        let childNum = 0;
+        for (
+          childNum = 0;
+          childNum < viewerContainer.current.children.length &&
+          imageHeightSum <
+            scrollContainer.scrollTop +
+              scrollContainer.clientHeight -
+              parseInt(getComputedStyle(readerPage).marginTop, 10);
+          childNum += 1
+        ) {
+          imageHeightSum += viewerContainer.current.children[childNum].clientHeight;
+        }
+
+        if (pageNumber !== childNum && childNum <= lastPageNumber && childNum > 0) {
+          // TODO: force ignore automatic batching. Prefer to replace this with
+          // detection from ScrollArea
+          flushSync(() => {
+            setSkipChangePageNumEffect(true);
+            setPageNumber(childNum);
+          });
+        }
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      scrollContainer.removeEventListener('scroll', onScroll);
+    };
   }, [pageStyle, lastPageNumber, pageNumber]);
 
   /**
@@ -231,6 +238,8 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
    * to the button of the previous page.
    */
   useEffect(() => {
+    const scrollContainer = getScrollContainer();
+
     if (pageStyle === PageStyle.LongStrip) {
       if (skipChangePageNumEffect) {
         setSkipChangePageNumEffect(false);
@@ -243,14 +252,13 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
           // since the image is covered by the header
           const root = document.getElementById(ROOT_ID);
           const readerPage = root?.firstElementChild;
-          if (root && readerPage && pageNumber < lastPageNumber) {
-            root.scrollTop -= parseInt(getComputedStyle(readerPage).marginTop, 10);
+          if (scrollContainer && readerPage && pageNumber < lastPageNumber) {
+            scrollContainer.scrollTop -= parseInt(getComputedStyle(readerPage).marginTop, 10);
           }
         }
       }
     } else {
-      const root = document.getElementById(ROOT_ID);
-      if (root) root.scrollTop = 0;
+      if (scrollContainer) scrollContainer.scrollTop = 0;
     }
   }, [pageStyle, pageNumber, lastPageNumber]);
 
@@ -280,9 +288,11 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
       {/* {props.overlayPageNumber ? renderPageNumberOverlay() : <></>} */}
       <div
         ref={viewerContainer}
-        className={`
-          ${styles.container}
-          ${hideScrollbar ? styles.noScrollbar : ''}`}
+        className={cn(
+          styles.container,
+          usesInternalScrollViewport && styles.scrollViewport,
+          hideScrollbar && styles.noScrollbar,
+        )}
         style={{ ['--USER-MAX-PAGE-WIDTH' as string]: `${maxPageWidth}${pageWidthMetric}` }}
         onClick={(e) => viewerContainerClickHandler(e)}
       >

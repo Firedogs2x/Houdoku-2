@@ -6,6 +6,21 @@ img {
   width: 100%;
 }
 
+.container.scrollViewport {
+  height: calc(100vh - var(--titlebar-height));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.noScrollbar {
+  scrollbar-width: none;
+}
+
+.noScrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .page {
   width: 100%;
   display: flex;
