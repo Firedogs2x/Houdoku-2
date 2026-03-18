@@ -115,15 +115,17 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
     chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 
+  const nextChapters = Object.values(chapterMap);
+
   persistantStore.write(
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${series.id}`,
-    JSON.stringify(Object.values(chapterMap)),
+    JSON.stringify(nextChapters),
   );
 
   // Update the series unread status after upserting chapters
   const updatedSeries = fetchSeries(series.id);
   if (updatedSeries) {
-    const unread = !Object.values(chapterMap).some((c: Chapter) => c.read);
+    const unread = !nextChapters.some((c: Chapter) => c.read);
     const seriesWithUnread = { ...updatedSeries, unread };
     upsertSeries(seriesWithUnread);
   }
@@ -148,7 +150,7 @@ const removeChapters = (chapterIds: string[], seriesId: string): void => {
 
   persistantStore.write(
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
-    JSON.stringify(Object.values(filteredChapters)),
+    JSON.stringify(filteredChapters),
   );
 
   // Update the series unread status after removing chapters

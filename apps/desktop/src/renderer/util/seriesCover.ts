@@ -50,7 +50,10 @@ export const getSeriesCoverUrl = (
   }
 
   if (coverUrlCache.size >= MAX_COVER_CACHE_SIZE) {
-    coverUrlCache.clear();
+    const oldestCacheKey = coverUrlCache.keys().next().value;
+    if (oldestCacheKey) {
+      coverUrlCache.delete(oldestCacheKey);
+    }
   }
 
   coverUrlCache.set(cacheKey, coverUrl);
