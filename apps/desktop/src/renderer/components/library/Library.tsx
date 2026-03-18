@@ -252,7 +252,7 @@ const Library: React.FC<Props> = () => {
   // Fetching 460+ series on every navigation was triggering React's "maximum update depth" protection.
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full min-h-0 flex flex-col overflow-hidden overscroll-none">
       {multiSelectEnabled ? (
         <LibraryControlBarMultiSelect
           showAssignCategoriesModal={() => console.log('TODO placeholder')}
@@ -260,7 +260,10 @@ const Library: React.FC<Props> = () => {
       ) : (
         <LibraryControlBar getFilteredList={getFilteredList} />
       )}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 min-h-0 w-full pr-4 -mr-2">
+      <ScrollArea
+        ref={scrollAreaRef}
+        className="flex-1 min-h-0 w-full overflow-hidden overscroll-contain pr-4 -mr-2"
+      >
         {activeSeriesList.length === 0 && renderEmptyMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
         {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}
