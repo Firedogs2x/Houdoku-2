@@ -1,7 +1,4 @@
-const fs = require('fs');
-import path from 'path';
 import React, { useEffect } from 'react';
-const { ipcRenderer } = require('electron');
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Series = any;
@@ -13,9 +10,6 @@ interface SeriesWithRating extends Record<string, unknown> {
 }
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import blankCover from '@/renderer/img/blank_cover.png';
-import ipcChannels from '@/common/constants/ipcChannels.json';
-import constants from '@/common/constants/constants.json';
 import {
   multiSelectEnabledState,
   multiSelectSeriesListState,
@@ -29,17 +23,12 @@ import { goToSeries } from '@/renderer/features/library/utils';
 import ExtensionImage from '../general/ExtensionImage';
 import { LibraryView } from '@/common/models/types';
 import LibraryGridContextMenu from './LibraryGridContextMenu';
-import { FS_METADATA } from '@/common/temp_fs_metadata';
 import library from '@/renderer/services/library';
+import { getSeriesCoverUrl } from '@/renderer/util/seriesCover';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
 import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
 import { Star } from 'lucide-react';
-
-const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
-if (!fs.existsSync(thumbnailsDir)) {
-  fs.mkdirSync(thumbnailsDir);
-}
 
 type Props = {
   getFilteredList: () => Series[];
@@ -60,28 +49,6 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
     goToSeries(series, navigate);
   };
 
-  /**
-   * Get the cover image source of a series.
-   * If the series id is non-undefined (i.e. it is in the user's library) we first try to find the
-   * downloaded thumbnail image. If it doesn't exist, we return the blankCover path.
-   * @param series
-   * @returns the cover image for a series, which can be put in an <img> tag
-   */
-  const getImageSource = (series: Series) => {
-    const fileExtensions = constants.IMAGE_EXTENSIONS;
-    for (let i = 0; i < fileExtensions.length; i += 1) {
-      const thumbnailPath = path.join(thumbnailsDir, `${series.id}.${fileExtensions[i]}`);
-      if (fs.existsSync(thumbnailPath)) return `atom://${encodeURIComponent(thumbnailPath)}`;
-    }
-
-    if (series.extensionId === FS_METADATA.id) {
-      return series.remoteCoverUrl
-        ? `atom://${encodeURIComponent(series.remoteCoverUrl)}`
-        : blankCover;
-    }
-    return series.remoteCoverUrl || blankCover;
-  };
-
   useEffect(() => {
     if (multiSelectSeriesList.length === 0) setMultiSelectEnabled(false);
   }, [multiSelectSeriesList]);
@@ -97,7 +64,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
       )}
     >
       {props.getFilteredList().map((series: Series) => {
-        const coverSource = getImageSource(series).replaceAll('\\', '/');
+        const coverSource = getSeriesCoverUrl(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
         const chapters = series.id ? library.fetchChapters(series.id) : [];
         const totalChapters = chapters.length;

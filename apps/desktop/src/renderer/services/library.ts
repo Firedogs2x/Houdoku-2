@@ -86,18 +86,11 @@ const upsertSeries = (series: Series): Series => {
 
   const filteredList = existingList.filter((s: Series) => s.id !== newSeries.id);
 
-  console.log(`[library.upsertSeries] Writing series to storage: title="${newSeries.title}", id=${seriesId}, numberUnread=${newSeries.numberUnread}, unread=${newSeries.unread}`);
-
   persistantStore.write(
     `${storeKeys.LIBRARY.SERIES_LIST}`,
     JSON.stringify([...filteredList, newSeries]),
   );
-  
-  console.log(`[library.upsertSeries] Successfully persisted. Verify by reading back...`);
-  const verifyList = fetchSeriesList();
-  const verifyThis = verifyList.find(s => s.id === seriesId);
-  console.log(`[library.upsertSeries] Verified persisted data: title="${verifyThis?.title}", numberUnread=${verifyThis?.numberUnread}, unread=${verifyThis?.unread}`);
-  
+
   return newSeries;
 };
 

@@ -1,9 +1,6 @@
-const fs = require('fs');
 import React from 'react';
 import { useSetRecoilState } from 'recoil';
-const { ipcRenderer } = require('electron');
 import { Languages, Series } from '@tiyo/common';
-import ipcChannels from '@/common/constants/ipcChannels.json';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@houdoku/ui/components/Card';
 import {
@@ -16,11 +13,6 @@ import {
 } from '@houdoku/ui/components/Select';
 import { seriesListState, seriesState } from '@/renderer/state/libraryStates';
 import library from '@/renderer/services/library';
-
-const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
-if (!fs.existsSync(thumbnailsDir)) {
-  fs.mkdirSync(thumbnailsDir);
-}
 
 type Props = {
   series: Series;

@@ -34,7 +34,7 @@ jobs:
       prerelease: ${{ steps.meta.outputs.prerelease }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5.0.1
         with:
           fetch-depth: 0
 
@@ -97,7 +97,7 @@ jobs:
           git push origin "${{ steps.meta.outputs.tag_name }}"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.3
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
           name: ${{ steps.meta.outputs.release_name }}
@@ -111,7 +111,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5.0.1
         with:
           ref: ${{ needs.tag.outputs.tag_name }}
 
@@ -175,7 +175,7 @@ jobs:
 
       # 🔧 FIX #2 — enforce tag-based release + proper title
       - name: Upload release assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.3
         with:
           tag_name: ${{ needs.tag.outputs.tag_name }}
           name: ${{ needs.tag.outputs.release_name }}

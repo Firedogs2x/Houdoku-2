@@ -1,22 +1,14 @@
-const fs = require('fs');
 import React from 'react';
-const { ipcRenderer } = require('electron');
 import { useRecoilValue } from 'recoil';
-import path from 'path';
-import { Series } from '@tiyo/common';
-import blankCover from '@/renderer/img/blank_cover.png';
-import ipcChannels from '@/common/constants/ipcChannels.json';
 import { currentExtensionMetadataState } from '@/renderer/state/libraryStates';
-import constants from '@/common/constants/constants.json';
-import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
 import { Badge } from '@houdoku/ui/components/Badge';
+import { getSeriesCoverUrl } from '../../../util/seriesCover';
 import ExtensionImage from '../../general/ExtensionImage';
 
-const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
-if (!fs.existsSync(thumbnailsDir)) {
-  fs.mkdirSync(thumbnailsDir);
-}
+// `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues.
+// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
+type Series = any;
 
 type Props = {
   series: Series;
@@ -25,27 +17,12 @@ type Props = {
 const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
   const currentExtensionMetadata = useRecoilValue(currentExtensionMetadataState);
 
-  const getThumbnailPath = () => {
-    const fileExtensions = constants.IMAGE_EXTENSIONS;
-    for (let i = 0; i < fileExtensions.length; i += 1) {
-      const thumbnailPath = path.join(thumbnailsDir, `${props.series.id}.${fileExtensions[i]}`);
-      if (fs.existsSync(thumbnailPath)) return `atom://${encodeURIComponent(thumbnailPath)}`;
-    }
-
-    if (props.series.extensionId === FS_METADATA.id) {
-      return props.series.remoteCoverUrl
-        ? `atom://${encodeURIComponent(props.series.remoteCoverUrl)}`
-        : blankCover;
-    }
-    return props.series.remoteCoverUrl || blankCover;
-  };
-
   return (
     <div>
       <div className="flex">
         <div className="max-w-[140px] md:max-w-[180px]">
           <ExtensionImage
-            url={getThumbnailPath().replaceAll('\\', '/')}
+            url={getSeriesCoverUrl(props.series).replaceAll('\\', '/')}
             series={props.series}
             alt={props.series.title}
             className="w-auto h-auto -mt-[70%] aspect-[70/100] object-cover rounded-sm"
