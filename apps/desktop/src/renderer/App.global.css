@@ -107,15 +107,16 @@
 body {
   /* height: 100vh; */
   overflow-y: hidden;
+  overflow-x: hidden;
   font-family: Arial, Helvetica, Helvetica Neue, serif;
   font-size: 14px;
 }
 
 #root {
-  height: calc(100vh - 24px);
-  overflow-y: auto;
-
   --titlebar-height: 24px;
+  height: calc(100vh - var(--titlebar-height));
+  overflow-y: hidden;
+  overflow-x: hidden;
   margin-top: var(--titlebar-height);
 }
 
