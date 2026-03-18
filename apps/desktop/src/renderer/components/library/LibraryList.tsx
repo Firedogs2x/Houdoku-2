@@ -8,7 +8,7 @@ import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextM
 import LibraryGridContextMenu from './LibraryGridContextMenu';
 
 type Props = {
-  getFilteredList: () => Series[];
+  seriesList: Series[];
   showRemoveModal: (series: Series) => void;
 };
 
@@ -27,7 +27,7 @@ const LibraryList: React.FC<Props> = (props: Props) => {
   return (
     <Table>
       <TableBody>
-        {props.getFilteredList().map((series) => (
+        {props.seriesList.map((series) => (
           <>
             <ContextMenu>
               <ContextMenuTrigger asChild>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Series, Chapter } from '@tiyo/common';
+import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import LibraryControlBar from './LibraryControlBar';
 import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';
@@ -22,7 +22,7 @@ import {
 } from '@/renderer/state/settingStates';
 import LibraryGrid from './LibraryGrid';
 import LibraryList from './LibraryList';
-import library from '@/renderer/services/library';
+import { buildSeriesChapterMetadataMap } from '@/renderer/util/librarySeriesMetadata';
 import LibraryControlBarMultiSelect from './LibraryControlBarMultiSelect';
 import { ScrollArea, ScrollBar } from '@houdoku/ui/components/ScrollArea';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
@@ -99,14 +99,7 @@ const Library: React.FC<Props> = () => {
     };
   }, [setScrollPosition]);
 
-  /**
-   * Get a filtered (and sorted) list of series after applying the specified filters.
-   * TODO: this can probably be moved into a Recoil selector
-   * @param seriesList the list of series to filter
-   * @returns a sorted list of series matching all filter props
-   */
-  const getFilteredList = (): Series[] => {
-    const filteredList = activeSeriesList.filter((series: Series) => {
+  const filteredList = activeSeriesList.filter((series: Series) => {
       if (!series) return false;
 
       if (series.preview) return false;
@@ -135,6 +128,9 @@ const Library: React.FC<Props> = () => {
       return true;
     });
 
+  const seriesChapterMetadata = buildSeriesChapterMetadataMap(filteredList);
+
+  const sortedFilteredList = (() => {
     switch (librarySort) {
       case LibrarySort.UnreadAsc:
         return filteredList.sort((a: Series, b: Series) => a.numberUnread - b.numberUnread);
@@ -146,9 +142,8 @@ const Library: React.FC<Props> = () => {
         return filteredList.sort((a: Series, b: Series) => b.title.localeCompare(a.title));
       case LibrarySort.DateLastRead:
         return filteredList.sort((a: Series, b: Series) => {
-          // Sort by latest date first
-          const dateCompare = new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();
-          // If dates are equal, sort alphabetically A to Z
+          const dateCompare =
+            new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();
           if (dateCompare === 0) {
             return a.title.localeCompare(b.title);
           }
@@ -156,24 +151,10 @@ const Library: React.FC<Props> = () => {
         });
       case LibrarySort.ChapterUpdate:
         return filteredList.sort((a: Series, b: Series) => {
-          // Get latest chapter added date for each series
-          const aChapters = a.id ? library.fetchChapters(a.id) : [];
-          const bChapters = b.id ? library.fetchChapters(b.id) : [];
-          
-          const getLatestChapterDate = (chapters: Chapter[]) => {
-            return chapters.reduce((latest: number, chapter: Chapter) => {
-              if (!chapter?.dateAdded) return latest;
-              const chapterDate = new Date(chapter.dateAdded).getTime();
-              return chapterDate > latest ? chapterDate : latest;
-            }, 0);
-          };
-          
-          const aLatestDate = getLatestChapterDate(aChapters);
-          const bLatestDate = getLatestChapterDate(bChapters);
-          
-          // Sort by latest chapter date first (latest first)
+          const aLatestDate = a.id ? seriesChapterMetadata[a.id]?.latestChapterAddedTimestamp || 0 : 0;
+          const bLatestDate = b.id ? seriesChapterMetadata[b.id]?.latestChapterAddedTimestamp || 0 : 0;
+
           const dateCompare = bLatestDate - aLatestDate;
-          // If dates are equal, sort alphabetically A to Z
           if (dateCompare === 0) {
             return a.title.localeCompare(b.title);
           }
@@ -182,7 +163,9 @@ const Library: React.FC<Props> = () => {
       default:
         return filteredList;
     }
-  };
+  })();
+
+  const getFilteredList = (): Series[] => sortedFilteredList;
 
   const renderLibrary = () => {
     return (
@@ -195,7 +178,7 @@ const Library: React.FC<Props> = () => {
 
         {libraryView === LibraryView.List ? (
           <LibraryList
-            getFilteredList={getFilteredList}
+            seriesList={sortedFilteredList}
             showRemoveModal={(series) => {
               setRemoveModalSeries(series);
               setRemoveModalShowing(true);
@@ -203,7 +186,8 @@ const Library: React.FC<Props> = () => {
           />
         ) : (
           <LibraryGrid
-            getFilteredList={getFilteredList}
+            seriesList={sortedFilteredList}
+            seriesChapterMetadata={seriesChapterMetadata}
             showRemoveModal={(series) => {
               setRemoveModalSeries(series);
               setRemoveModalShowing(true);
@@ -265,8 +249,8 @@ const Library: React.FC<Props> = () => {
         className="flex-1 min-h-0 w-full overflow-hidden overscroll-contain pr-4 -mr-2"
       >
         {activeSeriesList.length === 0 && renderEmptyMessage()}
-        {activeSeriesList.length > 0 && getFilteredList().length === 0 && renderNoneMatchMessage()}
-        {activeSeriesList.length > 0 && getFilteredList().length > 0 && renderLibrary()}
+        {activeSeriesList.length > 0 && sortedFilteredList.length === 0 && renderNoneMatchMessage()}
+        {activeSeriesList.length > 0 && sortedFilteredList.length > 0 && renderLibrary()}
         <ScrollBar thumbClassName="custom-scrollbar-thumb" />
       </ScrollArea>
     </div>

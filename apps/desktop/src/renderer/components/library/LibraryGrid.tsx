@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Series = any;
-// biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
-type Chapter = any;
 // Series extended with optional rating property for star rating feature
 interface SeriesWithRating extends Record<string, unknown> {
   rating?: number;
@@ -23,15 +21,16 @@ import { goToSeries } from '@/renderer/features/library/utils';
 import ExtensionImage from '../general/ExtensionImage';
 import { LibraryView } from '@/common/models/types';
 import LibraryGridContextMenu from './LibraryGridContextMenu';
-import library from '@/renderer/services/library';
 import { getSeriesCoverUrl } from '@/renderer/util/seriesCover';
+import { SeriesChapterMetadata } from '@/renderer/util/librarySeriesMetadata';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { cn } from '@houdoku/ui/util';
 import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
 import { Star } from 'lucide-react';
 
 type Props = {
-  getFilteredList: () => Series[];
+  seriesList: Series[];
+  seriesChapterMetadata: Record<string, SeriesChapterMetadata>;
   showRemoveModal: (series: Series) => void;
 };
 
@@ -63,23 +62,16 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         `grid gap-2`,
       )}
     >
-      {props.getFilteredList().map((series: Series) => {
+      {props.seriesList.map((series: Series) => {
         const coverSource = getSeriesCoverUrl(series).replaceAll('\\', '/');
         const isMultiSelected = multiSelectSeriesList.includes(series);
-        const chapters = series.id ? library.fetchChapters(series.id) : [];
-        const totalChapters = chapters.length;
+        const chapterMetadata = series.id ? props.seriesChapterMetadata[series.id] : undefined;
+        const totalChapters = chapterMetadata?.totalChapters || 0;
         const hasUnreadFlag = series.unread === true;
-        const hasNewDate =
-          series.lastReadDate && chapters.some((c: Chapter) => c.dateAdded && new Date(c.dateAdded) > new Date(series.lastReadDate));
+        const hasNewDate = chapterMetadata?.hasNewChaptersSinceLastRead || false;
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
         const ratingValue = (series as SeriesWithRating).rating ?? 0;
-        const latestChapterAddedDate = chapters.reduce((latest: string | undefined, chapter: Chapter) => {
-          if (!chapter?.dateAdded) return latest;
-          if (!latest) return chapter.dateAdded;
-          return new Date(chapter.dateAdded).getTime() > new Date(latest).getTime()
-            ? chapter.dateAdded
-            : latest;
-        }, undefined);
+        const latestChapterAddedDate = chapterMetadata?.latestChapterAddedDate;
 
         return (
           <div key={`${series.id}-${series.title}`} className="space-y-2">

@@ -42,11 +42,7 @@ export async function loadPlugins(spoofWindow: BrowserWindow) {
       const mod = aki.load(
         PLUGINS_DIR,
         pluginName,
-        /**
-         *  TODO can maybe remove this eval now. It was done here to avoid being
-         *  overwritten by webpack, which doesn't seem to happen with vite
-         */
-        eval('require') as NodeRequire,
+        require as NodeRequire,
       );
 
       TIYO_CLIENT = new mod.TiyoClient(spoofWindow);

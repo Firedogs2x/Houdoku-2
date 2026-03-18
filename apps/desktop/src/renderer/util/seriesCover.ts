@@ -6,6 +6,7 @@ import blankCover from '@/renderer/img/blank_cover.png';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
+import { toAtomUrl } from '@/renderer/util/atomUrl';
 
 const MAX_COVER_CACHE_SIZE = 1000;
 
@@ -15,8 +16,6 @@ if (!fs.existsSync(thumbnailsDir)) {
 }
 
 const coverUrlCache = new Map<string, string>();
-
-const toAtomUrl = (localPath: string) => `atom://${encodeURIComponent(localPath)}`;
 
 const getCoverCacheKey = (
   series: Pick<Series, 'id' | 'extensionId' | 'remoteCoverUrl'>,
