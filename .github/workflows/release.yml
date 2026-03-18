@@ -3,6 +3,14 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      release_type:
+        description: Release type
+        type: choice
+        required: true
+        default: official
+        options:
+          - official
+          - nightly
       bump:
         description: Version bump type
         type: choice
@@ -20,17 +28,21 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      tag_name: ${{ steps.meta.outputs.tag_name }}
+      release_name: ${{ steps.meta.outputs.release_name }}
+      app_version: ${{ steps.meta.outputs.app_version }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - id: version
-        name: Calculate next version
+      - id: meta
+        name: Calculate release metadata
         shell: bash
         run: |
+          set -euo pipefail
           git fetch --tags
           latest=$(git tag -l 'V*' --sort=-v:refname | head -n 1)
 
@@ -38,36 +50,58 @@ jobs:
             latest="V0.0.0"
           fi
 
-          latest=${latest#V}
-          IFS='.' read -r major minor patch <<< "$latest"
+          base_version=${latest#V}
+          release_type="${{ inputs.release_type }}"
 
-          case "${{ inputs.bump }}" in
-            major)
-              major=$((major+1))
-              minor=0
-              patch=0
-              ;;
-            minor)
-              minor=$((minor+1))
-              patch=0
-              ;;
-            patch)
-              patch=$((patch+1))
-              ;;
-          esac
+          if [ "$release_type" = "official" ]; then
+            IFS='.' read -r major minor patch <<< "$base_version"
 
-          echo "version=V$major.$minor.$patch" >> "$GITHUB_OUTPUT"
+            case "${{ inputs.bump }}" in
+              major)
+                major=$((major+1))
+                minor=0
+                patch=0
+                ;;
+              minor)
+                minor=$((minor+1))
+                patch=0
+                ;;
+              patch)
+                patch=$((patch+1))
+                ;;
+            esac
+
+            tag_name="V$major.$minor.$patch"
+            release_name="Houdoku $tag_name"
+            app_version="${tag_name#V}"
+            prerelease="false"
+          else
+            nightly_stamp="$(date -u +"%Y%m%d-%H%M")"
+            nightly_display="$(date -u +"%d/%m/%Y %I:%M %p" | tr '[:upper:]' '[:lower:]')"
+
+            # Keep git ref safe while exposing a friendly release title.
+            tag_name="nightly-$nightly_stamp"
+            release_name="Nightly - $nightly_display UTC"
+            app_version="$base_version-nightly.${GITHUB_RUN_NUMBER:-0}"
+            prerelease="true"
+          fi
+
+          echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+          echo "release_name=$release_name" >> "$GITHUB_OUTPUT"
+          echo "app_version=$app_version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
         run: |
-          git tag "${{ steps.version.outputs.version }}"
-          git push origin "${{ steps.version.outputs.version }}"
+          git tag "${{ steps.meta.outputs.tag_name }}"
+          git push origin "${{ steps.meta.outputs.tag_name }}"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: Houdoku ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.meta.outputs.tag_name }}
+          name: ${{ steps.meta.outputs.release_name }}
+          prerelease: ${{ steps.meta.outputs.prerelease }}
 
   build:
     needs: tag
@@ -79,7 +113,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.tag.outputs.version }}
+          ref: ${{ needs.tag.outputs.tag_name }}
 
       - uses: actions/setup-node@v4
         with:
@@ -111,8 +145,7 @@ jobs:
       - name: Sync app version to release tag
         shell: bash
         run: |
-          VERSION="${{ needs.tag.outputs.version }}"
-          VERSION="${VERSION#V}"
+          VERSION="${{ needs.tag.outputs.app_version }}"
           
           # Update apps/desktop/package.json using Node.js directly
           # This is more reliable in pnpm monorepos than using npm version
@@ -144,8 +177,9 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.tag.outputs.version }}
-          name: Houdoku ${{ needs.tag.outputs.version }}
+          tag_name: ${{ needs.tag.outputs.tag_name }}
+          name: ${{ needs.tag.outputs.release_name }}
+          prerelease: ${{ needs.tag.outputs.prerelease }}
           overwrite_files: true
           files: |
             apps/desktop/release/*.AppImage
