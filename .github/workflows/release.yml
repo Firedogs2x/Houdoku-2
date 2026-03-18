@@ -115,30 +115,16 @@ jobs:
         with:
           ref: ${{ needs.tag.outputs.tag_name }}
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
       - uses: actions/setup-node@v5.0.0
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install pnpm (latest, with retry)
-        shell: bash
-        run: |
-          set -euo pipefail
-          corepack enable
-
-          for attempt in 1 2 3; do
-            echo "Attempt ${attempt}: corepack prepare pnpm@latest --activate"
-            if corepack prepare pnpm@latest --activate; then
-              pnpm --version
-              exit 0
-            fi
-            sleep $((attempt * 5))
-          done
-
-          echo "corepack failed after retries; falling back to npm global install"
-          npm install -g pnpm@latest
-          pnpm --version
 
       - name: Install dependencies
         run: pnpm install
