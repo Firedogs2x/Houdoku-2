@@ -13,7 +13,10 @@
   
     "dist:win": "electron-builder --win --publish never",
     "dist:mac": "electron-builder --mac --publish never",
-    "dist:linux": "electron-builder --linux --publish never"
+    "dist:linux": "electron-builder --linux --publish never",
+    "dist:win:dev": "node ./scripts/build-dev-release.cjs --win",
+    "dist:mac:dev": "node ./scripts/build-dev-release.cjs --mac",
+    "dist:linux:dev": "node ./scripts/build-dev-release.cjs --linux"
   },
   "build": {
     "productName": "Houdoku",

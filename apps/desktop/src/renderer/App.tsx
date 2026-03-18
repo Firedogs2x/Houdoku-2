@@ -153,7 +153,7 @@ export default function App() {
           <AlertDialogHeader>
             <AlertDialogTitle>Update available</AlertDialogTitle>
             {updateStatus?.tiyoUpdateAvailable ? (
-              <AlertDialogDescription>
+              <AlertDialogDescription className="text-white text-base">
                 A new Tiyo version is available. Open the Plugins page to update Tiyo.
               </AlertDialogDescription>
             ) : undefined}
@@ -178,7 +178,7 @@ export default function App() {
           <AlertDialogHeader>
             <AlertDialogTitle>Restart required</AlertDialogTitle>
             {updateInfo && (
-              <AlertDialogDescription>
+              <AlertDialogDescription className="text-white text-base">
                 Houdoku needs to restart to finish installing updates.
               </AlertDialogDescription>
             )}
@@ -199,29 +199,29 @@ export default function App() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center">Version check results</AlertDialogTitle>
             {updateStatus?.houdokuUpToDate !== false ? (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 You are using the most current version of Houdoku.
               </AlertDialogDescription>
             ) : (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 Unable to confirm that you are using the most current version of Houdoku. Please
                 run Check for updates again.
               </AlertDialogDescription>
             )}
             {updateStatus?.tiyoChecked && updateStatus.tiyoUpToDate ? (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 You are using the most current version of Tiyo.
               </AlertDialogDescription>
             ) : updateStatus?.tiyoUpdateAvailable ? (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 A new version of Tiyo is available. Open the Plugins page to update Tiyo.
               </AlertDialogDescription>
             ) : updateStatus?.tiyoInstalled === false ? (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 Tiyo is not installed. Open the Plugins page to install Tiyo.
               </AlertDialogDescription>
             ) : (
-              <AlertDialogDescription className="text-center">
+              <AlertDialogDescription className="text-center text-white text-base">
                 Unable to confirm Tiyo version status right now.
               </AlertDialogDescription>
             )}

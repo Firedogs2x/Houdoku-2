@@ -11,160 +11,101 @@ import {
 } from '@tiyo/common';
 const aki = require('aki-plugin-manager');
 import fs from 'fs';
-import https from 'https';
 import path from 'path';
 import { BrowserWindow, IpcMain } from 'electron';
+import semver from 'semver';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { FSExtensionClient } from './extensions/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { EXTRACT_DIR, PLUGINS_DIR } from '../util/appdata';
-import { installPluginFromLatestReleaseZip } from '../util/pluginReleaseInstaller';
+import {
+  getLatestReleaseZipInfo,
+  installPluginFromLatestReleaseZip,
+} from '../util/pluginReleaseInstaller';
 
 const TIYO_PACKAGE_NAME = '@tiyo/core';
-const NPM_REGISTRY_URL = 'https://registry.npmjs.org';
-const INSTALL_TIMEOUT_MS = 60_000;
 
 let TIYO_CLIENT: TiyoClientInterface | null = null;
 let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
 
-type NpmManifest = {
-  name: string;
-  version: string;
-  dependencies?: Record<string, string>;
-  dist: {
-    tarball: string;
-  };
+type TiyoPluginUpdateStatus = {
+  checked: boolean;
+  installed: boolean;
+  currentVersion?: string;
+  latestVersion?: string;
+  updateAvailable: boolean;
+  error?: string;
 };
 
-const cleanVersion = (version: string): string => {
-  if (version === 'latest') {
-    return version;
+function normalizeVersion(version: string | undefined): string | undefined {
+  if (!version) return undefined;
+  const trimmed = version.trim();
+  if (trimmed.startsWith('V') || trimmed.startsWith('v')) {
+    return trimmed.substring(1);
   }
-  return version.replace(/^\D/, '');
-};
+  return trimmed;
+}
 
-const fetchJson = <T>(url: string): Promise<T> => {
-  return new Promise((resolve, reject) => {
-    const request = https.get(url, (response) => {
-      if ((response.statusCode ?? 500) >= 400) {
-        response.resume();
-        reject(new Error(`HTTP ${response.statusCode} for ${url}`));
-        return;
-      }
+function getInstalledTiyoPackageVersion(): string | undefined {
+  const packagePath = path.join(PLUGINS_DIR, ...TIYO_PACKAGE_NAME.split('/'), 'package.json');
+  if (!fs.existsSync(packagePath)) return undefined;
 
-      let body = '';
-      response.on('data', (chunk) => {
-        body += chunk;
-      });
-      response.on('error', (error) => {
-        reject(error);
-      });
-      response.on('end', () => {
-        try {
-          resolve(JSON.parse(body) as T);
-        } catch {
-          reject(new Error(`Invalid JSON response from ${url}`));
-        }
-      });
-    });
-
-    request.setTimeout(INSTALL_TIMEOUT_MS, () => {
-      request.destroy(new Error(`Request timeout for ${url}`));
-    });
-    request.on('error', (error) => {
-      reject(error);
-    });
-  });
-};
-
-const getTarExtractor = () => {
-  const dynamicRequire = eval('require') as NodeRequire;
-  const tarModule = dynamicRequire('tar') as {
-    x: (opts: { C: string; strip: number }) => NodeJS.WritableStream;
-  };
-  return tarModule;
-};
-
-const downloadAndExtractTarball = (url: string, destinationDir: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    fs.mkdirSync(destinationDir, { recursive: true });
-
-    const request = https.get(url, (response) => {
-      if ((response.statusCode ?? 500) >= 400) {
-        response.resume();
-        reject(new Error(`HTTP ${response.statusCode} while downloading ${url}`));
-        return;
-      }
-
-      const extractStream = getTarExtractor().x({
-        C: destinationDir,
-        strip: 1,
-      });
-
-      extractStream.on('error', (error) => {
-        reject(error);
-      });
-      extractStream.on('close', () => {
-        resolve();
-      });
-
-      response.on('error', (error) => {
-        reject(error);
-      });
-      response.pipe(extractStream);
-    });
-
-    request.setTimeout(INSTALL_TIMEOUT_MS, () => {
-      request.destroy(new Error(`Download timeout for ${url}`));
-    });
-    request.on('error', (error) => {
-      reject(error);
-    });
-  });
-};
-
-const fetchManifest = (name: string, version: string): Promise<NpmManifest> => {
-  const encodedName = name
-    .split('/')
-    .map((segment) => encodeURIComponent(segment))
-    .join('/');
-  const url = `${NPM_REGISTRY_URL}/${encodedName}/${cleanVersion(version)}`;
-  return fetchJson<NpmManifest>(url);
-};
-
-const installPackageRecursive = async (
-  name: string,
-  version: string,
-  baseDir: string,
-): Promise<void> => {
-  const manifest = await fetchManifest(name, version);
-  const installDir = path.join(baseDir, name);
-
-  await downloadAndExtractTarball(manifest.dist.tarball, installDir);
-
-  const dependencies = Object.entries(manifest.dependencies ?? {});
-  for (const [dependencyName, dependencyVersion] of dependencies) {
-    const dependencyBaseDir = path.join(installDir, 'node_modules');
-    await installPackageRecursive(dependencyName, dependencyVersion, dependencyBaseDir);
+  try {
+    const packageJsonText = fs.readFileSync(packagePath, 'utf8');
+    const packageJson = JSON.parse(packageJsonText) as { version?: string };
+    return packageJson.version?.trim() || undefined;
+  } catch (error) {
+    console.error('Failed to parse installed Tiyo package.json', error);
+    return undefined;
   }
-};
+}
 
-const installExtensionPackage = async (name: string, version: string): Promise<void> => {
-  console.info(`Installing extension ${name}@${version} into ${PLUGINS_DIR}`);
-  fs.mkdirSync(PLUGINS_DIR, { recursive: true });
-  await installPackageRecursive(name, version, PLUGINS_DIR);
+async function getTiyoPluginUpdateStatus(): Promise<TiyoPluginUpdateStatus> {
+  const installedRaw = getInstalledTiyoPackageVersion();
+  const installedNormalized = installedRaw ? semver.clean(normalizeVersion(installedRaw)) : undefined;
 
-  const installedNames = aki.list(PLUGINS_DIR).map((item: [string, string]) => item[0]);
-  if (!installedNames.includes(name)) {
-    throw new Error(`Extension ${name} was not found after install.`);
+  try {
+    const latestRelease = await getLatestReleaseZipInfo();
+    const latestVersion = semver.clean(normalizeVersion(latestRelease.versionTag));
+
+    if (!latestVersion) {
+      return {
+        checked: false,
+        installed: installedRaw !== undefined,
+        currentVersion: installedRaw,
+        updateAvailable: false,
+        error: 'Latest release tag is not a valid semver.',
+      };
+    }
+
+    if (!installedNormalized) {
+      return {
+        checked: true,
+        installed: false,
+        currentVersion: installedRaw,
+        latestVersion,
+        updateAvailable: true,
+      };
+    }
+
+    return {
+      checked: true,
+      installed: true,
+      currentVersion: installedNormalized,
+      latestVersion,
+      updateAvailable: semver.gt(latestVersion, installedNormalized),
+    };
+  } catch (error) {
+    console.error('Failed to check Tiyo plugin updates', error);
+    return {
+      checked: false,
+      installed: installedRaw !== undefined,
+      currentVersion: installedRaw,
+      updateAvailable: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
-};
-
-const uninstallExtensionPackage = async (name: string): Promise<void> => {
-  const targetDir = path.join(PLUGINS_DIR, name);
-  console.info(`Uninstalling extension ${name} from ${targetDir}`);
-  await fs.promises.rm(targetDir, { recursive: true, force: true });
-};
+}
 
 export async function loadPlugins(spoofWindow: BrowserWindow) {
   if (TIYO_CLIENT !== null) {
@@ -180,26 +121,41 @@ export async function loadPlugins(spoofWindow: BrowserWindow) {
     FILESYSTEM_EXTENSION = null;
   }
 
+  if (!fs.existsSync(PLUGINS_DIR)) {
+    fs.mkdirSync(PLUGINS_DIR, { recursive: true });
+  }
+
   console.info('Checking for Tiyo plugin...');
-  aki.list(PLUGINS_DIR).forEach((pluginDetails: [string, string]) => {
+  let pluginList: [string, string][] = [];
+  try {
+    pluginList = aki.list(PLUGINS_DIR);
+  } catch (error) {
+    console.error('Failed to list plugin directory', error);
+  }
+
+  pluginList.forEach((pluginDetails: [string, string]) => {
     const pluginName = pluginDetails[0];
     if (pluginName === TIYO_PACKAGE_NAME) {
-      const mod = aki.load(
-        PLUGINS_DIR,
-        pluginName,
-        /**
-         *  TODO can maybe remove this eval now. It was done here to avoid being
-         *  overwritten by webpack, which doesn't seem to happen with vite
-         */
-        eval('require') as NodeRequire,
-      );
+      try {
+        const mod = aki.load(
+          PLUGINS_DIR,
+          pluginName,
+          /**
+           *  TODO can maybe remove this eval now. It was done here to avoid being
+           *  overwritten by webpack, which doesn't seem to happen with vite
+           */
+          eval('require') as NodeRequire,
+        );
 
-      TIYO_CLIENT = new mod.TiyoClient(spoofWindow);
-      console.info(
-        `Loaded Tiyo plugin v${TIYO_CLIENT!.getVersion()}; it has ${
-          Object.keys(TIYO_CLIENT!.getExtensions()).length
-        } extensions`,
-      );
+        TIYO_CLIENT = new mod.TiyoClient(spoofWindow);
+        console.info(
+          `Loaded Tiyo plugin v${TIYO_CLIENT!.getVersion()}; it has ${
+            Object.keys(TIYO_CLIENT!.getExtensions()).length
+          } extensions`,
+        );
+      } catch (error) {
+        console.error('Failed to load Tiyo plugin', error);
+      }
     } else {
       console.warn(`Ignoring unsupported plugin: ${pluginName}`);
     }
@@ -443,49 +399,26 @@ function getFilterOptions(extensionId: string): FilterOption[] {
 export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: BrowserWindow) => {
   console.debug('Creating extension IPC handlers in main...');
 
-  const runOperationWithTimeout = (operation: () => Promise<void>) => {
-    return new Promise<void>((resolve, reject) => {
-      let settled = false;
-      const settle = (error?: unknown) => {
-        if (settled) {
-          return;
-        }
-        settled = true;
-        if (error) {
-          reject(error instanceof Error ? error : new Error(String(error)));
-          return;
-        }
-        resolve();
-      };
-
-      const timeoutHandle = setTimeout(() => {
-        settle(new Error('Plugin operation timed out.'));
-      }, 60_000);
-
-      operation()
-        .then(() => {
-          clearTimeout(timeoutHandle);
-          settle();
-        })
-        .catch((error) => {
-          clearTimeout(timeoutHandle);
-          settle(error);
-        });
-    });
-  };
-
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.RELOAD, async (event) => {
     await loadPlugins(spoofWindow);
     return event.sender.send(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL, (_event, name: string, version: string) => {
-    return runOperationWithTimeout(() => installExtensionPackage(name, version));
+    return new Promise<void>((resolve) => {
+      aki.install(name, version, PLUGINS_DIR, () => {
+        resolve();
+      });
+    });
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL_FROM_RELEASE_ZIP, async () => {
     return installPluginFromLatestReleaseZip(PLUGINS_DIR, TIYO_PACKAGE_NAME);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.UNINSTALL, (_event, name: string) => {
-    return runOperationWithTimeout(() => uninstallExtensionPackage(name));
+    return new Promise<void>((resolve) => {
+      aki.uninstall(name, PLUGINS_DIR, () => {
+        resolve();
+      });
+    });
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.LIST, async () => {
     return aki.list(PLUGINS_DIR);
@@ -507,11 +440,13 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
     return result;
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION, () => {
-    return TIYO_CLIENT ? TIYO_CLIENT.getVersion() : undefined;
+    if (TIYO_CLIENT) {
+      return TIYO_CLIENT.getVersion();
+    }
+    return getInstalledTiyoPackageVersion();
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.CHECK_FOR_UPDATES, async () => {
-    // TODO: check registry
-    return {};
+    return getTiyoPluginUpdateStatus();
   });
 
   ipcMain.handle(
