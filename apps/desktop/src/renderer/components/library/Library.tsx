@@ -252,7 +252,7 @@ const Library: React.FC<Props> = () => {
   // Fetching 460+ series on every navigation was triggering React's "maximum update depth" protection.
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full min-h-0 flex flex-col overflow-hidden">
       {multiSelectEnabled ? (
         <LibraryControlBarMultiSelect
           showAssignCategoriesModal={() => console.log('TODO placeholder')}

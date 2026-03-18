@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "build": "echo \"@houdoku/ui has no build step\"",
     "lint": "biome lint src"
   },
   "exports": {

@@ -26,6 +26,22 @@ type Props = {
 };
 
 export const SeriesEditControls: React.FC<Props> = (props: Props) => {
+  const getAltTitles = (): string[] => props.series.altTitles ?? [];
+
+  const getAltTitle = (index: number): string => getAltTitles()[index] ?? '';
+
+  const setAltTitle = (index: number, value: string) => {
+    const existingAltTitles = getAltTitles();
+    const preservedTail = existingAltTitles.slice(2);
+    const nextAltTitles = [getAltTitle(0), getAltTitle(1)];
+    nextAltTitles[index] = value;
+
+    props.setSeries({
+      ...props.series,
+      altTitles: [...nextAltTitles, ...preservedTail],
+    });
+  };
+
   const getCoverSrcUrl = () => {
     if (props.series.extensionId === FS_METADATA.id) {
       return props.series.remoteCoverUrl
@@ -92,6 +108,28 @@ export const SeriesEditControls: React.FC<Props> = (props: Props) => {
                 title: e.target.value,
               })
             }
+            disabled={!props.editable}
+          />
+        </div>
+        <div className="flex space-x-2 items-center">
+          <Label className="min-w-20 text-right">Alt. 1</Label>
+          <Input
+            className="w-full"
+            title={getAltTitle(0)}
+            value={getAltTitle(0)}
+            placeholder={'Alternate Title 1'}
+            onChange={(e) => setAltTitle(0, e.target.value)}
+            disabled={!props.editable}
+          />
+        </div>
+        <div className="flex space-x-2 items-center">
+          <Label className="min-w-20 text-right">Alt. 2</Label>
+          <Input
+            className="w-full"
+            title={getAltTitle(1)}
+            value={getAltTitle(1)}
+            placeholder={'Alternate Title 2'}
+            onChange={(e) => setAltTitle(1, e.target.value)}
             disabled={!props.editable}
           />
         </div>

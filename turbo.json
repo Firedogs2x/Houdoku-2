@@ -70,6 +70,30 @@
       "passThroughEnv": [
         "GH_TOKEN"
       ]
+    },
+    "dist:win:dev": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ]
+    },
+    "dist:mac:dev": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ]
+    },
+    "dist:linux:dev": {
+      "dependsOn": [
+        "build"
+      ],
+      "outputs": [
+        "release/**"
+      ]
     }
   }
 }

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-const aki = require('aki-plugin-manager');
 import { useLocation } from 'react-router-dom';
 const { ipcRenderer } = require('electron');
-import { gt } from 'semver';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import PluginSettingsModal from './PluginSettingsModal';
 import {
@@ -15,97 +13,151 @@ import {
 } from '@houdoku/ui/components/Table';
 import { Button } from '@houdoku/ui/components/Button';
 import { Loader2 } from 'lucide-react';
+import { toast } from '@houdoku/ui/hooks/use-toast';
+
+type TiyoPluginUpdateStatus = {
+  checked: boolean;
+  installed: boolean;
+  currentVersion?: string;
+  latestVersion?: string;
+  updateAvailable: boolean;
+};
 
 const Plugins: React.FC = () => {
   const [currentTiyoVersion, setCurrentTiyoVersion] = useState<string | undefined>(undefined);
   const [availableTiyoVersion, setAvailableTiyoVersion] = useState<string | undefined>(undefined);
+  const [tiyoUpdateAvailable, setTiyoUpdateAvailable] = useState(false);
   const [showingSettingsModal, setShowingSettingsModal] = useState(false);
 
-  const [installingPlugins, setInstallingPlugins] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [reloading, setReloading] = useState(false);
   const [installingFromRelease, setInstallingFromRelease] = useState(false);
   const location = useLocation();
 
-  const refreshMetadata = async () => {
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  };
+
+  const refreshMetadata = async (showResultToast: boolean = false) => {
     setRefreshing(true);
     setCurrentTiyoVersion(undefined);
     setAvailableTiyoVersion(undefined);
+    setTiyoUpdateAvailable(false);
 
-    const currentVersion = await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION);
-    setCurrentTiyoVersion(currentVersion);
+    try {
+      const [currentVersion, updateStatus] = await Promise.all([
+        ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION),
+        ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.CHECK_FOR_UPDATES),
+      ]);
 
-    await aki
-      // TODO hack
-      .search('author:xgi @tiyo/core', '', 1)
-      // biome-ignore lint/suspicious/noExplicitAny: TODO external schema
-      .then((results: any) => {
-        if (results.objects.length > 0) {
-          setAvailableTiyoVersion(results.objects[0].package.version);
+      const typedStatus = updateStatus as TiyoPluginUpdateStatus;
+
+      setCurrentTiyoVersion(currentVersion || typedStatus.currentVersion);
+      setAvailableTiyoVersion(typedStatus.latestVersion);
+      setTiyoUpdateAvailable(typedStatus.updateAvailable === true);
+
+      if (showResultToast) {
+        if (!typedStatus.checked) {
+          toast({
+            title: 'Tiyo update check failed',
+            description: 'Could not confirm latest Tiyo release right now.',
+            duration: 5000,
+          });
+        } else if (typedStatus.updateAvailable) {
+          toast({
+            title: 'Tiyo update available',
+            description: `Latest: ${typedStatus.latestVersion || 'unknown'}`,
+            duration: 5000,
+          });
+        } else {
+          toast({
+            title: 'Tiyo is up to date',
+            description: `Current: ${typedStatus.currentVersion || 'unknown'}`,
+            duration: 5000,
+          });
         }
-      })
-      .catch(console.error);
-    setRefreshing(false);
+      }
+    } catch (error) {
+      console.error(error);
+      if (showResultToast) {
+        toast({
+          title: 'Tiyo update check failed',
+          description: getErrorMessage(error),
+          duration: 6000,
+        });
+      }
+    } finally {
+      setRefreshing(false);
+    }
   };
 
-  const handleInstall = (pkgName: string, version: string) => {
-    console.info(`Installing plugin ${pkgName}@${version}`);
-    setInstallingPlugins((current) => [...current, pkgName]);
+  const installOrUpdateFromReleaseZip = async () => {
+    setInstallingFromRelease(true);
 
-    ipcRenderer
-      .invoke(ipcChannels.EXTENSION_MANAGER.INSTALL, pkgName, version)
-      .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
-      .then(() => refreshMetadata())
-      .catch((e) => console.error(e))
-      .finally(() => setInstallingPlugins((current) => current.filter((item) => item !== pkgName)))
-      .catch((e) => console.error(e));
+    try {
+      await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.INSTALL_FROM_RELEASE_ZIP);
+      await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD);
+      await refreshMetadata();
+
+      toast({
+        title: currentTiyoVersion ? 'Tiyo updated' : 'Tiyo installed',
+        description: 'Tiyo was installed from the latest release asset.',
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Failed to install Tiyo',
+        description: getErrorMessage(error),
+        duration: 8000,
+      });
+    } finally {
+      setInstallingFromRelease(false);
+    }
   };
 
-  const handleRemove = (pkgName: string) => {
-    console.info(`Removing plugin ${pkgName}...`);
+  const handleRemove = async () => {
+    try {
+      await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.UNINSTALL, '@tiyo/core');
+      await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD);
+      await refreshMetadata();
 
-    ipcRenderer
-      .invoke(ipcChannels.EXTENSION_MANAGER.UNINSTALL, pkgName)
-      .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
-      .then(() => refreshMetadata())
-      .catch((e) => console.error(e));
+      toast({
+        title: 'Tiyo uninstalled',
+        description: 'Tiyo was removed successfully.',
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Failed to uninstall Tiyo',
+        description: getErrorMessage(error),
+        duration: 8000,
+      });
+    }
   };
 
   const reloadPlugins = async () => {
     setReloading(true);
     await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD).catch((e) => console.error(e));
     setReloading(false);
-    refreshMetadata();
-  };
-
-  const installFromReleaseZip = async () => {
-    setInstallingFromRelease(true);
-    await ipcRenderer
-      .invoke(ipcChannels.EXTENSION_MANAGER.INSTALL_FROM_RELEASE_ZIP)
-      .then(() => ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.RELOAD))
-      .then(() => refreshMetadata())
-      .catch((e) => console.error(e));
-    setInstallingFromRelease(false);
+    refreshMetadata(true);
   };
 
   const renderInstallOrUninstallButton = () => {
-    const isNotInstalled = currentTiyoVersion === undefined && availableTiyoVersion !== undefined;
-    const loading = installingPlugins.includes('@tiyo/core');
-
-    if (isNotInstalled) {
+    if (currentTiyoVersion === undefined) {
       return (
-        <Button
-          disabled={loading}
-          onClick={() => handleInstall('@tiyo/core', availableTiyoVersion)}
-        >
-          {loading && <Loader2 className="animate-spin" />}
-          {installingPlugins.includes('@tiyo/core') ? 'Installing...' : 'Install'}
+        <Button disabled={installingFromRelease} onClick={() => installOrUpdateFromReleaseZip()}>
+          {installingFromRelease && <Loader2 className="animate-spin" />}
+          Install
         </Button>
       );
     }
 
     return (
-      <Button variant="destructive" onClick={() => handleRemove('@tiyo/core')}>
+      <Button variant="destructive" onClick={() => handleRemove()}>
         Uninstall
       </Button>
     );
@@ -115,15 +167,12 @@ const Plugins: React.FC = () => {
     refreshMetadata();
   }, [location]);
 
-  const tiyoCanUpdate =
-    currentTiyoVersion && availableTiyoVersion && gt(currentTiyoVersion, availableTiyoVersion);
-
   return (
     <div className="h-full overflow-auto flex flex-col">
       <PluginSettingsModal showing={showingSettingsModal} setShowing={setShowingSettingsModal} />
 
       <div className="flex justify-start py-2 space-x-2">
-        <Button disabled={refreshing} onClick={() => refreshMetadata()}>
+        <Button disabled={refreshing} onClick={() => refreshMetadata(true)}>
           {refreshing && <Loader2 className="animate-spin" />}
           Check for Updates
         </Button>
@@ -135,7 +184,7 @@ const Plugins: React.FC = () => {
           {reloading && <Loader2 className="animate-spin" />}
           Reload Installed Plugins
         </Button>
-        <Button disabled={installingFromRelease} onClick={() => installFromReleaseZip()}>
+        <Button disabled={installingFromRelease} onClick={() => installOrUpdateFromReleaseZip()}>
           {installingFromRelease && <Loader2 className="animate-spin" />}
           Install/Update from Release ZIP
         </Button>
@@ -156,13 +205,17 @@ const Plugins: React.FC = () => {
               Adds support for importing content from other sources, including 3rd-party websites.
             </TableCell>
             <TableCell className="text-center">
-              {availableTiyoVersion === currentTiyoVersion || !currentTiyoVersion ? (
-                availableTiyoVersion
+              {currentTiyoVersion ? (
+                tiyoUpdateAvailable && availableTiyoVersion ? (
+                  <>
+                    {currentTiyoVersion}→
+                    <span className="font-bold underline">{availableTiyoVersion}</span>
+                  </>
+                ) : (
+                  currentTiyoVersion
+                )
               ) : (
-                <>
-                  {currentTiyoVersion}→
-                  <span className="font-bold underline">{availableTiyoVersion}</span>
-                </>
+                ''
               )}
             </TableCell>
             <TableCell>
@@ -173,8 +226,12 @@ const Plugins: React.FC = () => {
                   </Button>
                 ) : undefined}
 
-                {tiyoCanUpdate ? (
-                  <Button onClick={() => handleInstall('@tiyo/core', availableTiyoVersion)}>
+                {currentTiyoVersion !== undefined && tiyoUpdateAvailable ? (
+                  <Button
+                    disabled={installingFromRelease}
+                    onClick={() => installOrUpdateFromReleaseZip()}
+                  >
+                    {installingFromRelease && <Loader2 className="animate-spin" />}
                     Update
                   </Button>
                 ) : undefined}

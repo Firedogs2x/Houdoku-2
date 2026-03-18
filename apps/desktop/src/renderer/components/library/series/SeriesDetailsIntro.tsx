@@ -24,6 +24,9 @@ type Props = {
 
 const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
   const currentExtensionMetadata = useRecoilValue(currentExtensionMetadataState);
+  const altTitles = props.series.altTitles ?? [];
+  const altTitleOne = altTitles[0] ?? '';
+  const altTitleTwo = altTitles[1] ?? '';
 
   const getThumbnailPath = () => {
     const fileExtensions = constants.IMAGE_EXTENSIONS;
@@ -49,6 +52,15 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
           alt={props.series.title}
           className="w-auto h-auto -mt-[70%] aspect-[70/100] object-cover rounded-sm"
         />
+        <div className="mt-3 space-y-1">
+          <div className="text-white text-[14px] font-semibold">Alternate Titles:</div>
+          <div className="text-white text-[12px]">
+            <span className="font-semibold">Alt 1:</span> {altTitleOne}
+          </div>
+          <div className="text-white text-[12px]">
+            <span className="font-semibold">Alt 2:</span> {altTitleTwo}
+          </div>
+        </div>
       </div>
       <div className="w-full py-2 px-2">
         <div className="flex justify-between">

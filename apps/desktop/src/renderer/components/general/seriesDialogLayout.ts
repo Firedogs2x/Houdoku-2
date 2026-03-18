@@ -1,0 +1,1 @@
+export const SERIES_DIALOG_CONTENT_CLASS = 'h-auto max-h-none overflow-visible md:max-w-[700px] lg:max-w-[800px]';

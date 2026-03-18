@@ -17,6 +17,7 @@ import {
 } from '@houdoku/ui/components/Dialog';
 import { Button } from '@houdoku/ui/components/Button';
 import { Skeleton } from '@houdoku/ui/components/Skeleton';
+import { SERIES_DIALOG_CONTENT_CLASS } from '../general/seriesDialogLayout';
 
 type Props = {
   series: Series | undefined;
@@ -82,7 +83,7 @@ const AddSeriesModal: React.FC<Props> = (props: Props) => {
 
   return (
     <Dialog open={props.showing} onOpenChange={props.setShowing}>
-      <DialogContent className="overflow-y-scroll max-h-screen [@media(min-height:500px)]:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
+      <DialogContent className={SERIES_DIALOG_CONTENT_CLASS}>
         <DialogHeader>
           <DialogTitle>Add series</DialogTitle>
         </DialogHeader>

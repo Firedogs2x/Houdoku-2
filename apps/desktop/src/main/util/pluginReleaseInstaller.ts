@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
+import { KEIYOUSHI_APK_EXTENSIONS_DIR } from './appdata';
 
 const RELEASE_OWNER = 'Firedogs2x';
 const RELEASE_REPO = 'tiyo';
@@ -107,6 +108,8 @@ export async function installPluginFromLatestReleaseZip(
   pluginsDir: string,
   packageName: string,
 ): Promise<{ installedVersionTag: string; assetName: string }> {
+  fs.mkdirSync(KEIYOUSHI_APK_EXTENSIONS_DIR, { recursive: true });
+
   const { assetName, assetUrl, versionTag } = await getLatestReleaseZipInfo();
   const assetResponse = await fetch(assetUrl);
 

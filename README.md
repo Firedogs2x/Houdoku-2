@@ -57,6 +57,25 @@ Start the app in the dev environment:
 pnpm dev
 ```
 
+Create a test/dev release build without bumping the stable version:
+
+```
+pnpm dist:win:dev
+```
+
+This generates a ZIP package using a prerelease version format like `2.17.1-dev.202603011430`.
+The stable `version` in `apps/desktop/package.json` is not modified.
+The ZIP contains the complete portable application - extract and run Houdoku.exe.
+
+> **Note**: NSIS installer builds are currently disabled due to Windows MAX_PATH limitations with pnpm's dependency structure.
+
+Also available:
+
+```
+pnpm dist:mac:dev
+pnpm dist:linux:dev
+```
+
 ## Stack
 
 **Application**: This is an Electron application. The majority of the functionality is performed in the renderer thread. Exceptions are for cases like accessing the window class (i.e. to support minimizing the window), locating application directories, and for working with extensions. The renderer can invoke these functions through ipc.

@@ -6,9 +6,12 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "preview": "turbo preview",
-    "dist:win": "turbo dist:win",
-    "dist:mac": "turbo dist:mac",
-    "dist:linux": "turbo dist:linux"
+    "dist:win": "turbo run dist:win --filter=@houdoku/desktop",
+    "dist:mac": "turbo run dist:mac --filter=@houdoku/desktop",
+    "dist:linux": "turbo run dist:linux --filter=@houdoku/desktop",
+    "dist:win:dev": "turbo run dist:win:dev --filter=@houdoku/desktop",
+    "dist:mac:dev": "turbo run dist:mac:dev --filter=@houdoku/desktop",
+    "dist:linux:dev": "turbo run dist:linux:dev --filter=@houdoku/desktop"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

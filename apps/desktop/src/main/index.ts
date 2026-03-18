@@ -20,7 +20,13 @@ import packageJson from '../../package.json';
 import { createTrackerIpcHandlers } from './services/tracker';
 import { createDiscordIpcHandlers } from './services/discord';
 import { createUpdaterIpcHandlers } from './services/updater';
-import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, PLUGINS_DIR, THUMBNAILS_DIR } from './util/appdata';
+import {
+  DEFAULT_DOWNLOADS_DIR,
+  LOGS_DIR,
+  PLUGINS_DIR,
+  THUMBNAILS_DIR,
+  ensureAppDataDirectories,
+} from './util/appdata';
 import { createFilesystemIpcHandlers } from './services/filesystem';
 import { createSeriesAutoIpcHandlers } from './services/seriesAuto';
 
@@ -129,6 +135,8 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
+    ensureAppDataDirectories();
+
     await createWindows();
 
     // create ipc handlers for specific extension functionality
