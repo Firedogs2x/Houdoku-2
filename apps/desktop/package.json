@@ -18,6 +18,7 @@
   "build": {
     "productName": "Houdoku",
     "appId": "com.faltro.Houdoku",
+    "nodeGypRebuild": false,
     "files": ["out/**/*"],
     "mac": {
       "target": [
