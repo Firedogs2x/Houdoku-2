@@ -107,6 +107,7 @@
 body {
   /* height: 100vh; */
   overflow-y: hidden;
+  overflow-x: hidden;
   font-family: Arial, Helvetica, Helvetica Neue, serif;
   font-size: 14px;
 }

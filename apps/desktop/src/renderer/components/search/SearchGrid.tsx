@@ -1,9 +1,6 @@
-const fs = require('fs');
 import React, { useEffect, useRef } from 'react';
-const { ipcRenderer } = require('electron');
 import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import ipcChannels from '@/common/constants/ipcChannels.json';
 import { libraryColumnsState, libraryCropCoversState } from '@/renderer/state/settingStates';
 import {
   searchResultState,
@@ -19,11 +16,6 @@ import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextM
 import { cn } from '@houdoku/ui/util';
 import { Skeleton } from '@houdoku/ui/components/Skeleton';
 import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
-
-const thumbnailsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.THUMBNAILS_DIR);
-if (!fs.existsSync(thumbnailsDir)) {
-  fs.mkdirSync(thumbnailsDir);
-}
 
 type Props = {
   loading: boolean;
@@ -135,7 +127,10 @@ const SearchGrid: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScrollArea viewportRef={viewportRef} className="flex-1 min-h-0 w-full pr-4 -mr-2">
+      <ScrollArea
+        viewportRef={viewportRef}
+        className="flex-1 min-h-0 w-full overflow-hidden overscroll-contain pr-4 -mr-2"
+      >
         <div
           className={cn(
             libraryColumns === 2 && 'grid-cols-2',

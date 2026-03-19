@@ -163,18 +163,11 @@ const upsertSeries = (series: Series): Series => {
 
   const filteredList = existingList.filter((s: Series) => s.id !== newSeries.id);
 
-  console.log(`[library.upsertSeries] Writing series to storage: title="${newSeries.title}", id=${seriesId}, numberUnread=${newSeries.numberUnread}, unread=${newSeries.unread}`);
-
   persistantStore.write(
     `${storeKeys.LIBRARY.SERIES_LIST}`,
     JSON.stringify([...filteredList, newSeries]),
   );
-  
-  console.log(`[library.upsertSeries] Successfully persisted. Verify by reading back...`);
-  const verifyList = fetchSeriesList();
-  const verifyThis = verifyList.find(s => s.id === seriesId);
-  console.log(`[library.upsertSeries] Verified persisted data: title="${verifyThis?.title}", numberUnread=${verifyThis?.numberUnread}, unread=${verifyThis?.unread}`);
-  
+
   return newSeries;
 };
 
@@ -199,15 +192,17 @@ const upsertChapters = (chapters: Chapter[], series: Series): void => {
     chapterMap[chapterId] = { ...chapter, id: chapterId, dateAdded };
   });
 
+  const nextChapters = Object.values(chapterMap);
+
   persistantStore.write(
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${series.id}`,
-    JSON.stringify(Object.values(chapterMap)),
+    JSON.stringify(nextChapters),
   );
 
   // Update the series unread status after upserting chapters
   const updatedSeries = fetchSeries(series.id);
   if (updatedSeries) {
-    const unread = !Object.values(chapterMap).some((c: Chapter) => c.read);
+    const unread = !nextChapters.some((c: Chapter) => c.read);
     const seriesWithUnread = { ...updatedSeries, unread };
     upsertSeries(seriesWithUnread);
   }
@@ -232,7 +227,7 @@ const removeChapters = (chapterIds: string[], seriesId: string): void => {
 
   persistantStore.write(
     `${storeKeys.LIBRARY.CHAPTER_LIST_PREFIX}${seriesId}`,
-    JSON.stringify(Object.values(filteredChapters)),
+    JSON.stringify(filteredChapters),
   );
 
   // Update the series unread status after removing chapters

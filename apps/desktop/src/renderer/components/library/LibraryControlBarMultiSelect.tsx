@@ -72,7 +72,7 @@ const LibraryControlBarMultiSelect: React.FC<Props> = () => {
   };
 
   return (
-    <div className="flex justify-between flex-nowrap py-3">
+    <div className="flex justify-between flex-nowrap py-3 flex-shrink-0">
       <div className="flex gap-3 flex-nowrap">
         <Button disabled={reloadingSeriesList} onClick={refreshHandler}>
           {reloadingSeriesList && <Loader2 className="animate-spin" />}

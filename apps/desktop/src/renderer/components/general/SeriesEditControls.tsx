@@ -6,6 +6,7 @@ import constants from '@/common/constants/constants.json';
 import ExtensionImage from './ExtensionImage';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import blankCover from '@/renderer/img/blank_cover.png';
+import { toAtomUrl } from '@/renderer/util/atomUrl';
 import { Label } from '@houdoku/ui/components/Label';
 import { Input } from '@houdoku/ui/components/Input';
 import { InputTags } from '@houdoku/ui/components/InputTags';
@@ -44,9 +45,7 @@ export const SeriesEditControls: React.FC<Props> = (props: Props) => {
 
   const getCoverSrcUrl = () => {
     if (props.series.extensionId === FS_METADATA.id) {
-      return props.series.remoteCoverUrl
-        ? `atom://${encodeURIComponent(props.series.remoteCoverUrl)}`
-        : blankCover;
+      return props.series.remoteCoverUrl ? toAtomUrl(props.series.remoteCoverUrl) : blankCover;
     }
     return props.series.remoteCoverUrl;
   };

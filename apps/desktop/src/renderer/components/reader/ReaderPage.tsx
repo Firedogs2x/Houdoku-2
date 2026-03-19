@@ -21,6 +21,7 @@ import { sendProgressToTrackers } from '@/renderer/features/tracker/utils';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import library from '@/renderer/services/library';
+import { mapLocalFileUrlsToAtom } from '@/renderer/util/atomUrl';
 import * as libraryStates from '@/renderer/state/libraryStates';
 import * as readerStates from '@/renderer/state/readerStates';
 import * as settingStates from '@/renderer/state/settingStates';
@@ -194,7 +195,7 @@ const ReaderPage: React.FC = () => {
       .then((pageRequesterData: PageRequesterData) =>
         ipcRenderer.invoke(ipcChannels.EXTENSION.GET_PAGE_URLS, FS_METADATA.id, pageRequesterData),
       );
-    newPageUrls = newPageUrls.map((pageUrl) => `atom://${encodeURIComponent(pageUrl)}`);
+    newPageUrls = mapLocalFileUrlsToAtom(newPageUrls);
 
     setPageUrls(newPageUrls);
     setLastPageNumber(newPageUrls.length);
@@ -264,7 +265,7 @@ const ReaderPage: React.FC = () => {
       );
 
     if (series.extensionId === FS_METADATA.id) {
-      newPageUrls = newPageUrls.map((pageUrl) => `atom://${encodeURIComponent(pageUrl)}`);
+      newPageUrls = mapLocalFileUrlsToAtom(newPageUrls);
     }
 
     setPageUrls(newPageUrls);
