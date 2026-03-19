@@ -19,7 +19,7 @@
   "packageManager": "pnpm@9.0.0",
   "pnpm": {
     "overrides": {
-      "@electron/rebuild": "3.7.0",
+      "@electron/rebuild": "3.6.1",
       "baseline-browser-mapping": "2.10.8",
       "update-browserslist-db": "1.2.3"
     }
