@@ -66,7 +66,7 @@ import { TableColumnSortOrder } from '@/common/models/types';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { ChapterTableContextMenu } from './ChapterTableContextMenu';
-import { useEffect } from 'react';
+import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { currentTaskState } from '@/renderer/state/downloaderStates';
 
 const defaultDownloadsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.DEFAULT_DOWNLOADS_DIR);
@@ -83,6 +83,14 @@ interface ChapterTableProps {
 
 export function ChapterTable(props: ChapterTableProps) {
   const navigate = useNavigate();
+  const [selectionAnchorChapterId, setSelectionAnchorChapterId] = useState<string | undefined>(
+    undefined,
+  );
+  const pendingCheckboxShiftClick = useRef<{
+    chapterId: string;
+    checked: boolean;
+    shiftKey: boolean;
+  } | null>(null);
   const setSeries = useSetRecoilState(seriesState);
   const setSeriesList = useSetRecoilState(seriesListState);
   const [chapterList, setChapterList] = useRecoilState(chapterListState);
@@ -121,7 +129,34 @@ export function ChapterTable(props: ChapterTableProps) {
           <span className="w-5 h-5">
             <Checkbox
               checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(event: MouseEvent<HTMLButtonElement>) => {
+                if (!row.original.id) return;
+
+                pendingCheckboxShiftClick.current = {
+                  chapterId: row.original.id,
+                  checked: !row.getIsSelected(),
+                  shiftKey: event.shiftKey,
+                };
+              }}
+              onCheckedChange={(value) => {
+                const chapterId = row.original.id;
+                if (!chapterId) return;
+
+                const pendingClick = pendingCheckboxShiftClick.current;
+                if (
+                  pendingClick?.chapterId === chapterId &&
+                  pendingClick.shiftKey &&
+                  pendingClick.checked
+                ) {
+                  selectChapterRange(chapterId, true);
+                  pendingCheckboxShiftClick.current = null;
+                  return;
+                }
+
+                row.toggleSelected(!!value);
+                setSelectionAnchorChapterId(!!value ? chapterId : undefined);
+                pendingCheckboxShiftClick.current = null;
+              }}
             />
           </span>
         </div>
@@ -317,6 +352,42 @@ export function ChapterTable(props: ChapterTableProps) {
     return table.getSelectedRowModel().rows.map((row) => row.original) as Chapter[];
   };
 
+  const selectChapterRange = (
+    targetChapterId: string,
+    keepCurrentSelection: boolean = true,
+    anchorChapterId: string | undefined = selectionAnchorChapterId,
+  ) => {
+    const allRows = table.getPrePaginationRowModel().rows;
+    const targetIndex = allRows.findIndex((row) => row.original.id === targetChapterId);
+
+    if (targetIndex === -1) return;
+
+    const baseAnchorChapterId = anchorChapterId ?? targetChapterId;
+    const anchorIndex = allRows.findIndex((row) => row.original.id === baseAnchorChapterId);
+
+    if (anchorIndex === -1) {
+      table.setRowSelection((old: RowSelectionState) => {
+        const result = keepCurrentSelection ? { ...old } : {};
+        result[allRows[targetIndex].id] = true;
+        return result;
+      });
+      setSelectionAnchorChapterId(targetChapterId);
+      return;
+    }
+
+    const startIndex = Math.min(anchorIndex, targetIndex);
+    const endIndex = Math.max(anchorIndex, targetIndex);
+    table.setRowSelection((old: RowSelectionState) => {
+      const result = keepCurrentSelection ? { ...old } : {};
+      for (let idx = startIndex; idx <= endIndex; idx += 1) {
+        result[allRows[idx].id] = true;
+      }
+      return result;
+    });
+
+    setSelectionAnchorChapterId(targetChapterId);
+  };
+
   const getNextUnreadChapter = () => {
     return sortedFilteredChapterList
       .slice()
@@ -456,9 +527,19 @@ export function ChapterTable(props: ChapterTableProps) {
                     <TableRow
                       className="cursor-pointer"
                       data-state={row.getIsSelected() && 'selected'}
-                      onClick={() =>
-                        navigate(`${routes.READER}/${props.series.id}/${row.original.id}`)
-                      }
+                      onClick={(event: MouseEvent<HTMLTableRowElement>) => {
+                        const chapterId = row.original.id;
+                        if (!chapterId) return;
+
+                        if (event.shiftKey) {
+                          event.preventDefault();
+                          selectChapterRange(chapterId, true);
+                          return;
+                        }
+
+                        setSelectionAnchorChapterId(chapterId);
+                        navigate(`${routes.READER}/${props.series.id}/${chapterId}`);
+                      }}
                     >
                       {row.getVisibleCells().map((cell) => {
                         const canClickThrough = ['select', 'icons'].includes(
