@@ -83,6 +83,7 @@ interface ChapterTableProps {
 
 export function ChapterTable(props: ChapterTableProps) {
   const navigate = useNavigate();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectionAnchorChapterId, setSelectionAnchorChapterId] = useState<string | undefined>(
     undefined,
   );
@@ -317,10 +318,15 @@ export function ChapterTable(props: ChapterTableProps) {
   const table = useReactTable({
     data: sortedFilteredChapterList,
     columns: columns,
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualSorting: true,
     manualFiltering: true,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      rowSelection,
+    },
     initialState: {
       pagination: {
         pageSize: chapterListPageSize || 10,
@@ -348,6 +354,15 @@ export function ChapterTable(props: ChapterTableProps) {
     if (chapterList.length > 0) updateDownloadStatuses();
   }, [chapterList]);
 
+  useEffect(() => {
+    if (
+      selectionAnchorChapterId &&
+      !sortedFilteredChapterList.some((chapter) => chapter.id === selectionAnchorChapterId)
+    ) {
+      setSelectionAnchorChapterId(undefined);
+    }
+  }, [selectionAnchorChapterId, sortedFilteredChapterList]);
+
   const getSelectedChapters = (): Chapter[] => {
     return table.getSelectedRowModel().rows.map((row) => row.original) as Chapter[];
   };
@@ -366,7 +381,7 @@ export function ChapterTable(props: ChapterTableProps) {
     const anchorIndex = allRows.findIndex((row) => row.original.id === baseAnchorChapterId);
 
     if (anchorIndex === -1) {
-      table.setRowSelection((old: RowSelectionState) => {
+      setRowSelection((old: RowSelectionState) => {
         const result = keepCurrentSelection ? { ...old } : {};
         result[allRows[targetIndex].id] = true;
         return result;
@@ -377,7 +392,7 @@ export function ChapterTable(props: ChapterTableProps) {
 
     const startIndex = Math.min(anchorIndex, targetIndex);
     const endIndex = Math.max(anchorIndex, targetIndex);
-    table.setRowSelection((old: RowSelectionState) => {
+    setRowSelection((old: RowSelectionState) => {
       const result = keepCurrentSelection ? { ...old } : {};
       for (let idx = startIndex; idx <= endIndex; idx += 1) {
         result[allRows[idx].id] = true;
@@ -398,10 +413,10 @@ export function ChapterTable(props: ChapterTableProps) {
   const selectChapters = (chapters: Chapter[], keepCurrentSelection: boolean = true) => {
     const chapterIds = chapters.map((chapter) => chapter.id).filter((id) => id !== undefined);
     const rowsToSelect = table
-      .getCoreRowModel()
+      .getPrePaginationRowModel()
       .rows.filter((row) => chapterIds.includes(row.original.id!));
 
-    table.setRowSelection((old: RowSelectionState) => {
+    setRowSelection((old: RowSelectionState) => {
       const result = keepCurrentSelection ? { ...old } : {};
       rowsToSelect.forEach((row) => (result[row.id] = true));
       return result;
