@@ -8,7 +8,6 @@ import {
 } from '@tanstack/react-table';
 const { ipcRenderer } = require('electron');
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
@@ -433,7 +432,7 @@ export function ChapterTable(props: ChapterTableProps) {
       </div>
       <div className="rounded-md border flex-1 min-h-0 overflow-hidden">
         <div className="h-full overflow-auto overscroll-contain">
-          <Table>
+          <table className="w-full caption-bottom text-sm">
             <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -492,7 +491,7 @@ export function ChapterTable(props: ChapterTableProps) {
               </TableRow>
             )}
             </TableBody>
-          </Table>
+          </table>
         </div>
       </div>
       <div className="flex-none">
