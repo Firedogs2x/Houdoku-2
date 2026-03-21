@@ -25,6 +25,7 @@ import SeriesDetailsInfoGrid from './series/SeriesDetailsInfoGrid';
 import { ChapterTable } from './series/chapter-table/ChapterTable';
 import { Loader2 } from 'lucide-react';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
+import { ScrollArea, ScrollBar } from '@houdoku/ui/components/ScrollArea';
 
 type Props = unknown;
 
@@ -81,39 +82,40 @@ const SeriesDetails: React.FC<Props> = () => {
     );
   }
   return (
-    <div className="relative pb-4 overflow-auto h-full">
-      <>
-        <SeriesTrackerDialog
-          series={series}
-          showing={showingTrackerModal}
-          setShowing={setShowingTrackerModal}
-        />
-        <EditSeriesModal
-          series={series}
-          showing={showingEditModal}
-          setShowing={setShowingEditModal}
-          save={(newSeries) => {
-            if (newSeries.remoteCoverUrl !== series?.remoteCoverUrl) {
-              console.debug(`Updating cover for series ${series?.id}`);
-              ipcRenderer
-                .invoke(ipcChannels.FILESYSTEM.DELETE_THUMBNAIL, newSeries)
-                .then(() => downloadCover(newSeries))
-                .catch(console.error);
-            }
-            setSeries(newSeries);
-          }}
-        />
-        <DownloadModal
-          series={series}
-          showing={showingDownloadModal}
-          setShowing={setShowingDownloadModal}
-        />
-        <RemoveSeriesDialog
-          series={series}
-          showing={showingRemoveModal}
-          setShowing={setShowingRemoveModal}
-        />
+    <div className="relative flex flex-col h-full overflow-hidden">
+      <SeriesTrackerDialog
+        series={series}
+        showing={showingTrackerModal}
+        setShowing={setShowingTrackerModal}
+      />
+      <EditSeriesModal
+        series={series}
+        showing={showingEditModal}
+        setShowing={setShowingEditModal}
+        save={(newSeries) => {
+          if (newSeries.remoteCoverUrl !== series?.remoteCoverUrl) {
+            console.debug(`Updating cover for series ${series?.id}`);
+            ipcRenderer
+              .invoke(ipcChannels.FILESYSTEM.DELETE_THUMBNAIL, newSeries)
+              .then(() => downloadCover(newSeries))
+              .catch(console.error);
+          }
+          setSeries(newSeries);
+        }}
+      />
+      <DownloadModal
+        series={series}
+        showing={showingDownloadModal}
+        setShowing={setShowingDownloadModal}
+      />
+      <RemoveSeriesDialog
+        series={series}
+        showing={showingRemoveModal}
+        setShowing={setShowingRemoveModal}
+      />
 
+      {/* Fixed header: banner, cover/title, metadata cards */}
+      <div className="flex-none">
         <SeriesDetailsFloatingHeader series={series} />
 
         <SeriesDetailsBanner
@@ -127,9 +129,13 @@ const SeriesDetails: React.FC<Props> = () => {
         <SeriesDetailsIntro series={series} />
 
         <SeriesDetailsInfoGrid series={series} />
+      </div>
 
+      {/* Scrollable chapter list */}
+      <ScrollArea className="flex-1 min-h-0 w-full">
         <ChapterTable series={series} />
-      </>
+        <ScrollBar thumbClassName="custom-scrollbar-thumb" />
+      </ScrollArea>
     </div>
   );
 };
