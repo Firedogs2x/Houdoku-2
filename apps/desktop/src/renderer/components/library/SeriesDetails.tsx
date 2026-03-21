@@ -25,7 +25,6 @@ import SeriesDetailsInfoGrid from './series/SeriesDetailsInfoGrid';
 import { ChapterTable } from './series/chapter-table/ChapterTable';
 import { Loader2 } from 'lucide-react';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
-import { ScrollArea, ScrollBar } from '@houdoku/ui/components/ScrollArea';
 
 type Props = unknown;
 
@@ -131,11 +130,9 @@ const SeriesDetails: React.FC<Props> = () => {
         <SeriesDetailsInfoGrid series={series} />
       </div>
 
-      {/* Scrollable chapter list */}
-      <ScrollArea className="flex-1 min-h-0 w-full">
+      <div className="flex-1 min-h-0 w-full overflow-hidden">
         <ChapterTable series={series} />
-        <ScrollBar thumbClassName="custom-scrollbar-thumb" />
-      </ScrollArea>
+      </div>
     </div>
   );
 };

@@ -362,8 +362,8 @@ export function ChapterTable(props: ChapterTableProps) {
   };
 
   return (
-    <div className="space-y-2 pb-4">
-      <div className="flex items-center justify-between">
+    <div className="h-full min-h-0 flex flex-col space-y-2 pb-4">
+      <div className="flex items-center justify-between flex-none bg-background/95 border-b border-border pb-2">
         {table.getIsSomeRowsSelected() || table.getIsAllRowsSelected() ? (
           <div className="flex space-x-2 items-end">
             <Button className="ml-auto" onClick={() => setSelectedRead(true)}>
@@ -431,9 +431,10 @@ export function ChapterTable(props: ChapterTableProps) {
           </>
         )}
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+      <div className="rounded-md border flex-1 min-h-0 overflow-hidden">
+        <div className="h-full overflow-auto overscroll-contain">
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -447,8 +448,8 @@ export function ChapterTable(props: ChapterTableProps) {
                 })}
               </TableRow>
             ))}
-          </TableHeader>
-          <TableBody>
+            </TableHeader>
+            <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <ContextMenu key={row.id}>
@@ -490,10 +491,13 @@ export function ChapterTable(props: ChapterTableProps) {
                 </TableCell>
               </TableRow>
             )}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </div>
       </div>
-      <ChapterTablePagination table={table} />
+      <div className="flex-none">
+        <ChapterTablePagination table={table} />
+      </div>
     </div>
   );
 }
