@@ -135,6 +135,20 @@ export function markChapters(
 }
 
 async function reloadSeries(
+  export function skipChapters(
+    chapters: Chapter[],
+    series: Series,
+    skip: boolean,
+    setChapterList: (chapterList: Chapter[]) => void,
+  ) {
+    if (series.id !== undefined) {
+      const newChapters = chapters.map((chapter) => ({ ...chapter, skip }));
+      library.upsertChapters(newChapters, series);
+      loadChapterList(series.id, setChapterList);
+    }
+  }
+
+  async function reloadSeries(
   series: Series,
   chapterLanguages: LanguageKey[],
 ): Promise<Error | void> {

@@ -58,7 +58,7 @@ import {
 } from 'lucide-react';
 import { ChapterTableLanguageFilter } from './ChapterTableLanguageFilter';
 import { ChapterTableGroupFilter } from './ChapterTableGroupFilter';
-import { markChapters } from '@/renderer/features/library/utils';
+import { markChapters, skipChapters } from '@/renderer/features/library/utils';
 import { downloaderClient } from '@/renderer/services/downloader';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { Checkbox } from '@houdoku/ui/components/Checkbox';
@@ -179,6 +179,25 @@ export function ChapterTable(props: ChapterTableProps) {
           </span>
         );
       },
+      enableHiding: false,
+    },
+    {
+      id: 'skip',
+      header: () => <span>Skip</span>,
+      cell: ({ row }) => (
+        <div className="flex">
+          <span className="w-5 h-5">
+            <Checkbox
+              checked={row.original.skip ?? false}
+              onCheckedChange={(value) => {
+                const chapterId = row.original.id;
+                if (!chapterId) return;
+                skipChapters([row.original], props.series, !!value, setChapterList);
+              }}
+            />
+          </span>
+        </div>
+      ),
       enableHiding: false,
     },
     {
@@ -557,7 +576,7 @@ export function ChapterTable(props: ChapterTableProps) {
                       }}
                     >
                       {row.getVisibleCells().map((cell) => {
-                        const canClickThrough = ['select', 'icons'].includes(
+                        const canClickThrough = ['select', 'icons', 'skip'].includes(
                           cell.column.columnDef.id!,
                         );
                         return (
