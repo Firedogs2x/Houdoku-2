@@ -183,16 +183,23 @@ export function ChapterTable(props: ChapterTableProps) {
     },
     {
       id: 'skip',
-      header: () => <span>Skip</span>,
+      header: () => (
+        <div className="flex justify-center">
+          <span>Skip</span>
+        </div>
+      ),
       cell: ({ row }) => (
-        <div className="flex">
-          <span className="w-5 h-5">
+        <div className="flex justify-center">
+          <span className="flex h-5 w-5 items-center justify-center">
             <Checkbox
               checked={row.original.skip ?? false}
               onCheckedChange={(value) => {
-                const chapterId = row.original.id;
-                if (!chapterId) return;
-                skipChapters([row.original], props.series, !!value, setChapterList);
+                if (!row.original.id) return;
+
+                const nextSkip = value === true;
+                if ((row.original.skip ?? false) === nextSkip) return;
+
+                skipChapters([row.original], props.series, nextSkip, setChapterList);
               }}
             />
           </span>
