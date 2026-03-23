@@ -5,6 +5,18 @@ Download Houdoku from [GitHub releases page](https://github.com/Firedogs2x/houdo
 ## Home Page
 ![Home Page Screenshot 2026-02-16 221908](https://github.com/user-attachments/assets/e2542c9c-d733-4344-954d-01e23540c4e7)
 
+New:
+  1) Set the color of the scroll bar slider.
+
+## Series Page
+![Houdoku Series Page 2 17 7 Screenshot 2026-03-22 215653](https://github.com/user-attachments/assets/8d849ac2-7605-4dd2-b2bc-2aa374b66b3e)
+
+New:
+  1) Added the ability to add and display two alternate titles.
+  2) Added Series rating, 0 - 10, selectable drop-down menu, displayed on Series Card.
+  3) The abilty to select multiple check boxes in column one using "Shift + Left Mouse Button".
+  4) New column called "Skip". Allows you to select chapters that you wish to skip while reading.
+  5) Now only the chapter list scrolls instead of the whole page.
 
 ## Series Card
 <img width="570" height="540" alt="Series Card Mod 2026-01-16" src="https://github.com/user-attachments/assets/e7215cba-c740-4096-85ca-e15e44b84cc1" />
@@ -16,10 +28,12 @@ Indicator positioned just below the total number of chapters has two functions.
   1) Shows that no chapters have been read in that series.
   2) Shows new chapters have been added after the last time a chapter was read in that series.
 
+Series Rating is shown inside of the star located in the lower left corner. To set the rating goto the Series page.
+
 Below the title is the date showing the last time a chapter in that series was read and the date showing the last time a new chapter was added.
 Bottom left corner a Ratings count with a star icon.
 
-The following items now have the ability to have a costom set color:
+The following items now have the ability to have a custom set color:
   1) Chapter count background.
   2) Chapter count font.
   3) Rating star fill.
@@ -31,10 +45,10 @@ NOTE: The total number of chapters may show up wrong. This is because some websi
 
 ## Features
 - Semi-automated Series loader. Button located on Add Series page. Must have Settings / Folder tab filled out for option to work.
-- Read manga from popular websites or import ones from your filesystem,
-  all in one place.
-- Download chapters for offline reading.
+- Read manga from popular websites or import ones from your filesystem, all in one place.
 - Customizable reader interface with multiple layouts and settings.
+- The ability to set custom colors.
+- Download chapters for offline reading.
 - Tagging and filtering support to easily browse and manage large libraries.
 - Cross-platform!
 
@@ -42,39 +56,6 @@ NOTE: The total number of chapters may show up wrong. This is because some websi
 
 User guides and documentation are available on
 [houdoku.org](https://houdoku.org).
-
-## Development
-
-Install dependencies:
-
-```
-pnpm i
-```
-
-Start the app in the dev environment:
-
-```
-pnpm dev
-```
-
-Create a test/dev release build without bumping the stable version:
-
-```
-pnpm dist:win:dev
-```
-
-This generates a ZIP package using a prerelease version format like `2.17.1-dev.202603011430`.
-The stable `version` in `apps/desktop/package.json` is not modified.
-The ZIP contains the complete portable application - extract and run Houdoku.exe.
-
-> **Note**: NSIS installer builds are currently disabled due to Windows MAX_PATH limitations with pnpm's dependency structure.
-
-Also available:
-
-```
-pnpm dist:mac:dev
-pnpm dist:linux:dev
-```
 
 ## Stack
 
