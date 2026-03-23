@@ -113,24 +113,37 @@ export function markChapters(
 ) {
   if (series.id !== undefined) {
     console.log(`[markChapters] START: Marking ${chapters.length} chapter(s) as ${read ? 'read' : 'unread'} for series "${series.title}" (id: ${series.id})`);
-    
+
     const newChapters = chapters.map((chapter) => ({ ...chapter, read }));
     library.upsertChapters(newChapters, series);
     console.log(`[markChapters] After upsertChapters - calling updateSeriesNumberUnread`);
-    
+
     updateSeriesNumberUnread(series, chapterLanguages);
     loadChapterList(series.id, setChapterList);
     loadSeries(series.id, setSeries);
-    
+
     // Refresh the series list state to ensure UI reflects updated unread counts
     if (setSeriesList) {
       const freshList = library.fetchSeriesList();
-      const thisSeriesInList = freshList.find(s => s.id === series.id);
+      const thisSeriesInList = freshList.find((s) => s.id === series.id);
       console.log(`[markChapters] Calling setSeriesList with fresh data. This series: title="${thisSeriesInList?.title}", numberUnread=${thisSeriesInList?.numberUnread}, unread=${thisSeriesInList?.unread}`);
       setSeriesList(freshList);
     } else {
       console.warn(`[markChapters] setSeriesList callback not provided! Series list may not update in UI.`);
     }
+  }
+}
+
+export function skipChapters(
+  chapters: Chapter[],
+  series: Series,
+  skip: boolean,
+  setChapterList: (chapterList: Chapter[]) => void,
+) {
+  if (series.id !== undefined) {
+    const newChapters = chapters.map((chapter) => ({ ...chapter, skip }));
+    library.upsertChapters(newChapters, series);
+    loadChapterList(series.id, setChapterList);
   }
 }
 
@@ -181,6 +194,7 @@ async function reloadSeries(
     if (matchingChapter !== undefined && matchingChapter.id !== undefined) {
       chapter.id = matchingChapter.id;
       chapter.read = matchingChapter.read;
+      chapter.skip = matchingChapter.skip;
       // preserve existing dateAdded if present
       if (matchingChapter.dateAdded) chapter.dateAdded = matchingChapter.dateAdded;
 

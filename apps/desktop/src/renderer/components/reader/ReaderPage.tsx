@@ -281,13 +281,17 @@ const ReaderPage: React.FC = () => {
    * @return the ID of the chapter, or null if none exists (or props.chapter or
    *  props.relevantChapterList have not been loaded)
    */
-  const getAdjacentChapterId = (previous: boolean): string | null => {
+  const getAdjacentChapterId = (
+    previous: boolean,
+    skipSkippedChapters: boolean = false,
+  ): string | null => {
     if (readerChapter === undefined) return null;
 
     const curChapterIndex: number = relevantChapterList.findIndex(
       (chapter: Chapter) => (chapter as any).id === (readerChapter as any)?.id,
     );
-    const newChapterIndex = previous ? curChapterIndex + 1 : curChapterIndex - 1;
+    const delta = previous ? 1 : -1;
+    let newChapterIndex = curChapterIndex + delta;
 
     if (
       curChapterIndex === -1 ||
@@ -295,6 +299,20 @@ const ReaderPage: React.FC = () => {
       newChapterIndex >= relevantChapterList.length
     )
       return null;
+
+    if (!previous && skipSkippedChapters) {
+      while (
+        newChapterIndex >= 0 &&
+        newChapterIndex < relevantChapterList.length &&
+        (relevantChapterList[newChapterIndex] as any)?.skip === true
+      ) {
+        newChapterIndex += delta;
+      }
+
+      if (newChapterIndex < 0 || newChapterIndex >= relevantChapterList.length) {
+        return null;
+      }
+    }
 
     const id = (relevantChapterList[newChapterIndex] as any)?.id;
     return id === undefined ? null : (id as string);
@@ -342,7 +360,10 @@ const ReaderPage: React.FC = () => {
       previous = direction === 'previous';
     }
 
-    const newChapterId = getAdjacentChapterId(previous);
+    // Skip-marked chapters only when advancing forward via page overflow
+    // (i.e. user clicked at/after the final page to go to the next chapter).
+    const skipSkippedChapters = !!fromPageMovement && !previous;
+    const newChapterId = getAdjacentChapterId(previous, skipSkippedChapters);
     if (newChapterId === null) return false;
     const desiredPage = fromPageMovement && previous ? Infinity : 1;
     setChapter(newChapterId, desiredPage);

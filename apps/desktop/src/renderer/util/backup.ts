@@ -184,6 +184,7 @@ const buildBackupPayload = () => {
       groupName: c.groupName,
       time: c.time,
       read: c.read,
+      skip: c.skip ?? false,
       id: c.id,
       dateAdded: c.dateAdded,
     }));
@@ -378,6 +379,7 @@ export const restoreBackup = (backupFileContent: string) => {
           return {
             ...chapter,
             read: (existingChapter && existingChapter.read) || chapter.read,
+            skip: (existingChapter && existingChapter.skip) || (chapter as Chapter).skip || false,
           };
         });
 
@@ -411,6 +413,7 @@ export const restoreBackup = (backupFileContent: string) => {
           chaptersToSave.push({
             ...oldChapter,
             read: (existingChapter && existingChapter.read) || oldChapter.read,
+            skip: (existingChapter && existingChapter.skip) || oldChapter.skip || false,
           });
         });
         library.upsertChapters(chaptersToSave, series);

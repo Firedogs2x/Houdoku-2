@@ -3,5 +3,7 @@ declare module '@tiyo/common' {
   interface Chapter {
     /** ISO 8601 date string when the chapter was added to the library */
     dateAdded?: string;
+    /** Whether this chapter should be skipped */
+    skip?: boolean;
   }
 }
