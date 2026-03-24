@@ -85,10 +85,6 @@ interface ChapterTableProps {
 export function ChapterTable(props: ChapterTableProps) {
   const navigate = useNavigate();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: chapterListPageSize || 10,
-  });
   const [selectionAnchorChapterId, setSelectionAnchorChapterId] = useState<string | undefined>(
     undefined,
   );
@@ -113,6 +109,10 @@ export function ChapterTable(props: ChapterTableProps) {
   const customDownloadsDir = useRecoilValue(customDownloadsDirState);
   const downloaderCurrentTask = useRecoilValue(currentTaskState);
   const chapterListPageSize = useRecoilValue(chapterListPageSizeState);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: chapterListPageSize || 10,
+  });
 
   const columns: ColumnDef<Chapter>[] = [
     {
