@@ -3,6 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  PaginationState,
   RowSelectionState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -108,6 +109,10 @@ export function ChapterTable(props: ChapterTableProps) {
   const customDownloadsDir = useRecoilValue(customDownloadsDirState);
   const downloaderCurrentTask = useRecoilValue(currentTaskState);
   const chapterListPageSize = useRecoilValue(chapterListPageSizeState);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: chapterListPageSize || 10,
+  });
 
   const columns: ColumnDef<Chapter>[] = [
     {
@@ -345,20 +350,58 @@ export function ChapterTable(props: ChapterTableProps) {
     data: sortedFilteredChapterList,
     columns: columns,
     enableRowSelection: true,
+    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualSorting: true,
     manualFiltering: true,
+    onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
     state: {
+      pagination,
       rowSelection,
     },
-    initialState: {
-      pagination: {
-        pageSize: chapterListPageSize || 10,
-      },
-    },
   });
+
+  useEffect(() => {
+    setPagination((currentPagination) => {
+      const nextPageSize = chapterListPageSize || 10;
+
+      if (currentPagination.pageSize === nextPageSize) {
+        return currentPagination;
+      }
+
+      return {
+        pageIndex: currentPagination.pageIndex,
+        pageSize: nextPageSize,
+      };
+    });
+  }, [chapterListPageSize]);
+
+  useEffect(() => {
+    setPagination((currentPagination) => {
+      const maxPageIndex = Math.max(
+        0,
+        Math.ceil(sortedFilteredChapterList.length / currentPagination.pageSize) - 1,
+      );
+
+      if (currentPagination.pageIndex <= maxPageIndex) {
+        return currentPagination;
+      }
+
+      return {
+        ...currentPagination,
+        pageIndex: maxPageIndex,
+      };
+    });
+  }, [sortedFilteredChapterList.length]);
+
+  useEffect(() => {
+    setPagination((currentPagination) => ({
+      pageIndex: 0,
+      pageSize: currentPagination.pageSize,
+    }));
+  }, [props.series.id]);
 
   const updateDownloadStatuses = () => {
     ipcRenderer
