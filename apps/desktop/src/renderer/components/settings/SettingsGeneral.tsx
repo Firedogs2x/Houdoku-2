@@ -160,6 +160,8 @@ export const SettingsGeneral: React.FC = () => {
           <Input readOnly value={backupFolderDisplay} className="flex-1" />
         </div>
 
+        <div className="h-4" aria-hidden="true" />
+
         <div className="flex space-x-2">
           <Button size="sm" onClick={() => void handleCreateBackup()}>
             Create Backup

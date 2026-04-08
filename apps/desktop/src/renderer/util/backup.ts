@@ -69,6 +69,7 @@ const buildBackupPayload = () => {
       AutoCheckForUpdates: getSettingValue<string | boolean>(GeneralSetting.AutoCheckForUpdates),
       autoBackup: getSettingValue<string | boolean>(GeneralSetting.autoBackup),
       autoBackupCount: getSettingValue<string | number>(GeneralSetting.autoBackupCount),
+      BackupFolder: getSettingValue<string>(GeneralSetting.BackupFolder),
     },
     Theme: {
       ApplicationTheme: getSettingValue<string>(GeneralSetting.ApplicationTheme),
@@ -80,7 +81,6 @@ const buildBackupPayload = () => {
     },
     Folders: {
       MasterFolder: getSettingValue<string>(GeneralSetting.MasterFolder),
-      BackupFolder: getSettingValue<string>(GeneralSetting.BackupFolder),
       UseFolderAsTitle: getSettingValue<string | boolean>(GeneralSetting.UseFolderAsTitle),
       CoverImageFolder: getSettingValue<string>(GeneralSetting.CoverImageFolder),
       CoverImageName: getSettingValue<string>(GeneralSetting.CoverImageName),
@@ -326,6 +326,11 @@ export const restoreBackup = (backupFileContent: string) => {
 
       // Restore settings by category
       const settings = data.settings as Record<string, Record<string, unknown>>;
+      const backupFolderFromBackup = settings.General?.BackupFolder ?? settings.Folders?.BackupFolder;
+
+      if (typeof backupFolderFromBackup === 'string') {
+        saveGeneralSetting(GeneralSetting.BackupFolder, backupFolderFromBackup);
+      }
 
       if (settings.General) {
         saveGeneralSetting(GeneralSetting.AutoCheckForUpdates, settings.General.AutoCheckForUpdates);
@@ -344,7 +349,6 @@ export const restoreBackup = (backupFileContent: string) => {
 
       if (settings.Folders) {
         saveGeneralSetting(GeneralSetting.MasterFolder, settings.Folders.MasterFolder);
-        saveGeneralSetting(GeneralSetting.BackupFolder, settings.Folders.BackupFolder);
         saveGeneralSetting(GeneralSetting.UseFolderAsTitle, settings.Folders.UseFolderAsTitle);
         saveGeneralSetting(GeneralSetting.CoverImageFolder, settings.Folders.CoverImageFolder);
         saveGeneralSetting(GeneralSetting.CoverImageName, settings.Folders.CoverImageName);
