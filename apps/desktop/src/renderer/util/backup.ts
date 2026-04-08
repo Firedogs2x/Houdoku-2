@@ -36,6 +36,10 @@ type SeriesWithRating = Series & {
 
 const BACKUP_FILE_PREFIX = 'houdoku_backup_';
 const BACKUP_FILE_EXTENSION = '.json';
+const NATURAL_ASC_COLLATOR = new Intl.Collator('en', {
+  numeric: true,
+  sensitivity: 'base',
+});
 
 // Exact backup format matching the specification
 const getBackupDateStamp = (date: Date = new Date()): string => {
@@ -43,6 +47,35 @@ const getBackupDateStamp = (date: Date = new Date()): string => {
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
+};
+
+const toFiniteNumber = (value: unknown): number | null => {
+  const parsed = Number.parseFloat(String(value ?? '').trim());
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const compareSeriesForBackup = (left: Series, right: Series): number => {
+  const titleCompare = NATURAL_ASC_COLLATOR.compare(String(left.title ?? ''), String(right.title ?? ''));
+  if (titleCompare !== 0) return titleCompare;
+
+  return NATURAL_ASC_COLLATOR.compare(String(left.id ?? ''), String(right.id ?? ''));
+};
+
+const compareChapterForBackup = (left: Chapter, right: Chapter): number => {
+  const leftChapterNumber = toFiniteNumber(left.chapterNumber);
+  const rightChapterNumber = toFiniteNumber(right.chapterNumber);
+
+  if (leftChapterNumber !== null && rightChapterNumber !== null && leftChapterNumber !== rightChapterNumber) {
+    return leftChapterNumber - rightChapterNumber;
+  }
+
+  if (leftChapterNumber !== null && rightChapterNumber === null) return -1;
+  if (leftChapterNumber === null && rightChapterNumber !== null) return 1;
+
+  const titleCompare = NATURAL_ASC_COLLATOR.compare(String(left.title ?? ''), String(right.title ?? ''));
+  if (titleCompare !== 0) return titleCompare;
+
+  return NATURAL_ASC_COLLATOR.compare(String(left.id ?? ''), String(right.id ?? ''));
 };
 
 const buildBackupPayload = () => {
@@ -147,7 +180,9 @@ const buildBackupPayload = () => {
   };
 
   // Series with inline chapters - exact order preserved
-  const series = library.fetchSeriesList().map((s: Series) => {
+  const sortedSeries = [...library.fetchSeriesList()].sort(compareSeriesForBackup);
+
+  const series = sortedSeries.map((s: Series) => {
     const rating = (s as SeriesWithRating).rating;
     const seriesEntry: Record<string, unknown> = {
       title: s.title,
@@ -178,7 +213,7 @@ const buildBackupPayload = () => {
     });
 
     // Inline chapters with exact order preserved
-    const chapters = s.id ? library.fetchChapters(s.id) : [];
+    const chapters = s.id ? [...library.fetchChapters(s.id)].sort(compareChapterForBackup) : [];
     seriesEntry.chapters = chapters.map((c: Chapter) => ({
       sourceId: c.sourceId,
       title: c.title,
