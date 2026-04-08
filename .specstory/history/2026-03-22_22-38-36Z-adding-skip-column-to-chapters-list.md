@@ -367,3 +367,62 @@ Make sure any changes do not cause program errors. And do not cause errors in Li
 _**Agent (copilot/auto)**_
 
 I’m locating the reader’s end-of-chapter navigation path so I can inject Skip-only behavior there without affecting any other flows.
+
+---
+
+_**User (2026-03-24 01:44:55Z)**_
+
+I have tested out the Skip function and I have found that if I am on any page other than page one of the chapters list and I select a check box the chapters list jumps back to page one and to the start of the list. This is an issue that I would like to fix. If I am on any page other than page one, I do not want the list page to be reset when I select a check box. The only time the list page should be reset to page one is when I personally select page one or when I initially open a Series page from a different location.
+Use methods to repair and optimize the code.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+_**User (2026-03-24 02:32:35Z)**_
+
+After making the last changes I attempted to run the program. The All Series page loads up, but as so as I attempt to open any Series page I get the following error:
+Sorry, something went wrong.
+An error occurred while loading the page. Normally we would show more specific information, but the error caused the renderer to break, so we can only show you this page instead.
+What to do
+- Press Ctrl + R to reload the client.
+- You can open the console by pressing Ctrl + Shift + I, which may contain additional information about the error.
+- Report an issue on GitHub. Please copy the expanded error information below, as well as the steps you took before seeing this page.
+Error details
+Additional logs in C:\Users\dnvm8\AppData\Roaming\Houdoku\logs
+ReferenceError: Cannot access 'chapterListPageSize' before initialization
+ReferenceError: Cannot access 'chapterListPageSize' before initialization
+    at ChapterTable (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:37074:15)
+    at Nh (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:3380:7)
+    at Vk (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:6323:11)
+    at Uk (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:6017:11)
+    at Tk (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:6011:26)
+    at Ik (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:5996:7)
+    at Nk (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:5727:7)
+    at Gk (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:5663:51)
+    at J2 (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:406:19)
+    at Immediate.R2 [as _onImmediate] (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:434:13)
+
+    at ChapterTable (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:37070:20)
+    at div
+    at div
+    at SeriesDetails (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:37569:23)
+    at RenderedRoute (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13021:5)
+    at Routes (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13292:5)
+    at div
+    at div
+    at Provider2 (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:14453:15)
+    at TooltipProvider$1 (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:24024:5)
+    at file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:24520:5
+    at DashboardPage (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:44987:25)
+    at RenderedRoute (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13021:5)
+    at Routes (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13292:5)
+    at Router (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13236:15)
+    at HashRouter (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:13392:15)
+    at App (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:47360:46)
+    at ErrorBoundary (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:47503:5)
+    at div
+    at Root (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:47594:17)
+    at RecoilRoot_INTERNAL (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:9803:3)
+    at RecoilRoot (file:///C:/Users/dnvm8/AppData/Local/Temp/3BN6ryKuXrIZjyuBpDqUYtSua4g/resources/app.asar/out/renderer/assets/index-GXc-imB6.js:9916:5)
+Please do an extreme review of the code and fix any and all issues with the code.
+Use methods to repair and optimize the code.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.

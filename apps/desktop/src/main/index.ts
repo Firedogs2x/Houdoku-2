@@ -201,6 +201,7 @@ ipcMain.handle(
     directory = false,
     filters: { name: string; extensions: string[] }[] = [],
     title: string,
+    defaultPath?: string,
   ) => {
     console.info(`Showing open dialog directory=${directory} filters=${filters.join(';')}`);
 
@@ -214,6 +215,7 @@ ipcMain.handle(
         properties: [directory ? 'openDirectory' : 'openFile'],
         filters,
         title,
+        defaultPath,
       })
       .then((value: OpenDialogReturnValue) => {
         if (value.canceled) return [];

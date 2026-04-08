@@ -1,6 +1,7 @@
 import { Chapter, Series } from '@tiyo/common';
 const fs = require('fs');
 const path = require('path');
+import { toast } from '@houdoku/ui/hooks/use-toast';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { updateSeries } from '../features/library/utils';
 import library from '../services/library';
@@ -28,11 +29,13 @@ import {
   TrackerSetting,
   ApplicationTheme,
 } from '@/common/models/types';
-import { getLocalDateStampForFilename } from '@/renderer/util/date';
 
 type SeriesWithRating = Series & {
   rating?: number;
 };
+
+const BACKUP_FILE_PREFIX = 'houdoku_backup_';
+const BACKUP_FILE_EXTENSION = '.json';
 
 // Exact backup format matching the specification
 const getBackupDateStamp = (date: Date = new Date()): string => {
@@ -77,6 +80,7 @@ const buildBackupPayload = () => {
     },
     Folders: {
       MasterFolder: getSettingValue<string>(GeneralSetting.MasterFolder),
+      BackupFolder: getSettingValue<string>(GeneralSetting.BackupFolder),
       UseFolderAsTitle: getSettingValue<string | boolean>(GeneralSetting.UseFolderAsTitle),
       CoverImageFolder: getSettingValue<string>(GeneralSetting.CoverImageFolder),
       CoverImageName: getSettingValue<string>(GeneralSetting.CoverImageName),
@@ -200,40 +204,105 @@ const buildBackupPayload = () => {
   };
 };
 
-export const createBackup = async () => {
+const getBackupFileName = (backupDate: string) =>
+  `${BACKUP_FILE_PREFIX}${backupDate}${BACKUP_FILE_EXTENSION}`;
+
+const getBackupFiles = (backupDirectory: string) =>
+  fs
+    .readdirSync(backupDirectory, { withFileTypes: true })
+    .filter(
+      (entry: { isFile: () => boolean; name: string }) =>
+        entry.isFile() &&
+        entry.name.startsWith(BACKUP_FILE_PREFIX) &&
+        entry.name.endsWith(BACKUP_FILE_EXTENSION),
+    )
+    .map((entry: { name: string }) => {
+      const fullPath = path.join(backupDirectory, entry.name);
+      return {
+        fullPath,
+        stats: fs.statSync(fullPath),
+      };
+    })
+    .sort(
+      (
+        left: { stats: { mtimeMs: number } },
+        right: { stats: { mtimeMs: number } },
+      ) => left.stats.mtimeMs - right.stats.mtimeMs,
+    );
+
+export const getConfiguredBackupDirectory = (): string => {
+  const storedSettings = getAllStoredSettings() as { [key: string]: unknown };
+  const configuredBackupDirectory = String(storedSettings[GeneralSetting.BackupFolder] ?? '').trim();
+
+  if (!configuredBackupDirectory) {
+    throw new Error('Backup folder has not been configured.');
+  }
+
+  if (!fs.existsSync(configuredBackupDirectory)) {
+    throw new Error(`Backup folder does not exist: ${configuredBackupDirectory}`);
+  }
+
+  if (!fs.statSync(configuredBackupDirectory).isDirectory()) {
+    throw new Error(`Backup folder is not a directory: ${configuredBackupDirectory}`);
+  }
+
+  return configuredBackupDirectory;
+};
+
+const writeBackupFile = (backupDirectory: string) => {
   const payload = buildBackupPayload();
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {
-    type: 'application/json',
+  const filePath = path.join(backupDirectory, getBackupFileName(payload.backupDate));
+
+  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
+
+  return { filePath, payload };
+};
+
+const pruneBackupFiles = (backupDirectory: string, maxBackupCount: number) => {
+  const safeMaxBackupCount = Math.max(1, Math.floor(maxBackupCount));
+  const backupFiles = getBackupFiles(backupDirectory);
+  const filesToDelete = backupFiles.slice(0, Math.max(0, backupFiles.length - safeMaxBackupCount));
+
+  filesToDelete.forEach((file: { fullPath: string }) => {
+    fs.unlinkSync(file.fullPath);
   });
+};
 
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `houdoku_backup_${payload.backupDate}.json`;
+export const createBackup = async () => {
+  try {
+    const backupDirectory = getConfiguredBackupDirectory();
+    const { filePath } = writeBackupFile(backupDirectory);
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    toast({
+      title: 'Backup created',
+      description: `Saved backup to ${filePath}`,
+    });
+  } catch (error) {
+    toast({
+      title: 'Failed to create backup',
+      description:
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while creating the backup file.',
+    });
+    throw error;
+  }
 };
 
 export const createAutoBackup = async (Count = 1) => {
-  if (!fs.existsSync('backups')) {
-    fs.mkdir('backups', { recursive: true });
-  }
-  const payload = buildBackupPayload();
-  const fileName = `houdoku_backup_${payload.backupDate}.json`;
-  const filePath = path.join('backups', fileName);
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2));
-  }
-  fs.readdir('backups', (err: Error, files: string[]) => {
-    if (err) {
-      console.error(`Unable to scan directory: ${err}`);
-      return;
+  try {
+    const backupDirectory = getConfiguredBackupDirectory();
+    const fileName = getBackupFileName(getBackupDateStamp());
+    const filePath = path.join(backupDirectory, fileName);
+
+    if (!fs.existsSync(filePath)) {
+      writeBackupFile(backupDirectory);
     }
-    if (files.length > Count) {
-      fs.unlinkSync(path.join('backups', files[0]));
-    }
-  });
+
+    pruneBackupFiles(backupDirectory, Count);
+  } catch (error) {
+    console.error('Failed to create automatic backup:', error);
+  }
 };
 
 export const restoreBackup = (backupFileContent: string) => {
@@ -275,6 +344,7 @@ export const restoreBackup = (backupFileContent: string) => {
 
       if (settings.Folders) {
         saveGeneralSetting(GeneralSetting.MasterFolder, settings.Folders.MasterFolder);
+        saveGeneralSetting(GeneralSetting.BackupFolder, settings.Folders.BackupFolder);
         saveGeneralSetting(GeneralSetting.UseFolderAsTitle, settings.Folders.UseFolderAsTitle);
         saveGeneralSetting(GeneralSetting.CoverImageFolder, settings.Folders.CoverImageFolder);
         saveGeneralSetting(GeneralSetting.CoverImageName, settings.Folders.CoverImageName);

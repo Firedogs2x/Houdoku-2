@@ -77,6 +77,7 @@ export const autoBackupCountState = atm<number>(GeneralSetting.autoBackupCount);
 export const confirmRemoveSeriesState = atm<boolean>(GeneralSetting.ConfirmRemoveSeries);
 export const customDownloadsDirState = atm<string>(GeneralSetting.CustomDownloadsDir);
 export const masterFolderState = atm<string>(GeneralSetting.MasterFolder);
+export const backupFolderState = atm<string>(GeneralSetting.BackupFolder);
 export const useFolderAsTitleState = atm<boolean>(GeneralSetting.UseFolderAsTitle);
 export const coverImageFolderState = atm<string>(GeneralSetting.CoverImageFolder);
 export const coverImageNameState = atm<string>(GeneralSetting.CoverImageName);
