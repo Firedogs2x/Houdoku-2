@@ -45,3 +45,17 @@ Please cleanup and remove all unnecessary files created during the last testing 
 _**Agent (copilot/auto)**_
 
 I’m going to identify exactly which generated artifacts came from the recent lint/build/release attempts, then remove only those test byproducts and leave source changes intact.
+
+---
+
+_**User (2026-04-08 09:52:03Z)**_
+
+I want to inspect and repair the way that the backup file is created.
+I want the backup file top section of settings to remain at the top. Otherwise, no changes.
+Then when it comes to saving the series, I want them to always be sorted this way:
+1)	Numerical: Sorting numbers from smallest to largest
+2)	Alphabetical: Ordering text data from A to Z
+Make sure that all of the chapters under a series name are sorted Numerical: Sorting numbers from smallest to largest.
+Make sure that nothing can change the way a backup file is sorted and saved.
+Use methods to repair and optimize the code.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
