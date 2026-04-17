@@ -117,6 +117,17 @@ export default function App() {
       // field 'tags'.
       migrateSeriesTags();
 
+      // Migrate stale numberUnread values persisted by older algorithm versions.
+      // Recomputes the correct whole-chapter unread count for every series on startup.
+      library.fetchSeriesList().forEach((series) => {
+        if (!series.id) return;
+        const chapters = library.fetchChapters(series.id);
+        const numberUnread = getNumberUnreadChapters(chapters);
+        if (series.numberUnread !== numberUnread) {
+          library.upsertSeries({ ...series, numberUnread });
+        }
+      });
+
       // Remove any preview series.
       library
         .fetchSeriesList()

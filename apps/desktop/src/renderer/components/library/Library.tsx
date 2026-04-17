@@ -107,11 +107,8 @@ const Library: React.FC<Props> = () => {
   );
 
   const getUnreadCount = (series: Series): number => {
-    if (!series.id) {
-      return series.numberUnread;
-    }
-
-    return seriesChapterMetadata[series.id]?.unreadChapters ?? series.numberUnread;
+    if (!series.id) return 0;
+    return seriesChapterMetadata[series.id]?.unreadChapters ?? 0;
   };
 
   const filteredList = activeSeriesList.filter((series: Series) => {

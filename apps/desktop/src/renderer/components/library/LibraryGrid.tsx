@@ -67,7 +67,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const isMultiSelected = multiSelectSeriesList.includes(series);
         const chapterMetadata = series.id ? props.seriesChapterMetadata[series.id] : undefined;
         const totalChapters = chapterMetadata?.totalChapters || 0;
-        const unreadChapters = chapterMetadata?.unreadChapters ?? series.numberUnread;
+        const unreadChapters = chapterMetadata?.unreadChapters ?? 0;
         const hasUnreadFlag = series.unread === true;
         const hasNewDate = chapterMetadata?.hasNewChaptersSinceLastRead || false;
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);

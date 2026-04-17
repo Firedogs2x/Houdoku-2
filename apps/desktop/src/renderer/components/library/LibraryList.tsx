@@ -30,9 +30,7 @@ const LibraryList: React.FC<Props> = (props: Props) => {
     <Table>
       <TableBody>
         {props.seriesList.map((series) => {
-          const unreadChapters =
-            (series.id ? props.seriesChapterMetadata[series.id]?.unreadChapters : undefined) ??
-            series.numberUnread;
+          const unreadChapters = (series.id ? props.seriesChapterMetadata[series.id]?.unreadChapters : undefined) ?? 0;
 
           return (
             <ContextMenu key={`${series.id}-${series.title}`}>
