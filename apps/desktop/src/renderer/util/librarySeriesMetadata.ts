@@ -1,5 +1,6 @@
 import { Chapter, Series } from '@tiyo/common';
 import library from '@/renderer/services/library';
+import { getTotalWholeChapters } from '@/renderer/util/comparison';
 
 export type SeriesChapterMetadata = {
   totalChapters: number;
@@ -41,7 +42,7 @@ export const buildSeriesChapterMetadataMap = (
     const lastReadTimestamp = series.lastReadDate ? new Date(series.lastReadDate).getTime() : 0;
 
     metadataMap[series.id] = {
-      totalChapters: chapters.length,
+      totalChapters: getTotalWholeChapters(chapters),
       latestChapterAddedDate,
       latestChapterAddedTimestamp,
       hasNewChaptersSinceLastRead:

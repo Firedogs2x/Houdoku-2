@@ -45,70 +45,70 @@ export function selectMostSimilarChapter(original: Chapter, options: Chapter[]):
   return null;
 }
 
-function consolidateAndSortChapters(chapterList: Chapter[]): Chapter[] {
-  const grouped: { [index: string]: Chapter[] } = {};
+function getWholeChapterNumber(chapter: Chapter): number | null {
+  const chapterNumber = parseFloat(chapter.chapterNumber);
+  if (!Number.isFinite(chapterNumber)) {
+    return null;
+  }
+
+  const wholeChapterNumber = Math.floor(chapterNumber);
+  if (wholeChapterNumber < 1) {
+    return null;
+  }
+
+  return wholeChapterNumber;
+}
+
+export function getTotalWholeChapters(chapterList: Chapter[]): number {
+  let highestWholeChapterNumber = 0;
+
   chapterList.forEach((chapter: Chapter) => {
-    const key = chapter.chapterNumber === '' ? chapter.sourceId : chapter.chapterNumber;
-
-    if (grouped[key] === undefined) {
-      grouped[key] = [];
+    const wholeChapterNumber = getWholeChapterNumber(chapter);
+    if (wholeChapterNumber !== null && wholeChapterNumber > highestWholeChapterNumber) {
+      highestWholeChapterNumber = wholeChapterNumber;
     }
-
-    grouped[key].push(chapter);
   });
 
-  const chapters: Chapter[] = [];
-  Object.keys(grouped).forEach((key) => {
-    const groupedChapters = grouped[key];
-
-    let chapter = groupedChapters.find((chap) => chap.read);
-    if (chapter === undefined) {
-      [chapter] = groupedChapters;
-    }
-
-    chapters.push(chapter);
-  });
-
-  return chapters.sort(
-    (a: Chapter, b: Chapter) => parseFloat(a.chapterNumber) - parseFloat(b.chapterNumber),
-  );
+  return highestWholeChapterNumber;
 }
 
 /**
  * Get the number of unread chapters from a list.
- * This function calculates a value using the Chapter.chapterNumber field and read status of each
- * chapter. It is not necessarily correlated with the number of chapter objects in the list.
+ * The total chapter count is the highest whole chapter number in the list, where chapter numbers
+ * with decimals are rounded down (e.g. 35.9 -> 35). A whole chapter is only counted as completed
+ * when every chapter entry with that whole-number prefix is marked read.
  * @param chapterList the list of chapters to calculate from (usually all of a series' chapters)
- * @returns the number of unread chapters (by chapter number)
+ * @returns the number of unread whole chapters
  */
 export function getNumberUnreadChapters(chapterList: Chapter[]): number {
-  let highestRead = 0;
-  let highestReleased = 0;
-  let previousChapNumber = 0;
-  let cumulativeGaps = 1;
+  const totalWholeChapters = getTotalWholeChapters(chapterList);
+  if (totalWholeChapters === 0) {
+    return 0;
+  }
 
-  const chapters = consolidateAndSortChapters(chapterList);
+  const fullyReadWholeChapterMap = new Map<number, boolean>();
 
-  chapters.forEach((chapter: Chapter, index: number) => {
-    let absoluteNumber = cumulativeGaps + index;
-    const chapterNumber = parseFloat(chapter.chapterNumber);
-
-    const gap = Math.ceil(chapterNumber - previousChapNumber) - 1;
-    if (gap > 1) {
-      // A gap between chapters was found. Account for this in the absolute numbers
-      absoluteNumber += gap;
-      cumulativeGaps += gap;
+  chapterList.forEach((chapter: Chapter) => {
+    const wholeChapterNumber = getWholeChapterNumber(chapter);
+    if (wholeChapterNumber === null) {
+      return;
     }
 
-    if (chapter.read && absoluteNumber > highestRead) {
-      highestRead = absoluteNumber;
-    }
-    if (absoluteNumber > highestReleased) {
-      highestReleased = absoluteNumber;
+    if (!fullyReadWholeChapterMap.has(wholeChapterNumber)) {
+      fullyReadWholeChapterMap.set(wholeChapterNumber, true);
     }
 
-    previousChapNumber = chapterNumber;
+    if (!chapter.read) {
+      fullyReadWholeChapterMap.set(wholeChapterNumber, false);
+    }
   });
 
-  return Math.ceil(highestReleased - highestRead);
+  let completedWholeChapters = 0;
+  for (let chapterNumber = 1; chapterNumber <= totalWholeChapters; chapterNumber += 1) {
+    if (fullyReadWholeChapterMap.get(chapterNumber) === true) {
+      completedWholeChapters += 1;
+    }
+  }
+
+  return Math.max(totalWholeChapters - completedWholeChapters, 0);
 }
