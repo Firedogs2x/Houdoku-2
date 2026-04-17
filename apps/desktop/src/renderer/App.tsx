@@ -25,6 +25,7 @@ import {
   loadStoredExtensionSettings,
   loadStoredTrackerTokens,
 } from './services/ipc';
+import { getNumberUnreadChapters } from './util/comparison';
 import { DefaultSettings, GeneralSetting } from '@/common/models/types';
 import {
   AlertDialog,
