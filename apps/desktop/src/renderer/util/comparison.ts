@@ -86,7 +86,7 @@ export function getNumberUnreadChapters(chapterList: Chapter[]): number {
     return 0;
   }
 
-  const fullyReadWholeChapterMap = new Map<number, boolean>();
+  const wholeChapterIsCompleted = new Map<number, boolean>();
 
   chapterList.forEach((chapter: Chapter) => {
     const wholeChapterNumber = getWholeChapterNumber(chapter);
@@ -94,21 +94,18 @@ export function getNumberUnreadChapters(chapterList: Chapter[]): number {
       return;
     }
 
-    if (!fullyReadWholeChapterMap.has(wholeChapterNumber)) {
-      fullyReadWholeChapterMap.set(wholeChapterNumber, true);
+    if (!wholeChapterIsCompleted.has(wholeChapterNumber)) {
+      wholeChapterIsCompleted.set(wholeChapterNumber, true);
     }
 
     if (!chapter.read) {
-      fullyReadWholeChapterMap.set(wholeChapterNumber, false);
+      wholeChapterIsCompleted.set(wholeChapterNumber, false);
     }
   });
 
-  let completedWholeChapters = 0;
-  for (let chapterNumber = 1; chapterNumber <= totalWholeChapters; chapterNumber += 1) {
-    if (fullyReadWholeChapterMap.get(chapterNumber) === true) {
-      completedWholeChapters += 1;
-    }
-  }
+  const completedWholeChapters = Array.from(wholeChapterIsCompleted.values()).filter(
+    (completed) => completed,
+  ).length;
 
   return Math.max(totalWholeChapters - completedWholeChapters, 0);
 }
