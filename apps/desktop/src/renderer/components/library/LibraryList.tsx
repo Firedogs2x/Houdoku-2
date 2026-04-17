@@ -6,9 +6,11 @@ import { Table, TableBody, TableCell, TableRow } from '@houdoku/ui/components/Ta
 import { Badge } from '@houdoku/ui/components/Badge';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import LibraryGridContextMenu from './LibraryGridContextMenu';
+import { SeriesChapterMetadata } from '@/renderer/util/librarySeriesMetadata';
 
 type Props = {
   seriesList: Series[];
+  seriesChapterMetadata: Record<string, SeriesChapterMetadata>;
   showRemoveModal: (series: Series) => void;
 };
 
@@ -27,17 +29,17 @@ const LibraryList: React.FC<Props> = (props: Props) => {
   return (
     <Table>
       <TableBody>
-        {props.seriesList.map((series) => (
-          <>
-            <ContextMenu>
+        {props.seriesList.map((series) => {
+          const unreadChapters =
+            (series.id ? props.seriesChapterMetadata[series.id]?.unreadChapters : undefined) ??
+            series.numberUnread;
+
+          return (
+            <ContextMenu key={`${series.id}-${series.title}`}>
               <ContextMenuTrigger asChild>
-                <TableRow
-                  key={`${series.id}-${series.title}`}
-                  className="cursor-pointer"
-                  onClick={() => viewFunc(series)}
-                >
+                <TableRow className="cursor-pointer" onClick={() => viewFunc(series)}>
                   <TableCell className="truncate flex space-x-2">
-                    {series.numberUnread > 0 && <Badge>{series.numberUnread}</Badge>}
+                    {unreadChapters > 0 && <Badge>{unreadChapters}</Badge>}
                     <span>{series.title}</span>
                   </TableCell>
                   <TableCell className="truncate max-w-40">
@@ -50,8 +52,8 @@ const LibraryList: React.FC<Props> = (props: Props) => {
               </ContextMenuTrigger>
               <LibraryGridContextMenu series={series} showRemoveModal={props.showRemoveModal} />
             </ContextMenu>
-          </>
-        ))}
+          );
+        })}
       </TableBody>
     </Table>
   );
