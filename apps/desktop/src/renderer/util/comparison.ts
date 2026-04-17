@@ -74,18 +74,13 @@ export function getTotalWholeChapters(chapterList: Chapter[]): number {
 
 /**
  * Get the number of unread chapters from a list.
- * The total chapter count is the highest whole chapter number in the list, where chapter numbers
- * with decimals are rounded down (e.g. 35.9 -> 35). A whole chapter is only counted as completed
- * when every chapter entry with that whole-number prefix is marked read.
+ * A whole chapter is only counted as completed when every chapter entry with that whole-number
+ * prefix is marked read. Each whole chapter contributes at most one unread count, even if it has
+ * multiple parts (e.g. 47.1, 47.2).
  * @param chapterList the list of chapters to calculate from (usually all of a series' chapters)
  * @returns the number of unread whole chapters
  */
 export function getNumberUnreadChapters(chapterList: Chapter[]): number {
-  const totalWholeChapters = getTotalWholeChapters(chapterList);
-  if (totalWholeChapters === 0) {
-    return 0;
-  }
-
   const wholeChapterIsCompleted = new Map<number, boolean>();
 
   chapterList.forEach((chapter: Chapter) => {
@@ -103,9 +98,5 @@ export function getNumberUnreadChapters(chapterList: Chapter[]): number {
     }
   });
 
-  const completedWholeChapters = Array.from(wholeChapterIsCompleted.values()).filter(
-    (completed) => completed,
-  ).length;
-
-  return Math.max(totalWholeChapters - completedWholeChapters, 0);
+  return Array.from(wholeChapterIsCompleted.values()).filter((completed) => !completed).length;
 }
