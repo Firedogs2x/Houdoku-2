@@ -75,8 +75,8 @@ export function getTotalWholeChapters(chapterList: Chapter[]): number {
 /**
  * Get the number of unread chapters from a list.
  * A whole chapter is only counted as completed when every chapter entry with that whole-number
- * prefix is marked read. Each whole chapter contributes at most one unread count, even if it has
- * multiple parts (e.g. 47.1, 47.2).
+ * prefix is marked read or skipped. Each whole chapter contributes at most one unread count, even
+ * if it has multiple parts (e.g. 47.1, 47.2).
  * @param chapterList the list of chapters to calculate from (usually all of a series' chapters)
  * @returns the number of unread whole chapters
  */
@@ -93,7 +93,7 @@ export function getNumberUnreadChapters(chapterList: Chapter[]): number {
       wholeChapterIsCompleted.set(wholeChapterNumber, true);
     }
 
-    if (!chapter.read) {
+    if (!chapter.read && chapter.skip !== true) {
       wholeChapterIsCompleted.set(wholeChapterNumber, false);
     }
   });
