@@ -204,7 +204,13 @@ export function ChapterTable(props: ChapterTableProps) {
                 const nextSkip = value === true;
                 if ((row.original.skip ?? false) === nextSkip) return;
 
-                skipChapters([row.original], props.series, nextSkip, setChapterList);
+                skipChapters(
+                  [row.original],
+                  props.series,
+                  nextSkip,
+                  setChapterList,
+                  chapterLanguages,
+                );
               }}
             />
           </span>

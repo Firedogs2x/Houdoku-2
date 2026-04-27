@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import LibraryControlBar from './LibraryControlBar';
@@ -19,6 +19,7 @@ import {
   libraryViewState,
   libraryFilterCategoryState,
   libraryDisplayModeState,
+  chapterLanguagesState,
 } from '@/renderer/state/settingStates';
 import LibraryGrid from './LibraryGrid';
 import LibraryList from './LibraryList';
@@ -41,6 +42,7 @@ const Library: React.FC<Props> = () => {
   const libraryView = useRecoilValue(libraryViewState);
   const librarySort = useRecoilValue(librarySortState);
   const libraryDisplayMode = useRecoilValue(libraryDisplayModeState);
+  const chapterLanguages = useRecoilValue(chapterLanguagesState);
   const setSeries = useSetRecoilState(seriesState);
   const setChapterList = useSetRecoilState(chapterListState);
   const [scrollPosition, setScrollPosition] = useRecoilState(libraryScrollPositionState);
@@ -99,6 +101,16 @@ const Library: React.FC<Props> = () => {
     };
   }, [setScrollPosition]);
 
+  const seriesChapterMetadata = useMemo(
+    () => buildSeriesChapterMetadataMap(activeSeriesList, chapterLanguages),
+    [activeSeriesList, chapterLanguages],
+  );
+
+  const getUnreadCount = (series: Series): number => {
+    if (!series.id) return 0;
+    return seriesChapterMetadata[series.id]?.unreadChapters ?? 0;
+  };
+
   const filteredList = activeSeriesList.filter((series: Series) => {
       if (!series) return false;
 
@@ -108,10 +120,11 @@ const Library: React.FC<Props> = () => {
       if (libraryFilterStatus !== null && series.status !== libraryFilterStatus) {
         return false;
       }
-      if (libraryFilterProgress === ProgressFilter.Unread && series.numberUnread === 0) {
+      const unreadCount = getUnreadCount(series);
+      if (libraryFilterProgress === ProgressFilter.Unread && unreadCount === 0) {
         return false;
       }
-      if (libraryFilterProgress === ProgressFilter.Finished && series.numberUnread > 0) {
+      if (libraryFilterProgress === ProgressFilter.Finished && unreadCount > 0) {
         return false;
       }
 
@@ -128,14 +141,16 @@ const Library: React.FC<Props> = () => {
       return true;
     });
 
-  const seriesChapterMetadata = buildSeriesChapterMetadataMap(filteredList);
-
   const sortedFilteredList = (() => {
     switch (librarySort) {
       case LibrarySort.UnreadAsc:
-        return filteredList.sort((a: Series, b: Series) => a.numberUnread - b.numberUnread);
+        return filteredList.sort(
+          (a: Series, b: Series) => getUnreadCount(a) - getUnreadCount(b),
+        );
       case LibrarySort.UnreadDesc:
-        return filteredList.sort((a: Series, b: Series) => b.numberUnread - a.numberUnread);
+        return filteredList.sort(
+          (a: Series, b: Series) => getUnreadCount(b) - getUnreadCount(a),
+        );
       case LibrarySort.TitleAsc:
         return filteredList.sort((a: Series, b: Series) => a.title.localeCompare(b.title));
       case LibrarySort.TitleDesc:
@@ -179,6 +194,7 @@ const Library: React.FC<Props> = () => {
         {libraryView === LibraryView.List ? (
           <LibraryList
             seriesList={sortedFilteredList}
+            seriesChapterMetadata={seriesChapterMetadata}
             showRemoveModal={(series) => {
               setRemoveModalSeries(series);
               setRemoveModalShowing(true);

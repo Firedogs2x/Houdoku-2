@@ -1,8 +1,10 @@
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, LanguageKey, Series } from '@tiyo/common';
 import library from '@/renderer/services/library';
+import { getNumberUnreadChapters, getTotalWholeChapters } from '@/renderer/util/comparison';
 
 export type SeriesChapterMetadata = {
   totalChapters: number;
+  unreadChapters: number;
   latestChapterAddedDate?: string;
   latestChapterAddedTimestamp: number;
   hasNewChaptersSinceLastRead: boolean;
@@ -27,13 +29,19 @@ const getLatestChapterAddedDate = (chapters: Chapter[]): string | undefined => {
 
 export const buildSeriesChapterMetadataMap = (
   seriesList: Series[],
+  chapterLanguages: LanguageKey[] = [],
 ): Record<string, SeriesChapterMetadata> => {
   const metadataMap: Record<string, SeriesChapterMetadata> = {};
 
   for (const series of seriesList) {
     if (!series.id) continue;
 
-    const chapters = library.fetchChapters(series.id);
+    const chapters = library
+      .fetchChapters(series.id)
+      .filter(
+        (chapter) =>
+          chapterLanguages.length === 0 || chapterLanguages.includes(chapter.languageKey),
+      );
     const latestChapterAddedDate = getLatestChapterAddedDate(chapters);
     const latestChapterAddedTimestamp = latestChapterAddedDate
       ? new Date(latestChapterAddedDate).getTime()
@@ -41,7 +49,8 @@ export const buildSeriesChapterMetadataMap = (
     const lastReadTimestamp = series.lastReadDate ? new Date(series.lastReadDate).getTime() : 0;
 
     metadataMap[series.id] = {
-      totalChapters: chapters.length,
+      totalChapters: getTotalWholeChapters(chapters),
+      unreadChapters: getNumberUnreadChapters(chapters),
       latestChapterAddedDate,
       latestChapterAddedTimestamp,
       hasNewChaptersSinceLastRead:

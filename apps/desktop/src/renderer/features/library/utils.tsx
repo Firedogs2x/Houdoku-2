@@ -139,10 +139,12 @@ export function skipChapters(
   series: Series,
   skip: boolean,
   setChapterList: (chapterList: Chapter[]) => void,
+  chapterLanguages: LanguageKey[],
 ) {
   if (series.id !== undefined) {
     const newChapters = chapters.map((chapter) => ({ ...chapter, skip }));
     library.upsertChapters(newChapters, series);
+    updateSeriesNumberUnread(series, chapterLanguages);
     loadChapterList(series.id, setChapterList);
   }
 }
