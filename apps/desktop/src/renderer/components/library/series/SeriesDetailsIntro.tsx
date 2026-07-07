@@ -25,7 +25,7 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
             url={getSeriesCoverUrl(props.series).replaceAll('\\', '/')}
             series={props.series}
             alt={props.series.title}
-            className="w-auto h-auto -mt-[58%] aspect-[70/100] object-cover rounded-sm"
+            className="w-auto h-auto aspect-[70/100] object-cover rounded-sm"
           />
         </div>
         <div className="w-full py-2 px-2">
