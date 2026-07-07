@@ -45,7 +45,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
   };
 
   return (
-    <div className="-mx-2 h-[110px]" style={{ overflow: 'hidden' }}>
+    <div className="-mx-2 h-[100px]" style={{ overflow: 'hidden' }}>
       <SeriesDetailsBannerBackground>
         <div className="relative flex justify-end h-full">
           {props.series.lastReadDate && (
