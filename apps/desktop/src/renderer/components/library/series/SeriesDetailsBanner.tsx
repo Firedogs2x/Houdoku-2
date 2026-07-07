@@ -45,7 +45,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
   };
 
   return (
-    <div className="-mx-2 h-[180px]" style={{ overflow: 'hidden' }}>
+    <div className="-mx-2 h-[90px]" style={{ overflow: 'hidden' }}>
       <SeriesDetailsBannerBackground>
         <div className="flex justify-end h-full">
           <div className="flex flex-col justify-between">
