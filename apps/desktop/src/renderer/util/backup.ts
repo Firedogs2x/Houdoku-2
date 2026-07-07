@@ -106,6 +106,7 @@ const buildBackupPayload = () => {
     },
     Theme: {
       ApplicationTheme: getSettingValue<string>(GeneralSetting.ApplicationTheme),
+      SeriesPageScrollWhole: getSettingValue<string | boolean>(GeneralSetting.SeriesPageScrollWhole),
       ChapterCountBgColor: getSettingValue<string>(GeneralSetting.ChapterCountBgColor),
       ChapterCountFontColor: getSettingValue<string>(GeneralSetting.ChapterCountFontColor),
       ScrollBarSliderColor: getSettingValue<string>(GeneralSetting.ScrollBarSliderColor),
@@ -126,7 +127,6 @@ const buildBackupPayload = () => {
       RefreshOnStart: getSettingValue<string | boolean>(GeneralSetting.RefreshOnStart),
       ConfirmRemoveSeries: getSettingValue<string | boolean>(GeneralSetting.ConfirmRemoveSeries),
       LibraryCropCovers: getSettingValue<string | boolean>(GeneralSetting.LibraryCropCovers),
-      SeriesPageScrollWhole: getSettingValue<string | boolean>(GeneralSetting.SeriesPageScrollWhole),
       CustomDownloadsDir: getSettingValue<string>(GeneralSetting.CustomDownloadsDir),
     },
     Reader: {
@@ -378,6 +378,9 @@ export const restoreBackup = (backupFileContent: string) => {
 
       if (settings.Theme) {
         saveGeneralSetting(GeneralSetting.ApplicationTheme, settings.Theme.ApplicationTheme);
+        if ('SeriesPageScrollWhole' in settings.Theme) {
+          saveGeneralSetting(GeneralSetting.SeriesPageScrollWhole, settings.Theme.SeriesPageScrollWhole);
+        }
         saveGeneralSetting(GeneralSetting.ChapterCountBgColor, settings.Theme.ChapterCountBgColor);
         saveGeneralSetting(GeneralSetting.ChapterCountFontColor, settings.Theme.ChapterCountFontColor);
         saveGeneralSetting(GeneralSetting.ScrollBarSliderColor, settings.Theme.ScrollBarSliderColor);
@@ -404,7 +407,9 @@ export const restoreBackup = (backupFileContent: string) => {
         saveGeneralSetting(GeneralSetting.RefreshOnStart, settings.Library.RefreshOnStart);
         saveGeneralSetting(GeneralSetting.ConfirmRemoveSeries, settings.Library.ConfirmRemoveSeries);
         saveGeneralSetting(GeneralSetting.LibraryCropCovers, settings.Library.LibraryCropCovers);
-        saveGeneralSetting(GeneralSetting.SeriesPageScrollWhole, settings.Library.SeriesPageScrollWhole);
+        if (settings.Theme === undefined && 'SeriesPageScrollWhole' in settings.Library) {
+          saveGeneralSetting(GeneralSetting.SeriesPageScrollWhole, settings.Library.SeriesPageScrollWhole);
+        }
         saveGeneralSetting(GeneralSetting.CustomDownloadsDir, settings.Library.CustomDownloadsDir);
       }
 

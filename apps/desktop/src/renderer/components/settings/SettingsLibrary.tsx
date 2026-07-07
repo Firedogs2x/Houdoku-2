@@ -7,7 +7,6 @@ import {
   customDownloadsDirState,
   libraryCropCoversState,
   refreshOnStartState,
-  seriesPageScrollWholeState,
 } from '@/renderer/state/settingStates';
 import { Checkbox } from '@houdoku/ui/components/Checkbox';
 import { Label } from '@houdoku/ui/components/Label';
@@ -17,9 +16,6 @@ export const SettingsLibrary: React.FC = () => {
   const [refreshOnStart, setRefreshOnStart] = useRecoilState(refreshOnStartState);
   const [confirmRemoveSeries, setConfirmRemoveSeries] = useRecoilState(confirmRemoveSeriesState);
   const [libraryCropCovers, setLibraryCropCovers] = useRecoilState(libraryCropCoversState);
-  const [seriesPageScrollWhole, setSeriesPageScrollWhole] = useRecoilState(
-    seriesPageScrollWholeState,
-  );
   const [customDownloadsDir, setCustomDownloadsDir] = useRecoilState(customDownloadsDirState);
   const [defaultDownloadsDir, setDefaultDownloadsDir] = useState<string>('');
 
@@ -61,16 +57,6 @@ export const SettingsLibrary: React.FC = () => {
           />
           <Label htmlFor="checkboxLibraryCropCovers" className="font-normal">
             Crop cover images to library grid
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="checkboxSeriesPageWholeScroll"
-            checked={seriesPageScrollWhole}
-            onCheckedChange={(checked) => setSeriesPageScrollWhole(checked === true)}
-          />
-          <Label htmlFor="checkboxSeriesPageWholeScroll" className="font-normal">
-            Series page: scroll whole page (instead of chapter table only)
           </Label>
         </div>
       </div>

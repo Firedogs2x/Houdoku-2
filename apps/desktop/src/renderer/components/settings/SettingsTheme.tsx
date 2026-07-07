@@ -10,10 +10,13 @@ import {
   starRatingFontColorState,
   seriesPageBannerColorAState,
   seriesPageBannerColorBState,
+  seriesPageScrollWholeState,
 } from '@/renderer/state/settingStates';
 import { RadioGroup } from '@houdoku/ui/components/RadioGroup';
 import { Slider } from '@houdoku/ui/components/Slider';
 import { Button } from '@houdoku/ui/components/Button';
+import { Checkbox } from '@houdoku/ui/components/Checkbox';
+import { Label } from '@houdoku/ui/components/Label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -131,6 +134,9 @@ export const SettingsTheme: React.FC = () => {
   );
   const [seriesPageBannerColorB, setSeriesPageBannerColorB] = useRecoilState(
     seriesPageBannerColorBState,
+  );
+  const [seriesPageScrollWhole, setSeriesPageScrollWhole] = useRecoilState(
+    seriesPageScrollWholeState,
   );
 
   // Dialog state
@@ -254,6 +260,22 @@ export const SettingsTheme: React.FC = () => {
             <span className="block w-full text-center text-sm font-medium pt-1">Dark</span>
           </div>
         </RadioGroup>
+      </div>
+
+      <div className="flex flex-col space-y-2">
+        <div>
+          <h3 className="pb-0 mb-0 font-medium">Series Page Scroll Option</h3>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="checkboxSeriesPageWholeScroll"
+            checked={seriesPageScrollWhole}
+            onCheckedChange={(checked) => setSeriesPageScrollWhole(checked === true)}
+          />
+          <Label htmlFor="checkboxSeriesPageWholeScroll" className="font-normal">
+            Scroll whole page (instead of chapter table only)
+          </Label>
+        </div>
       </div>
 
       {/* Color Settings Section */}
