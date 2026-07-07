@@ -47,7 +47,12 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
   return (
     <div className="-mx-2 h-[120px]" style={{ overflow: 'hidden' }}>
       <SeriesDetailsBannerBackground>
-        <div className="flex justify-end h-full">
+        <div className="relative flex justify-end h-full">
+          {props.series.lastReadDate && (
+            <p className="absolute left-[148px] md:left-[188px] bottom-1 text-xs text-neutral-50">
+              Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}
+            </p>
+          )}
           <div className="flex flex-col justify-between">
             <div className="flex justify-end mt-2 mr-4 mb-2 ml-2">
               {!props.series.preview && (
@@ -75,11 +80,6 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
               )}
             </div>
             <div className="flex flex-col mt-2 mr-4 mb-2 ml-2 space-y-1">
-              {props.series.lastReadDate && (
-                <p className="text-xs text-neutral-50">
-                  Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}
-                </p>
-              )}
               <div className="flex space-x-2">
               {props.series.extensionId === FS_METADATA.id && (
                 <Button
