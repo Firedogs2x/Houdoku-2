@@ -46,7 +46,7 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
   };
 
   return (
-    <div className="-mx-2 h-[100px]" style={{ overflow: 'hidden' }}>
+    <div className="-mx-2 h-[80px]" style={{ overflow: 'hidden' }}>
       <SeriesDetailsBannerBackground>
         <div className="relative flex justify-end h-full">
           {props.series.lastReadDate && (
@@ -82,7 +82,6 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
                 <DropdownMenuTrigger asChild>
                   <Button
                     className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
-                    size="sm"
                   >
                     <MenuIcon className="w-4 h-4" />
                     Options
