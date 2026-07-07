@@ -23,6 +23,7 @@ import SeriesDetailsInfoGrid from './series/SeriesDetailsInfoGrid';
 import { ChapterTable } from './series/chapter-table/ChapterTable';
 import { Loader2 } from 'lucide-react';
 import { RemoveSeriesDialog } from './RemoveSeriesDialog';
+import { seriesPageScrollWholeState } from '@/renderer/state/settingStates';
 
 type Props = unknown;
 
@@ -38,6 +39,7 @@ const SeriesDetails: React.FC<Props> = () => {
   const [showingDownloadModal, setShowingDownloadModal] = useState(false);
   const setSeries = useSetRecoilState(seriesState);
   const seriesList = useRecoilValue(seriesListState);
+  const seriesPageScrollWhole = useRecoilValue(seriesPageScrollWholeState);
   const setChapterList = useSetRecoilState(chapterListState);
   const setChapterFilterGroupNames = useSetRecoilState(chapterFilterGroupNamesState);
 
@@ -74,7 +76,9 @@ const SeriesDetails: React.FC<Props> = () => {
     );
   }
   return (
-    <div className="relative flex flex-col h-full overflow-hidden">
+    <div
+      className={`relative flex flex-col h-full ${seriesPageScrollWhole ? 'overflow-auto' : 'overflow-hidden'}`}
+    >
       <SeriesTrackerDialog
         series={series}
         showing={showingTrackerModal}
@@ -123,8 +127,8 @@ const SeriesDetails: React.FC<Props> = () => {
         <SeriesDetailsInfoGrid series={series} />
       </div>
 
-      <div className="flex-1 min-h-0 w-full overflow-hidden">
-        <ChapterTable series={series} />
+      <div className={seriesPageScrollWhole ? 'w-full' : 'flex-1 min-h-0 w-full overflow-hidden'}>
+        <ChapterTable series={series} tableOnlyScroll={!seriesPageScrollWhole} />
       </div>
     </div>
   );

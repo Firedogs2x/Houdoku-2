@@ -94,6 +94,7 @@ export const libraryFilterStatusState = atm<SeriesStatus | null>(GeneralSetting.
 export const libraryFilterProgressState = atm<ProgressFilter>(GeneralSetting.LibraryFilterProgress);
 export const libraryFilterCategoryState = atm<string>(GeneralSetting.LibraryFilterCategory);
 export const libraryCropCoversState = atm<boolean>(GeneralSetting.LibraryCropCovers);
+export const seriesPageScrollWholeState = atm<boolean>(GeneralSetting.SeriesPageScrollWhole);
 // biome-ignore format: TODO ignore block
 export const chapterListVolOrderState = atm<TableColumnSortOrder>(GeneralSetting.ChapterListVolOrder);
 export const chapterListChOrderState = atm<TableColumnSortOrder>(GeneralSetting.ChapterListChOrder);

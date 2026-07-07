@@ -126,6 +126,7 @@ const buildBackupPayload = () => {
       RefreshOnStart: getSettingValue<string | boolean>(GeneralSetting.RefreshOnStart),
       ConfirmRemoveSeries: getSettingValue<string | boolean>(GeneralSetting.ConfirmRemoveSeries),
       LibraryCropCovers: getSettingValue<string | boolean>(GeneralSetting.LibraryCropCovers),
+      SeriesPageScrollWhole: getSettingValue<string | boolean>(GeneralSetting.SeriesPageScrollWhole),
       CustomDownloadsDir: getSettingValue<string>(GeneralSetting.CustomDownloadsDir),
     },
     Reader: {
@@ -403,6 +404,7 @@ export const restoreBackup = (backupFileContent: string) => {
         saveGeneralSetting(GeneralSetting.RefreshOnStart, settings.Library.RefreshOnStart);
         saveGeneralSetting(GeneralSetting.ConfirmRemoveSeries, settings.Library.ConfirmRemoveSeries);
         saveGeneralSetting(GeneralSetting.LibraryCropCovers, settings.Library.LibraryCropCovers);
+        saveGeneralSetting(GeneralSetting.SeriesPageScrollWhole, settings.Library.SeriesPageScrollWhole);
         saveGeneralSetting(GeneralSetting.CustomDownloadsDir, settings.Library.CustomDownloadsDir);
       }
 

@@ -80,6 +80,7 @@ const columnOrderMap = {
 
 interface ChapterTableProps {
   series: Series;
+  tableOnlyScroll: boolean;
 }
 
 export function ChapterTable(props: ChapterTableProps) {
@@ -522,7 +523,13 @@ export function ChapterTable(props: ChapterTableProps) {
   };
 
   return (
-    <div className="h-full min-h-0 flex flex-col space-y-2 pb-4">
+    <div
+      className={
+        props.tableOnlyScroll
+          ? 'h-full min-h-0 flex flex-col space-y-2 pb-4'
+          : 'flex flex-col space-y-2 pb-4'
+      }
+    >
       <div className="flex items-center justify-between flex-none bg-background/95 border-b border-border pb-2">
         {table.getIsSomeRowsSelected() || table.getIsAllRowsSelected() ? (
           <div className="flex space-x-2 items-end">
@@ -591,8 +598,20 @@ export function ChapterTable(props: ChapterTableProps) {
           </>
         )}
       </div>
-      <div className="rounded-md border flex-1 min-h-0 overflow-hidden">
-        <div className="h-full overflow-auto overscroll-contain">
+      <div
+        className={
+          props.tableOnlyScroll
+            ? 'rounded-md border flex-1 min-h-0 overflow-hidden'
+            : 'rounded-md border overflow-hidden'
+        }
+      >
+        <div
+          className={
+            props.tableOnlyScroll
+              ? 'h-full overflow-auto overscroll-contain'
+              : 'overflow-x-auto overflow-y-visible'
+          }
+        >
           <table className="w-full caption-bottom text-sm">
             <TableHeader className="sticky top-0 z-10 bg-background shadow-sm">
             {table.getHeaderGroups().map((headerGroup) => (
