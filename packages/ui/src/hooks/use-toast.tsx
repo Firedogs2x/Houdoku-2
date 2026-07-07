@@ -5,8 +5,8 @@ import * as React from 'react';
 
 import type { ToastActionElement, ToastProps } from '@houdoku/ui/components/Toast';
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 200;
 
 type ToasterToast = ToastProps & {
   id: string;

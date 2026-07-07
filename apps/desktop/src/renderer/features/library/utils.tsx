@@ -262,15 +262,16 @@ export async function reloadSeriesList(
     update({
       title: 'Library refresh failed',
       description: `Error while reloading series "${seriesList[0].title}"`,
-      duration: 5000,
+      duration: 6000,
     });
   } else if (failedToUpdate.length > 0) {
     update({
       title: 'Library refreshed with errors',
       description: `Failed to update ${failedToUpdate.length} series`,
+      duration: 6000,
     });
   } else {
-    update({ title: 'Library refreshed', description: `Reloaded ${cur} series`, duration: 5000 });
+    update({ title: 'Library refreshed', description: `Reloaded ${cur} series`, duration: 6000 });
   }
 
   setReloadingSeriesList(false);

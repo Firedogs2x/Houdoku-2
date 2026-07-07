@@ -10,6 +10,7 @@ import ipcChannels from '@/common/constants/ipcChannels.json';
 import { migrateSeriesTags } from './features/library/utils';
 import AppLoading from './components/general/AppLoading';
 import { Toaster } from '@houdoku/ui/components/Toaster';
+import { toast } from '@houdoku/ui/hooks/use-toast';
 import { categoryListState, seriesListState } from './state/libraryStates';
 import { downloaderClient } from './services/downloader';
 import {
@@ -27,17 +28,6 @@ import {
 } from './services/ipc';
 import { getNumberUnreadChapters } from './util/comparison';
 import { DefaultSettings, GeneralSetting } from '@/common/models/types';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@houdoku/ui/components/AlertDialog';
-import { UpdateInfo } from 'electron-updater';
 import { formatDateToMMDDYYYY } from './util/date';
 
 loadStoredExtensionSettings();
@@ -45,10 +35,6 @@ loadStoredTrackerTokens();
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | undefined>(undefined);
-  const [showUpdateAvailableDialog, setShowUpdateAvailableDialog] = useState(false);
-  const [showUpdateDownloadedDialog, setShowUpdateDownloadedDialog] = useState(false);
-  const [showNoUpdateAvailableDialog, setShowNoUpdateAvailableDialog] = useState(false);
   const setSeriesList = useSetRecoilState(seriesListState);
   const setCategoryList = useSetRecoilState(categoryListState);
   const setRunning = useSetRecoilState(runningState);
@@ -101,11 +87,24 @@ export default function App() {
 
       createRendererIpcHandlers(
         (updateInfo) => {
-          setUpdateInfo(updateInfo);
-          setShowUpdateAvailableDialog(true);
+          toast({
+            title: 'Update available',
+            description: `Houdoku v${updateInfo.version} was released on ${formatDateToMMDDYYYY(updateInfo.releaseDate) ?? 'Unknown date'}.`,
+            duration: 6000,
+          });
         },
-        () => setShowUpdateDownloadedDialog(true),
-        () => setShowNoUpdateAvailableDialog(true),
+        () =>
+          toast({
+            title: 'Restart required',
+            description: 'Houdoku needs to restart to finish installing updates.',
+            duration: 6000,
+          }),
+        () =>
+          toast({
+            title: 'Up to date',
+            description: 'You are using the latest version of Houdoku software.',
+            duration: 6000,
+          }),
       );
 
       // Give the downloader client access to the state modifiers
@@ -148,69 +147,9 @@ export default function App() {
     }
   }, [loading]);
 
-  useEffect(() => {
-    if (showNoUpdateAvailableDialog) {
-      const timer = setTimeout(() => {
-        setShowNoUpdateAvailableDialog(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [showNoUpdateAvailableDialog]);
-
   return (
     <>
       <Toaster />
-
-      <AlertDialog open={showUpdateAvailableDialog} onOpenChange={setShowUpdateAvailableDialog}>
-        <AlertDialogContent className="sm:max-w-[425px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Update available</AlertDialogTitle>
-          </AlertDialogHeader>
-          {updateInfo && (
-            <p>
-              Houdoku v{updateInfo?.version} was released on{' '}
-              {formatDateToMMDDYYYY(updateInfo.releaseDate) ?? 'Unknown date'}.
-            </p>
-          )}
-          <AlertDialogFooter>
-            <AlertDialogCancel>Not now</AlertDialogCancel>
-            <AlertDialogAction onClick={() => ipcRenderer.invoke(ipcChannels.APP.PERFORM_UPDATE)}>
-              Download update
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={showUpdateDownloadedDialog} onOpenChange={setShowUpdateDownloadedDialog}>
-        <AlertDialogContent className="sm:max-w-[425px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Restart required</AlertDialogTitle>
-            {updateInfo && (
-              <AlertDialogDescription>
-                Houdoku needs to restart to finish installing updates.
-              </AlertDialogDescription>
-            )}
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Not now</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => ipcRenderer.invoke(ipcChannels.APP.UPDATE_AND_RESTART)}
-            >
-              Restart
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={showNoUpdateAvailableDialog} onOpenChange={setShowNoUpdateAvailableDialog}>
-        <AlertDialogContent className="sm:max-w-[425px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">
-              You are using the latest version of Houdoku software.
-            </AlertDialogTitle>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {loading ? (
         <AppLoading />
