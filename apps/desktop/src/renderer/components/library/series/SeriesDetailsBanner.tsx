@@ -45,11 +45,11 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
   };
 
   return (
-    <div className="-mx-2 h-[120px]" style={{ overflow: 'hidden' }}>
+    <div className="-mx-2 h-[110px]" style={{ overflow: 'hidden' }}>
       <SeriesDetailsBannerBackground>
         <div className="relative flex justify-end h-full">
           {props.series.lastReadDate && (
-            <p className="absolute left-[152px] md:left-[192px] bottom-1 text-sm text-neutral-50">
+            <p className="absolute left-[153px] md:left-[193px] bottom-1 text-sm text-neutral-50">
               Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}
             </p>
           )}
