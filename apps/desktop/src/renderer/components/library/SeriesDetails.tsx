@@ -3,7 +3,6 @@ import { useParams, useLocation } from 'react-router-dom';
 const { ipcRenderer } = require('electron');
 import { Series } from '@tiyo/common';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { getBannerImageUrl } from '@/renderer/services/mediasource';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { SeriesTrackerDialog } from './tracker/SeriesTrackerDialog';
 import EditSeriesModal from './EditSeriesModal';
@@ -13,7 +12,6 @@ import {
   chapterFilterGroupNamesState,
   chapterListState,
   currentExtensionMetadataState,
-  seriesBannerUrlState,
   seriesListState,
   seriesState,
 } from '@/renderer/state/libraryStates';
@@ -42,7 +40,6 @@ const SeriesDetails: React.FC<Props> = () => {
   const seriesList = useRecoilValue(seriesListState);
   const setChapterList = useSetRecoilState(chapterListState);
   const setChapterFilterGroupNames = useSetRecoilState(chapterFilterGroupNamesState);
-  const setSeriesBannerUrl = useSetRecoilState(seriesBannerUrlState);
 
   const loadContent = async () => {
     console.info(`Series page is loading details from database for series ${id}`);
@@ -58,10 +55,6 @@ const SeriesDetails: React.FC<Props> = () => {
     ipcRenderer
       .invoke(ipcChannels.EXTENSION_MANAGER.GET, series.extensionId)
       .then((metadata) => setExtensionMetadata(metadata))
-      .catch((err: Error) => console.error(err));
-
-    getBannerImageUrl(series)
-      .then((url: string | null) => setSeriesBannerUrl(url))
       .catch((err: Error) => console.error(err));
   };
 

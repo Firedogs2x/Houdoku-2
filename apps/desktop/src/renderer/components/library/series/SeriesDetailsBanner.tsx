@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+// @ts-expect-error: @tiyo/common exports this type but TS cannot resolve it here.
 import { Series } from '@tiyo/common';
 import {
   reloadingSeriesListState,
@@ -53,58 +54,52 @@ const SeriesDetailsBanner: React.FC<SeriesDetailsBannerProps> = (
               Last read: {formatDateMMDDYYYY(props.series.lastReadDate)}
             </p>
           )}
-          <div className="flex flex-col justify-between">
-            <div className="flex justify-end mt-2 mr-4 mb-2 ml-2">
-              {!props.series.preview && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
-                      size="sm"
-                    >
-                      <MenuIcon className="w-4 h-4" />
-                      Options
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="bottom">
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem onSelect={() => props.showDownloadModal()}>
-                        Download
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => props.showRemoveModal()}>
-                        Remove series
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-            <div className="flex flex-col mt-2 mr-4 mb-2 ml-2 space-y-1">
-              <div className="flex space-x-2">
-              {props.series.extensionId === FS_METADATA.id && (
-                <Button
-                  className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
-                  onClick={() => props.showEditModal()}
-                >
-                  Edit
-                </Button>
-              )}
+          <div className="flex items-start justify-end gap-2 mt-2 mr-4 mb-2 ml-2">
+            <Button
+              disabled={reloadingSeriesList}
+              className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200 disabled:!bg-neutral-500 disabled:!opacity-100"
+              onClick={() => handleRefresh()}
+            >
+              {reloadingSeriesList && <Loader2 className="animate-spin" />}
+              {reloadingSeriesList ? 'Refreshing...' : 'Refresh'}{' '}
+            </Button>
+            {props.series.extensionId === FS_METADATA.id && (
               <Button
                 className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
-                onClick={() => props.showTrackerModal()}
+                onClick={() => props.showEditModal()}
               >
-                Trackers
+                Edit
               </Button>
-              <Button
-                disabled={reloadingSeriesList}
-                className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200 disabled:!bg-neutral-500 disabled:!opacity-100"
-                onClick={() => handleRefresh()}
-              >
-                {reloadingSeriesList && <Loader2 className="animate-spin" />}
-                {reloadingSeriesList ? 'Refreshing...' : 'Refresh'}{' '}
-              </Button>
-              </div>
-            </div>
+            )}
+            <Button
+              className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
+              onClick={() => props.showTrackerModal()}
+            >
+              Trackers
+            </Button>
+            {!props.series.preview && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className="!bg-neutral-50 !text-neutral-950 hover:!bg-neutral-200"
+                    size="sm"
+                  >
+                    <MenuIcon className="w-4 h-4" />
+                    Options
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="bottom">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onSelect={() => props.showDownloadModal()}>
+                      Download
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => props.showRemoveModal()}>
+                      Remove series
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </SeriesDetailsBannerBackground>

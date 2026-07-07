@@ -111,6 +111,8 @@ const buildBackupPayload = () => {
       ScrollBarSliderColor: getSettingValue<string>(GeneralSetting.ScrollBarSliderColor),
       StarRatingFillColor: getSettingValue<string>(GeneralSetting.StarRatingFillColor),
       StarRatingFontColor: getSettingValue<string>(GeneralSetting.StarRatingFontColor),
+      SeriesPageBannerColorA: getSettingValue<string>(GeneralSetting.SeriesPageBannerColorA),
+      SeriesPageBannerColorB: getSettingValue<string>(GeneralSetting.SeriesPageBannerColorB),
     },
     Folders: {
       MasterFolder: getSettingValue<string>(GeneralSetting.MasterFolder),
@@ -380,6 +382,12 @@ export const restoreBackup = (backupFileContent: string) => {
         saveGeneralSetting(GeneralSetting.ScrollBarSliderColor, settings.Theme.ScrollBarSliderColor);
         saveGeneralSetting(GeneralSetting.StarRatingFillColor, settings.Theme.StarRatingFillColor);
         saveGeneralSetting(GeneralSetting.StarRatingFontColor, settings.Theme.StarRatingFontColor);
+        if ('SeriesPageBannerColorA' in settings.Theme) {
+          saveGeneralSetting(GeneralSetting.SeriesPageBannerColorA, settings.Theme.SeriesPageBannerColorA);
+        }
+        if ('SeriesPageBannerColorB' in settings.Theme) {
+          saveGeneralSetting(GeneralSetting.SeriesPageBannerColorB, settings.Theme.SeriesPageBannerColorB);
+        }
       }
 
       if (settings.Folders) {

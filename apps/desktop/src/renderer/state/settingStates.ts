@@ -105,6 +105,8 @@ export const chapterCountFontColorState = atm<string>(GeneralSetting.ChapterCoun
 export const scrollBarSliderColorState = atm<string>(GeneralSetting.ScrollBarSliderColor);
 export const starRatingFillColorState = atm<string>(GeneralSetting.StarRatingFillColor);
 export const starRatingFontColorState = atm<string>(GeneralSetting.StarRatingFontColor);
+export const seriesPageBannerColorAState = atm<string>(GeneralSetting.SeriesPageBannerColorA);
+export const seriesPageBannerColorBState = atm<string>(GeneralSetting.SeriesPageBannerColorB);
 
 export const fitContainToWidthState = atm<boolean>(ReaderSetting.FitContainToWidth);
 export const fitContainToHeightState = atm<boolean>(ReaderSetting.FitContainToHeight);

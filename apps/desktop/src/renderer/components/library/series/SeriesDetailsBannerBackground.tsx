@@ -1,6 +1,9 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { seriesBannerUrlState } from '@/renderer/state/libraryStates';
+import {
+  seriesPageBannerColorAState,
+  seriesPageBannerColorBState,
+} from '@/renderer/state/settingStates';
 import { cn } from '@houdoku/ui/util';
 
 type Props = {
@@ -8,35 +11,17 @@ type Props = {
 };
 
 export const SeriesDetailsBannerBackground: React.FC<Props> = (props: Props) => {
-  const seriesBannerUrl = useRecoilValue(seriesBannerUrlState);
-
-  if (!seriesBannerUrl) {
-    return (
-      <div
-        className={cn(
-          'w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-cover',
-        )}
-      >
-        {props.children}
-      </div>
-    );
-  }
+  const seriesPageBannerColorA = useRecoilValue(seriesPageBannerColorAState);
+  const seriesPageBannerColorB = useRecoilValue(seriesPageBannerColorBState);
 
   return (
-    <>
-      <div
-        style={{ backgroundImage: `url(${seriesBannerUrl})` }}
-        className={cn('w-full h-full bg-cover')}
-      >
-        <div
-          style={{
-            background: 'rgba(0,0,0,.2)',
-          }}
-          className="w-full h-full"
-        >
-          {props.children}
-        </div>
-      </div>
-    </>
+    <div
+      className={cn('w-full h-full')}
+      style={{
+        background: `linear-gradient(to right, ${seriesPageBannerColorA}, ${seriesPageBannerColorB})`,
+      }}
+    >
+      {props.children}
+    </div>
   );
 };

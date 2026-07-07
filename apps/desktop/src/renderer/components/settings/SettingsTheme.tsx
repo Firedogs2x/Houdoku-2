@@ -8,6 +8,8 @@ import {
   scrollBarSliderColorState,
   starRatingFillColorState,
   starRatingFontColorState,
+  seriesPageBannerColorAState,
+  seriesPageBannerColorBState,
 } from '@/renderer/state/settingStates';
 import { RadioGroup } from '@houdoku/ui/components/RadioGroup';
 import { Slider } from '@houdoku/ui/components/Slider';
@@ -28,6 +30,8 @@ type ColorVariableType =
   | 'scrollBarSlider'
   | 'starRatingFill'
   | 'starRatingFont'
+  | 'seriesPageBannerColorA'
+  | 'seriesPageBannerColorB'
   | null;
 
 // Helper functions for color conversions
@@ -122,6 +126,12 @@ export const SettingsTheme: React.FC = () => {
   const [starRatingFontColor, setStarRatingFontColor] = useRecoilState(
     starRatingFontColorState,
   );
+  const [seriesPageBannerColorA, setSeriesPageBannerColorA] = useRecoilState(
+    seriesPageBannerColorAState,
+  );
+  const [seriesPageBannerColorB, setSeriesPageBannerColorB] = useRecoilState(
+    seriesPageBannerColorBState,
+  );
 
   // Dialog state
   const [selectedVariable, setSelectedVariable] = useState<ColorVariableType>(null);
@@ -133,12 +143,16 @@ export const SettingsTheme: React.FC = () => {
     document.documentElement.style.setProperty('--scrollbar-slider-color', scrollBarSliderColor);
     document.documentElement.style.setProperty('--star-rating-fill-color', starRatingFillColor);
     document.documentElement.style.setProperty('--star-rating-font-color', starRatingFontColor);
+    document.documentElement.style.setProperty('--series-page-banner-color-a', seriesPageBannerColorA);
+    document.documentElement.style.setProperty('--series-page-banner-color-b', seriesPageBannerColorB);
   }, [
     chapterCountBgColor,
     chapterCountFontColor,
     scrollBarSliderColor,
     starRatingFillColor,
     starRatingFontColor,
+    seriesPageBannerColorA,
+    seriesPageBannerColorB,
   ]);
 
   const handleRgbChange = (r: number, g: number, b: number) => {
@@ -178,6 +192,10 @@ export const SettingsTheme: React.FC = () => {
       setStarRatingFillColor(currentColor);
     } else if (selectedVariable === 'starRatingFont') {
       setStarRatingFontColor(currentColor);
+    } else if (selectedVariable === 'seriesPageBannerColorA') {
+      setSeriesPageBannerColorA(currentColor);
+    } else if (selectedVariable === 'seriesPageBannerColorB') {
+      setSeriesPageBannerColorB(currentColor);
     }
     setSelectedVariable(null);
   };
@@ -490,6 +508,28 @@ export const SettingsTheme: React.FC = () => {
             onClick={() => handleColorVariableClick('starRatingFont')}
             className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
             style={{ backgroundColor: starRatingFontColor }}
+            title="Click to change color"
+          />
+        </div>
+
+        {/* Color Variable: Series Page Banner Color A */}
+        <div className="relative flex items-center w-full pr-[240px]">
+          <span className="text-sm font-medium">Series Page Banner Color A (Left)</span>
+          <button
+            onClick={() => handleColorVariableClick('seriesPageBannerColorA')}
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            style={{ backgroundColor: seriesPageBannerColorA }}
+            title="Click to change color"
+          />
+        </div>
+
+        {/* Color Variable: Series Page Banner Color B */}
+        <div className="relative flex items-center w-full pr-[240px]">
+          <span className="text-sm font-medium">Series Page Banner Color B (Right)</span>
+          <button
+            onClick={() => handleColorVariableClick('seriesPageBannerColorB')}
+            className="absolute right-[200px] w-8 h-8 rounded border-2 border-muted cursor-pointer hover:border-foreground transition-colors"
+            style={{ backgroundColor: seriesPageBannerColorB }}
             title="Click to change color"
           />
         </div>

@@ -63,11 +63,6 @@ export const multiSelectSeriesListState = atom<Series[]>({
   default: [],
 });
 
-export const seriesBannerUrlState = atom({
-  key: 'seriesBannerUrlState',
-  default: null as string | null,
-});
-
 export const completedStartReloadState = atom({
   key: 'completedStartReloadState',
   default: false,
