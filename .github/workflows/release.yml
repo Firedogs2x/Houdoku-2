@@ -97,7 +97,7 @@ jobs:
           git push origin "${{ steps.meta.outputs.tag_name }}"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2.5.3
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
           name: ${{ steps.meta.outputs.release_name }}
@@ -163,7 +163,7 @@ jobs:
 
       # 🔧 FIX #2 — enforce tag-based release + proper title
       - name: Upload release assets
-        uses: softprops/action-gh-release@v2.5.3
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.tag.outputs.tag_name }}
           name: ${{ needs.tag.outputs.release_name }}
