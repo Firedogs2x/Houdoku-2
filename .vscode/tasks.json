@@ -1,0 +1,52 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "verify-dist-win",
+			"type": "shell",
+			"command": "corepack",
+			"args": [
+				"pnpm",
+				"--filter",
+				"@houdoku/desktop",
+				"dist:win"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "clear-release-lockers",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$names = 'Houdoku','electron','electron-builder','7za'; Get-Process | Where-Object { $names -contains $_.ProcessName } | Stop-Process -Force -ErrorAction SilentlyContinue; Write-Output 'CLEARED'"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "clear-release-lockers-2",
+			"type": "shell",
+			"command": "$names = @('Houdoku','electron','electron-builder','7za'); Get-Process | Where-Object { $names -contains $_.ProcessName } | Stop-Process -Force -ErrorAction SilentlyContinue; Write-Output 'CLEARED'",
+			"isBackground": false
+		},
+		{
+			"label": "verify-dist-win-2",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop dist:win",
+			"isBackground": false
+		},
+		{
+			"label": "verify-dist-win-zip-only",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop exec electron-builder --win zip --publish never",
+			"isBackground": false
+		},
+		{
+			"label": "verify-root-lint",
+			"type": "shell",
+			"command": "corepack pnpm lint",
+			"isBackground": false
+		}
+	]
+}

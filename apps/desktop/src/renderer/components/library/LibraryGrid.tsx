@@ -218,11 +218,14 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
               <div className="space-y-1 text-sm pb-3">
                 <h3 className="font-medium leading-none line-clamp-3">{series.title}</h3>
                 {series.lastReadDate && (
-                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    {latestChapterAddedDate
-                      ? `Last Read: ${formatDateMMDDYYYY(series.lastReadDate)} Ch. Update: ${formatDateMMDDYYYY(latestChapterAddedDate)}`
-                      : `Last Read: ${formatDateMMDDYYYY(series.lastReadDate)}`}
-                  </p>
+                  <div className="text-[10px] text-muted-foreground flex items-center justify-between gap-2 whitespace-nowrap">
+                    <span className="truncate">Last Read: {formatDateMMDDYYYY(series.lastReadDate)}</span>
+                    {latestChapterAddedDate && (
+                      <span className="truncate text-right">
+                        Ch. Update: {formatDateMMDDYYYY(latestChapterAddedDate)}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             )}
