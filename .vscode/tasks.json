@@ -47,6 +47,12 @@
 			"type": "shell",
 			"command": "corepack pnpm lint",
 			"isBackground": false
+		},
+		{
+			"label": "verify-dist-win-zip-only-bottom-lock",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop exec electron-builder --win zip --publish never",
+			"isBackground": false
 		}
 	]
 }

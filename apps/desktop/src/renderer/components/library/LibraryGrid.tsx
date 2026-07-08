@@ -127,7 +127,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const latestChapterAddedDate = chapterMetadata?.latestChapterAddedDate;
 
         return (
-          <div key={`${series.id}-${series.title}`} className="space-y-2">
+          <div key={`${series.id}-${series.title}`} className="h-full flex flex-col gap-2">
             <ContextMenu>
               <ContextMenuTrigger>
                 <div
@@ -215,10 +215,10 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
             </ContextMenu>
 
             {libraryView === LibraryView.GridComfortable && (
-              <div className="space-y-1 text-sm pb-3">
+              <div className="text-sm pb-[2px] flex-1 flex flex-col">
                 <h3 className="font-medium leading-none line-clamp-3">{series.title}</h3>
                 {series.lastReadDate && (
-                  <div className="text-[10px] text-muted-foreground flex items-center justify-between gap-2 whitespace-nowrap">
+                  <div className="mt-auto text-[10px] text-muted-foreground flex items-center justify-between gap-2 whitespace-nowrap">
                     <span className="truncate">Last Read: {formatDateMMDDYYYY(series.lastReadDate)}</span>
                     {latestChapterAddedDate && (
                       <span className="truncate text-right">
