@@ -34,10 +34,28 @@ type Props = {
   showRemoveModal: (series: Series) => void;
 };
 
-const getSafeChapterCount = (value?: number): number => Math.max(0, value ?? 0);
+type ChapterCountIndicatorState = {
+  unreadChapters: number;
+  totalChapters: number;
+  visible: boolean;
+};
 
-const shouldShowChapterCountIndicator = (unreadChapters: number, totalChapters: number): boolean =>
-  unreadChapters > 0 || totalChapters > 0;
+const getSafeChapterCount = (value?: number): number => {
+  const normalizedValue = Number.isFinite(value) ? (value as number) : 0;
+  return Math.max(0, normalizedValue);
+};
+
+const getChapterCountIndicatorState = (
+  chapterMetadata?: SeriesChapterMetadata,
+): ChapterCountIndicatorState => {
+  const unreadChapters = getSafeChapterCount(chapterMetadata?.unreadChapters);
+  const totalChapters = getSafeChapterCount(chapterMetadata?.totalChapters);
+  return {
+    unreadChapters,
+    totalChapters,
+    visible: unreadChapters > 0 || totalChapters > 0,
+  };
+};
 
 const LibraryGrid: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
@@ -100,9 +118,8 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
           ? selectedSeriesIdSet.has(series.id)
           : multiSelectSeriesList.includes(series);
         const chapterMetadata = series.id ? props.seriesChapterMetadata[series.id] : undefined;
-        const totalChapters = getSafeChapterCount(chapterMetadata?.totalChapters);
-        const unreadChapters = getSafeChapterCount(chapterMetadata?.unreadChapters);
-        const showChapterCountIndicator = shouldShowChapterCountIndicator(unreadChapters, totalChapters);
+        const chapterCountIndicatorState = getChapterCountIndicatorState(chapterMetadata);
+        const { unreadChapters, totalChapters } = chapterCountIndicatorState;
         const hasUnreadFlag = series.unread === true;
         const hasNewDate = chapterMetadata?.hasNewChaptersSinceLastRead || false;
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
@@ -137,7 +154,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     )}
                   />
 
-                  {showChapterCountIndicator && (
+                  {chapterCountIndicatorState.visible && (
                     <div
                       className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-center"
                       style={{
