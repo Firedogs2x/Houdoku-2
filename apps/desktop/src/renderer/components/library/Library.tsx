@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Series } from '@tiyo/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import LibraryControlBar from './LibraryControlBar';
@@ -45,8 +45,11 @@ const Library: React.FC<Props> = () => {
   const chapterLanguages = useRecoilValue(chapterLanguagesState);
   const setSeries = useSetRecoilState(seriesState);
   const setChapterList = useSetRecoilState(chapterListState);
-  const [scrollPosition, setScrollPosition] = useRecoilState(libraryScrollPositionState);
+  const initialScrollPosition = useRecoilValue(libraryScrollPositionState);
+  const setScrollPosition = useSetRecoilState(libraryScrollPositionState);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const hasRestoredScrollRef = useRef(false);
+  const latestScrollTopRef = useRef(initialScrollPosition);
 
   useEffect(() => {
     setSeries(undefined);
@@ -54,64 +57,90 @@ const Library: React.FC<Props> = () => {
     setMultiSelectEnabled(false);
   }, []);
 
-  // Restore scroll position when component mounts
+  const getViewport = useCallback((): HTMLElement | null => {
+    if (!scrollAreaRef.current) return null;
+    return scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+  }, []);
+
+  // Restore scroll position once when component mounts
   useEffect(() => {
-    const restoreScroll = () => {
-      if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (viewport) {
-          setTimeout(() => {
-            viewport.scrollTop = scrollPosition;
-          }, 0);
-        }
-      }
+    if (hasRestoredScrollRef.current) return;
+
+    const restoreTimer = window.setTimeout(() => {
+      const viewport = getViewport();
+      if (!viewport) return;
+
+      viewport.scrollTop = initialScrollPosition;
+      latestScrollTopRef.current = initialScrollPosition;
+      hasRestoredScrollRef.current = true;
+    }, 0);
+
+    return () => {
+      window.clearTimeout(restoreTimer);
     };
+  }, [getViewport, initialScrollPosition]);
 
-    // Use a small timeout to ensure the DOM is fully rendered
-    restoreScroll();
-  }, [scrollPosition]);
-
-  // Save scroll position when component unmounts or when navigating away
+  // Keep scrollTop in a ref while scrolling to avoid rerendering on every scroll event.
   useEffect(() => {
+    let throttleTimer: number | undefined;
+
     const handleScroll = () => {
-      if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (viewport) {
-          setScrollPosition(viewport.scrollTop);
-        }
-      }
+      const viewport = getViewport();
+      if (!viewport) return;
+
+      if (throttleTimer !== undefined) return;
+
+      throttleTimer = window.setTimeout(() => {
+        latestScrollTopRef.current = viewport.scrollTop;
+        throttleTimer = undefined;
+      }, 100);
     };
 
-    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    const viewport = getViewport();
     if (viewport) {
-      viewport.addEventListener('scroll', handleScroll);
+      latestScrollTopRef.current = viewport.scrollTop;
+      viewport.addEventListener('scroll', handleScroll, { passive: true });
     }
+
+    const persistScrollPosition = () => {
+      if (throttleTimer !== undefined) {
+        window.clearTimeout(throttleTimer);
+        throttleTimer = undefined;
+      }
+
+      const currentViewport = getViewport();
+      if (currentViewport) {
+        latestScrollTopRef.current = currentViewport.scrollTop;
+      }
+
+      setScrollPosition(latestScrollTopRef.current);
+    };
+
+    window.addEventListener('beforeunload', persistScrollPosition);
 
     return () => {
       if (viewport) {
         viewport.removeEventListener('scroll', handleScroll);
       }
-      // Also save on unmount
-      if (scrollAreaRef.current) {
-        const currentViewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (currentViewport) {
-          setScrollPosition(currentViewport.scrollTop);
-        }
-      }
+      window.removeEventListener('beforeunload', persistScrollPosition);
+      persistScrollPosition();
     };
-  }, [setScrollPosition]);
+  }, [getViewport, setScrollPosition]);
 
   const seriesChapterMetadata = useMemo(
     () => buildSeriesChapterMetadataMap(activeSeriesList, chapterLanguages),
     [activeSeriesList, chapterLanguages],
   );
 
-  const getUnreadCount = (series: Series): number => {
-    if (!series.id) return 0;
-    return seriesChapterMetadata[series.id]?.unreadChapters ?? 0;
-  };
+  const getUnreadCount = useCallback(
+    (series: Series): number => {
+      if (!series.id) return 0;
+      return seriesChapterMetadata[series.id]?.unreadChapters ?? 0;
+    },
+    [seriesChapterMetadata],
+  );
 
-  const filteredList = activeSeriesList.filter((series: Series) => {
+  const filteredList = useMemo(() => activeSeriesList.filter((series: Series) => {
       if (!series) return false;
 
       if (series.preview) return false;
@@ -139,24 +168,34 @@ const Library: React.FC<Props> = () => {
       }
 
       return true;
-    });
+    }), [
+      activeSeriesList,
+      filter,
+      getUnreadCount,
+      libraryDisplayMode,
+      libraryFilterCategory,
+      libraryFilterProgress,
+      libraryFilterStatus,
+    ]);
 
-  const sortedFilteredList = (() => {
+  const sortedFilteredList = useMemo(() => {
+    const sortedList = [...filteredList];
+
     switch (librarySort) {
       case LibrarySort.UnreadAsc:
-        return filteredList.sort(
+        return sortedList.sort(
           (a: Series, b: Series) => getUnreadCount(a) - getUnreadCount(b),
         );
       case LibrarySort.UnreadDesc:
-        return filteredList.sort(
+        return sortedList.sort(
           (a: Series, b: Series) => getUnreadCount(b) - getUnreadCount(a),
         );
       case LibrarySort.TitleAsc:
-        return filteredList.sort((a: Series, b: Series) => a.title.localeCompare(b.title));
+        return sortedList.sort((a: Series, b: Series) => a.title.localeCompare(b.title));
       case LibrarySort.TitleDesc:
-        return filteredList.sort((a: Series, b: Series) => b.title.localeCompare(a.title));
+        return sortedList.sort((a: Series, b: Series) => b.title.localeCompare(a.title));
       case LibrarySort.DateLastRead:
-        return filteredList.sort((a: Series, b: Series) => {
+        return sortedList.sort((a: Series, b: Series) => {
           const dateCompare =
             new Date(b.lastReadDate || 0).getTime() - new Date(a.lastReadDate || 0).getTime();
           if (dateCompare === 0) {
@@ -165,7 +204,7 @@ const Library: React.FC<Props> = () => {
           return dateCompare;
         });
       case LibrarySort.ChapterUpdate:
-        return filteredList.sort((a: Series, b: Series) => {
+        return sortedList.sort((a: Series, b: Series) => {
           const aLatestDate = a.id ? seriesChapterMetadata[a.id]?.latestChapterAddedTimestamp || 0 : 0;
           const bLatestDate = b.id ? seriesChapterMetadata[b.id]?.latestChapterAddedTimestamp || 0 : 0;
 
@@ -176,9 +215,14 @@ const Library: React.FC<Props> = () => {
           return dateCompare;
         });
       default:
-        return filteredList;
+        return sortedList;
     }
-  })();
+  }, [filteredList, getUnreadCount, librarySort, seriesChapterMetadata]);
+
+  const onShowRemoveModal = useCallback((series: Series) => {
+    setRemoveModalSeries(series);
+    setRemoveModalShowing(true);
+  }, []);
 
   const getFilteredList = (): Series[] => sortedFilteredList;
 
@@ -195,19 +239,13 @@ const Library: React.FC<Props> = () => {
           <LibraryList
             seriesList={sortedFilteredList}
             seriesChapterMetadata={seriesChapterMetadata}
-            showRemoveModal={(series) => {
-              setRemoveModalSeries(series);
-              setRemoveModalShowing(true);
-            }}
+            showRemoveModal={onShowRemoveModal}
           />
         ) : (
           <LibraryGrid
             seriesList={sortedFilteredList}
             seriesChapterMetadata={seriesChapterMetadata}
-            showRemoveModal={(series) => {
-              setRemoveModalSeries(series);
-              setRemoveModalShowing(true);
-            }}
+            showRemoveModal={onShowRemoveModal}
           />
         )}
       </>

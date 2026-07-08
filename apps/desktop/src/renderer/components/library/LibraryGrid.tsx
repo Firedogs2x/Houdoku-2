@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Series = any;
@@ -44,13 +44,40 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
     multiSelectSeriesListState,
   );
 
-  const viewFunc = (series: Series) => {
+  const selectedSeriesIdSet = useMemo(() => {
+    const idSet = new Set<string>();
+    multiSelectSeriesList.forEach((series) => {
+      if (series.id) idSet.add(series.id);
+    });
+    return idSet;
+  }, [multiSelectSeriesList]);
+
+  const viewFunc = useCallback((series: Series) => {
     goToSeries(series, navigate);
-  };
+  }, [navigate]);
+
+  const toggleMultiSelectSeries = useCallback((series: Series) => {
+    setMultiSelectSeriesList((prev) => {
+      if (series.id) {
+        const alreadySelected = prev.some((selectedSeries) => selectedSeries.id === series.id);
+        if (alreadySelected) {
+          return prev.filter((selectedSeries) => selectedSeries.id !== series.id);
+        }
+        return [...prev, series];
+      }
+
+      const alreadySelected = prev.includes(series);
+      if (alreadySelected) {
+        return prev.filter((selectedSeries) => selectedSeries !== series);
+      }
+
+      return [...prev, series];
+    });
+  }, [setMultiSelectSeriesList]);
 
   useEffect(() => {
     if (multiSelectSeriesList.length === 0) setMultiSelectEnabled(false);
-  }, [multiSelectSeriesList]);
+  }, [multiSelectSeriesList, setMultiSelectEnabled]);
 
   return (
     <div
@@ -64,7 +91,9 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
     >
       {props.seriesList.map((series: Series) => {
         const coverSource = getSeriesCoverUrl(series).replaceAll('\\', '/');
-        const isMultiSelected = multiSelectSeriesList.includes(series);
+        const isMultiSelected = series.id
+          ? selectedSeriesIdSet.has(series.id)
+          : multiSelectSeriesList.includes(series);
         const chapterMetadata = series.id ? props.seriesChapterMetadata[series.id] : undefined;
         const totalChapters = chapterMetadata?.totalChapters || 0;
         const unreadChapters = chapterMetadata?.unreadChapters ?? 0;
@@ -82,11 +111,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   className="relative overflow-hidden cursor-pointer"
                   onClick={() => {
                     if (multiSelectEnabled) {
-                      if (isMultiSelected) {
-                        setMultiSelectSeriesList(multiSelectSeriesList.filter((s) => s !== series));
-                      } else {
-                        setMultiSelectSeriesList([...multiSelectSeriesList, series]);
-                      }
+                      toggleMultiSelectSeries(series);
                     } else {
                       viewFunc(series);
                     }
@@ -125,25 +150,27 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     </div>
                   )}
                   {/* Star rating indicator in bottom left corner of cover */}
-                  <div
-                    className="absolute flex items-center justify-center pointer-events-none"
-                    style={{ bottom: 2, left: 2, width: 48, height: 48 }}
-                  >
-                    <Star
-                      size={45}
-                      fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                      stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                      strokeWidth={0}
-                      className="absolute"
-                      style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
-                    />
-                    <span
-                      className="absolute text-center font-semibold"
-                      style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
+                  {ratingValue > 0 && (
+                    <div
+                      className="absolute flex items-center justify-center pointer-events-none"
+                      style={{ bottom: 2, left: 2, width: 48, height: 48 }}
                     >
-                      {ratingValue}
-                    </span>
-                  </div>
+                      <Star
+                        size={45}
+                        fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                        stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                        strokeWidth={0}
+                        className="absolute"
+                        style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
+                      />
+                      <span
+                        className="absolute text-center font-semibold"
+                        style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
+                      >
+                        {ratingValue}
+                      </span>
+                    </div>
+                  )}
 
                   {libraryView === LibraryView.GridCompact && (
                     <div
