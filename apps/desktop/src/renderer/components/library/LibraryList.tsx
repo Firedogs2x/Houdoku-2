@@ -5,6 +5,7 @@ import { goToSeries } from '@/renderer/features/library/utils';
 import { Table, TableBody, TableCell, TableRow } from '@houdoku/ui/components/Table';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
+import { interactiveCursor } from '@houdoku/ui/util';
 import LibraryGridContextMenu from './LibraryGridContextMenu';
 import { SeriesChapterMetadata } from '@/renderer/util/librarySeriesMetadata';
 
@@ -35,7 +36,7 @@ const LibraryList: React.FC<Props> = (props: Props) => {
           return (
             <ContextMenu key={`${series.id}-${series.title}`}>
               <ContextMenuTrigger asChild>
-                <TableRow className="cursor-pointer" onClick={() => viewFunc(series)}>
+                <TableRow className={interactiveCursor()} onClick={() => viewFunc(series)}>
                   <TableCell className="truncate flex space-x-2">
                     {unreadChapters > 0 && <Badge>{unreadChapters}</Badge>}
                     <span>{series.title}</span>

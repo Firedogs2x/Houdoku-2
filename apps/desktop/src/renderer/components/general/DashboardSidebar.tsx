@@ -128,7 +128,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton
-                        className="cursor-pointer"
                         onClick={() => {
                           setLibraryFilterCategory('');
                           navigate(routes.LIBRARY);
@@ -142,7 +141,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         <ContextMenu>
                           <ContextMenuTrigger>
                             <SidebarMenuSubButton
-                              className="cursor-pointer"
                               onClick={() => {
                                 setLibraryFilterCategory(category.id);
                                 navigate(routes.LIBRARY);
@@ -178,7 +176,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                     ))}
                     <SidebarMenuSubItem>
                       <SidebarMenuSubButton
-                        className="cursor-pointer"
                         onClick={() => setShowingNewCategoryDialog(true)}
                       >
                         <span className="text-muted-foreground">New category...</span>

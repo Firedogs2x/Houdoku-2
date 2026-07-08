@@ -98,6 +98,9 @@
     background: hsl(var(--border));
     border-radius: 5px;
   }
+  ::-webkit-scrollbar-thumb:hover {
+    cursor: pointer;
+  }
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;

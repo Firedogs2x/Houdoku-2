@@ -24,7 +24,7 @@ import LibraryGridContextMenu from './LibraryGridContextMenu';
 import { getSeriesCoverUrl } from '@/renderer/util/seriesCover';
 import { SeriesChapterMetadata } from '@/renderer/util/librarySeriesMetadata';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
-import { cn } from '@houdoku/ui/util';
+import { cn, interactiveCursor } from '@houdoku/ui/util';
 import { formatDateMMDDYYYY } from '@/renderer/util/formatDate';
 import { Star } from 'lucide-react';
 
@@ -108,7 +108,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
             <ContextMenu>
               <ContextMenuTrigger>
                 <div
-                  className="relative overflow-hidden cursor-pointer"
+                  className={cn('relative overflow-hidden', interactiveCursor())}
                   onClick={() => {
                     if (multiSelectEnabled) {
                       toggleMultiSelectSeries(series);

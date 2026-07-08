@@ -66,6 +66,7 @@ import { Checkbox } from '@houdoku/ui/components/Checkbox';
 import { TableColumnSortOrder } from '@/common/models/types';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
+import { interactiveCursor } from '@houdoku/ui/util';
 import { ChapterTableContextMenu } from './ChapterTableContextMenu';
 import { MouseEvent, useEffect, useRef, useState } from 'react';
 import { currentTaskState } from '@/renderer/state/downloaderStates';
@@ -634,7 +635,7 @@ export function ChapterTable(props: ChapterTableProps) {
                 <ContextMenu key={row.id}>
                   <ContextMenuTrigger asChild>
                     <TableRow
-                      className="cursor-pointer"
+                      className={interactiveCursor()}
                       data-state={row.getIsSelected() && 'selected'}
                       onClick={(event: MouseEvent<HTMLTableRowElement>) => {
                         const chapterId = row.original.id;

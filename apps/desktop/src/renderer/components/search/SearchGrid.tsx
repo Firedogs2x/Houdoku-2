@@ -13,7 +13,7 @@ import { FS_METADATA } from '@/common/temp_fs_metadata';
 import ExtensionImage from '../general/ExtensionImage';
 import SearchGridContextMenu from './SearchGridContextMenu';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
-import { cn } from '@houdoku/ui/util';
+import { cn, interactiveCursor } from '@houdoku/ui/util';
 import { Skeleton } from '@houdoku/ui/components/Skeleton';
 import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
 
@@ -45,7 +45,7 @@ const SearchGrid: React.FC<Props> = (props: Props) => {
           <ContextMenu>
             <ContextMenuTrigger>
               <div
-                className="relative overflow-hidden cursor-pointer"
+                className={cn('relative overflow-hidden', interactiveCursor())}
                 onClick={() => handleOpenAddModal(series)}
               >
                 <ExtensionImage
