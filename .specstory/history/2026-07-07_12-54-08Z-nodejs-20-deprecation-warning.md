@@ -13,3 +13,67 @@ When I run a Release in Github I get the following Tab: Node.js 20 is deprecated
 _**Agent (copilot/auto)**_
 
 I’m going to locate your GitHub release workflow and update the action versions so they run on a supported runtime and remove the Node 20 deprecation warning. I’ll then summarize exactly what changed and why.
+
+---
+
+_**User (2026-07-07 12:57:46Z)**_
+
+Do I need to update the node-js?
+
+---
+
+_**Agent (copilot/auto)**_
+
+You do not need to change your project’s Node version just to fix that warning; the warning is about the GitHub Action runtime version, not the Node version your build uses. I’ll clarify what is optional versus required so you can decide confidently.Short answer: no, not required for this warning.
+
+The warning was about the action runtime for that release action, not your build Node version. Updating the release action reference was the needed fix.
+
+Optional:
+1. Keep your workflow build Node at 20 if your app/tooling expects it.
+2. Upgrade build Node later (for example to 22 LTS) as a separate compatibility task.
+3. Only move to 24 after confirming Electron/toolchain support in your project.
+
+---
+
+_**User (2026-07-07 13:18:37Z)**_
+
+See Series Page Top Section Screenshot 2026-07-07 052030
+I want to move the text “Last Read” to the left. Position it just above the border between the banner and the lower section. Spaced slightly to the right of the Series image.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’ll adjust the top section layout in the series banner component so “Last read” is anchored near the bottom-left of the gradient area, just to the right of the cover image as shown. I’m opening the component and related styles now to make a targeted layout change.
+
+---
+
+_**User (2026-07-07 13:33:27Z)**_
+
+The text was moved but I need to move it more to the right. Which of the two variables do I need to change ((`left-[148px]` and `md:left-[188px]`)?
+I also wish to increase the font size. Which variable do I need to change?
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+Use both.
+
+- left-[148px] controls the position on smaller screens (default/mobile width).
+- md:left-[188px] controls the position from the md breakpoint and up (desktop/tablet).
+
+So if you want it farther right in all sizes, increase both numbers.
+If you only care about desktop, change only md:left-[188px].
+
+For font size:
+- text-xs is the size class you need to change.
+- Increase it to text-sm, text-base, etc.
+
+Location:
+- [apps/desktop/src/renderer/components/library/series/SeriesDetailsBanner.tsx](apps/desktop/src/renderer/components/library/series/SeriesDetailsBanner.tsx#L51)
+
+Example direction:
+1. Move right a bit: left-[168px] and md:left-[210px]
+2. Make text bigger: text-xs → text-sm
