@@ -8,6 +8,7 @@ import ipcChannels from '@/common/constants/ipcChannels.json';
 import library from '@/renderer/services/library';
 import { getNumberUnreadChapters } from '@/renderer/util/comparison';
 import routes from '@/common/constants/routes.json';
+import { invalidateSeriesCoverUrlCache } from '@/renderer/util/seriesCover';
 
 const updateSeriesNumberUnread = (series: Series, chapterLanguages: LanguageKey[]) => {
   if (series.id !== undefined) {
@@ -44,6 +45,7 @@ export function removeSeries(series: Series, setSeriesList: (seriesList: Series[
 
   library.removeSeries(series.id);
   ipcRenderer.invoke(ipcChannels.FILESYSTEM.DELETE_THUMBNAIL, series);
+  invalidateSeriesCoverUrlCache(series);
   setSeriesList(library.fetchSeriesList());
 }
 

@@ -121,6 +121,8 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     url={coverSource}
                     series={series}
                     alt={series.title}
+                    width={700}
+                    height={1000}
                     className={cn(
                       !multiSelectEnabled && 'hover:scale-105',
                       multiSelectEnabled && isMultiSelected && 'border-4 border-sky-500',

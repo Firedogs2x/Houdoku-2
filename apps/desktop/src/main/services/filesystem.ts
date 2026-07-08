@@ -10,6 +10,7 @@ import {
   getChaptersDownloaded,
   getChapterDownloaded,
   listDirectory,
+  cleanupThumbnails,
 } from '@/main/util/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { THUMBNAILS_DIR } from '../util/appdata';
@@ -58,8 +59,8 @@ export const createFilesystemIpcHandlers = (ipcMain: IpcMain) => {
 
   ipcMain.handle(
     ipcChannels.FILESYSTEM.DOWNLOAD_THUMBNAIL,
-    (_event, thumbnailPath: string, data: string | BlobPart) => {
-      return downloadThumbnail(thumbnailPath, data);
+    (_event, thumbnailPath: string, data: string | BlobPart, sourceUrl?: string) => {
+      return downloadThumbnail(thumbnailPath, data, sourceUrl);
     },
   );
 
@@ -71,6 +72,13 @@ export const createFilesystemIpcHandlers = (ipcMain: IpcMain) => {
     ipcChannels.FILESYSTEM.LIST_DIRECTORY,
     (_event, pathname: string, directoriesOnly: boolean = false) => {
       return listDirectory(pathname, directoriesOnly);
+    },
+  );
+
+  ipcMain.handle(
+    ipcChannels.FILESYSTEM.CLEANUP_THUMBNAILS,
+    (_event, seriesList: Pick<Series, 'id' | 'remoteCoverUrl'>[]) => {
+      return cleanupThumbnails(seriesList, THUMBNAILS_DIR);
     },
   );
 };

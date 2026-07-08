@@ -29,6 +29,7 @@ import {
 import { getNumberUnreadChapters } from './util/comparison';
 import { DefaultSettings, GeneralSetting } from '@/common/models/types';
 import { formatDateToMMDDYYYY } from './util/date';
+import { invalidateSeriesCoverUrlCache } from '@/renderer/util/seriesCover';
 
 loadStoredExtensionSettings();
 loadStoredTrackerTokens();
@@ -132,7 +133,12 @@ export default function App() {
       library
         .fetchSeriesList()
         .filter((series) => series.preview)
-        .forEach((series) => (series.id ? library.removeSeries(series.id, false) : undefined));
+        .forEach((series) => {
+          if (!series.id) return;
+          library.removeSeries(series.id, false);
+          ipcRenderer.invoke(ipcChannels.FILESYSTEM.DELETE_THUMBNAIL, series);
+          invalidateSeriesCoverUrlCache(series);
+        });
 
       // If AutoCheckForUpdates setting is enabled, check for client updates now
       if (autoCheckForUpdates) {
@@ -141,7 +147,25 @@ export default function App() {
         console.debug('Skipping update check, autoCheckForUpdates is disabled');
       }
 
-      setSeriesList(library.fetchSeriesList());
+      const seriesList = library.fetchSeriesList();
+      ipcRenderer
+        .invoke(
+          ipcChannels.FILESYSTEM.CLEANUP_THUMBNAILS,
+          seriesList.map((series) => ({
+            id: series.id,
+            remoteCoverUrl: series.remoteCoverUrl,
+          })),
+        )
+        .then((result) => {
+          if (result?.removedCount > 0) {
+            console.debug(`Removed ${result.removedCount} stale/orphaned thumbnails`);
+          }
+        })
+        .catch((error) => {
+          console.warn('Thumbnail cleanup failed during startup', error);
+        });
+
+      setSeriesList(seriesList);
       setCategoryList(library.fetchCategoryList());
       setLoading(false);
     }

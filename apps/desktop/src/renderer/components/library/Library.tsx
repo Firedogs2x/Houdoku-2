@@ -48,8 +48,8 @@ const Library: React.FC<Props> = () => {
   const initialScrollPosition = useRecoilValue(libraryScrollPositionState);
   const setScrollPosition = useSetRecoilState(libraryScrollPositionState);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
   const hasRestoredScrollRef = useRef(false);
-  const latestScrollTopRef = useRef(initialScrollPosition);
 
   useEffect(() => {
     setSeries(undefined);
@@ -58,8 +58,7 @@ const Library: React.FC<Props> = () => {
   }, []);
 
   const getViewport = useCallback((): HTMLElement | null => {
-    if (!scrollAreaRef.current) return null;
-    return scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+    return scrollViewportRef.current;
   }, []);
 
   // Restore scroll position once when component mounts
@@ -71,7 +70,6 @@ const Library: React.FC<Props> = () => {
       if (!viewport) return;
 
       viewport.scrollTop = initialScrollPosition;
-      latestScrollTopRef.current = initialScrollPosition;
       hasRestoredScrollRef.current = true;
     }, 0);
 
@@ -80,48 +78,18 @@ const Library: React.FC<Props> = () => {
     };
   }, [getViewport, initialScrollPosition]);
 
-  // Keep scrollTop in a ref while scrolling to avoid rerendering on every scroll event.
+  // Persist scroll position when navigating away without attaching a scroll handler.
   useEffect(() => {
-    let throttleTimer: number | undefined;
-
-    const handleScroll = () => {
-      const viewport = getViewport();
-      if (!viewport) return;
-
-      if (throttleTimer !== undefined) return;
-
-      throttleTimer = window.setTimeout(() => {
-        latestScrollTopRef.current = viewport.scrollTop;
-        throttleTimer = undefined;
-      }, 100);
-    };
-
-    const viewport = getViewport();
-    if (viewport) {
-      latestScrollTopRef.current = viewport.scrollTop;
-      viewport.addEventListener('scroll', handleScroll, { passive: true });
-    }
-
     const persistScrollPosition = () => {
-      if (throttleTimer !== undefined) {
-        window.clearTimeout(throttleTimer);
-        throttleTimer = undefined;
-      }
-
       const currentViewport = getViewport();
       if (currentViewport) {
-        latestScrollTopRef.current = currentViewport.scrollTop;
+        setScrollPosition(currentViewport.scrollTop);
       }
-
-      setScrollPosition(latestScrollTopRef.current);
     };
 
     window.addEventListener('beforeunload', persistScrollPosition);
 
     return () => {
-      if (viewport) {
-        viewport.removeEventListener('scroll', handleScroll);
-      }
       window.removeEventListener('beforeunload', persistScrollPosition);
       persistScrollPosition();
     };
@@ -300,6 +268,7 @@ const Library: React.FC<Props> = () => {
       )}
       <ScrollArea
         ref={scrollAreaRef}
+        viewportRef={scrollViewportRef}
         className="flex-1 min-h-0 w-full overflow-hidden overscroll-contain pr-4 -mr-2"
       >
         {activeSeriesList.length === 0 && renderEmptyMessage()}

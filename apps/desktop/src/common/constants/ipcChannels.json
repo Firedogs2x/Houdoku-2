@@ -58,7 +58,8 @@
     "GET_THUMBNAIL_PATH": "filesystem-get-thumbnail-path",
     "DOWNLOAD_THUMBNAIL": "filesystem-download-thumbnail",
     "DELETE_THUMBNAIL": "filesystem-delete-thumbnail",
-    "LIST_DIRECTORY": "filesystem-list-directory"
+    "LIST_DIRECTORY": "filesystem-list-directory",
+    "CLEANUP_THUMBNAILS": "filesystem-cleanup-thumbnails"
   },
   "TRACKER_MANAGER": {
     "GET_ALL": "tracker-manager-get-alls"
