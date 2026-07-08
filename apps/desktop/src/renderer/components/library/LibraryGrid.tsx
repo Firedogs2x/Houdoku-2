@@ -34,6 +34,11 @@ type Props = {
   showRemoveModal: (series: Series) => void;
 };
 
+const getSafeChapterCount = (value?: number): number => Math.max(0, value ?? 0);
+
+const shouldShowChapterCountIndicator = (unreadChapters: number, totalChapters: number): boolean =>
+  unreadChapters > 0 || totalChapters > 0;
+
 const LibraryGrid: React.FC<Props> = (props: Props) => {
   const navigate = useNavigate();
   const libraryView = useRecoilValue(libraryViewState);
@@ -95,8 +100,9 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
           ? selectedSeriesIdSet.has(series.id)
           : multiSelectSeriesList.includes(series);
         const chapterMetadata = series.id ? props.seriesChapterMetadata[series.id] : undefined;
-        const totalChapters = chapterMetadata?.totalChapters || 0;
-        const unreadChapters = chapterMetadata?.unreadChapters ?? 0;
+        const totalChapters = getSafeChapterCount(chapterMetadata?.totalChapters);
+        const unreadChapters = getSafeChapterCount(chapterMetadata?.unreadChapters);
+        const showChapterCountIndicator = shouldShowChapterCountIndicator(unreadChapters, totalChapters);
         const hasUnreadFlag = series.unread === true;
         const hasNewDate = chapterMetadata?.hasNewChaptersSinceLastRead || false;
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
@@ -131,7 +137,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                     )}
                   />
 
-                  {unreadChapters > 0 && (
+                  {showChapterCountIndicator && (
                     <div
                       className="absolute top-0 right-0 px-1 mr-1 mt-1 min-w-5 rounded-md font-semibold text-center"
                       style={{
