@@ -21,3 +21,19 @@ Make sure any changes do not cause program errors. And do not cause errors in Li
 _**Agent (copilot/auto)**_
 
 I’m going to inspect how clickability is currently expressed in the renderer and UI components, then I’ll draft a concrete cross-platform plan (without making code changes) for a single reusable cursor strategy using the Series card on Main as the reference pattern.
+
+---
+
+_**User (2026-07-08 17:57:32Z)**_
+
+Go ahead an implement the plan. Make sure you double check each step to reduce the chance of issue later on.
+Use functions or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’m implementing the full cursor-standard rollout now, starting with shared utility and UI primitives so the behavior is centralized and low risk, then I’ll patch remaining local clickable surfaces and run lint/build/release verification across all targets.

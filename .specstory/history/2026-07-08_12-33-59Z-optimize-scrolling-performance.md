@@ -25,3 +25,113 @@ Make sure any changes do not cause program errors. And do not cause errors in Li
 _**Agent (copilot/auto)**_
 
 I’ll inspect the current renderer/listing/image pipeline to pinpoint likely scroll stutter sources and then produce a concrete optimization plan first, without making code changes yet, matching your constraints. I’ll gather relevant files and performance-sensitive functions next.
+
+---
+
+_**User (2026-07-08 14:51:11Z)**_
+
+Yes, please start with the highest-impact scroll-state and rerender fixes first.
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’ll implement phase 1 now: high-impact scroll-state and rerender reductions in the library view first, while preserving startup/image-loading behavior exactly as requested. I’ll edit 
+
+---
+
+_**User (2026-07-08 15:24:18Z)**_
+
+Okay try Phase 2
+
+_**User (2026-07-08 15:51:25Z)**_
+
+The changes you made, made things worst.
+The loading of the images was not done ahead of time. Only when I scrolled down the page did the images load. I told you at the beginning “Do not change the way the program starts and loads all of the images”.
+The scrolling is still very choppy.
+Repair the startup procedure back to the way it was.
+Do you have any other ideas as to fix the scrolling issue?
+Use functions to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+_**User (2026-07-08 16:10:27Z)**_
+
+The program already creates a folder called Thumbnails.
+Can you use that for this option “Highest impact without changing startup semantics: precompute and store smaller local thumbnail files per series update/import, and always render those in Library grid.”?
+Use functions to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’ll implement that directly by reusing the existing Thumbnails pipeline: generate and store optimized local covers for library rendering, keep startup behavior unchanged, and then run lint/build/release verification. I’m first locating where thumbnails are currently created/updated so I can extend it safely.
+
+---
+
+_**User (2026-07-08 16:20:04Z)**_
+
+Why did you not optimize the thumbnails located in each series folder.
+Having the extra thumbnail folder takes up disk space. Causes issues if a thumbnail is change in a specific series folder, and if a series is deleted the thumbnail in the thumbnail folder might not be deleted.
+Do not make any changes only answer the questions and offer solutions.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+Good question. You are right to call out those risks.
+
+Why I did not optimize thumbnails in each series folder:
+1. The current architecture is already centered on an app-managed thumbnail cache in [apps/desktop/src/main/util/appdata.ts](apps/desktop/src/main/util/appdata.ts) and [apps/desktop/src/main/util/filesystem.ts](apps/desktop/src/main/util/filesystem.ts).
+2. Not all series have a stable writable “series folder” path:
+   1. Some covers are remote URLs.
+   2. Some local covers can be in user-managed or plugin-managed paths where writing back is risky.
+3. A centralized app cache avoids writing into user content folders, which helps cross-platform permission safety (Windows/macOS/Linux) and keeps plugin behavior isolated.
+4. I followed your request to reuse the existing thumbnails pipeline rather than redesign storage layout first.
+
+Your concerns are valid:
+1. Extra disk usage from duplicate copies.
+2. Potential stale cache when an in-folder image changes but path is unchanged.
+3. Potential orphaned thumbnails if deletion flow is skipped or interrupted.
+
+Solutions I recommend (no code changes yet):
+1. Best balance: hybrid strategy.
+   1. If cover is local filesystem-based, render directly from series folder image (no duplicate in app cache).
+   2. If cover is remote, keep app cache thumbnail.
+   3. Result: less disk duplication, still fast for remote covers.
+2. Add thumbnail invalidation by file metadata/hash.
+   1. Track source image modified time and size (or hash) in series metadata.
+   2. Regenerate only when source changes.
+   3. Fixes the “changed image but same path” issue.
+3. Add periodic orphan cleanup job for app cache.
+   1. Compare cached thumbnail ids with current library series ids.
+   2. Delete stale files at startup or during library refresh.
+4. Strengthen delete-path cleanup.
+   1. Ensure thumbnail delete runs on all remove-series flows and batch deletions.
+   2. Add a fallback sweep on startup for crash-recovery cases.
+5. Optional migration mode.
+   1. “No duplicate local thumbnails” setting for users who prioritize disk space.
+   2. Keep current cache mode for users who prioritize speed/stability.
+
+If you want, I can next provide a concrete implementation plan for option 1 + 2 + 3 (hybrid source + invalidation + orphan cleanup), which directly addresses all three issues you listed while staying cross-platform safe.
+
+---
+
+_**User (2026-07-08 16:24:40Z)**_
+
+Please implement solutions one through four only.
+Use functions to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’m implementing solutions 1–4 now with minimal risk: hybrid local-vs-remote cover handling, source-change invalidation metadata, orphaned thumbnail cleanup, and stronger delete-flow cleanup. I’ll first map existing remove/refresh flows so I can patch every relevant path safely.
