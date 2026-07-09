@@ -5,6 +5,7 @@ import { toast } from '@houdoku/ui/hooks/use-toast';
 import storeKeys from '@/common/constants/storeKeys.json';
 import { updateSeries } from '../features/library/utils';
 import library from '../services/library';
+import { getSeriesRatingValue } from '@/renderer/util/seriesRating';
 import {
   getAllStoredSettings,
   saveGeneralSetting,
@@ -29,10 +30,6 @@ import {
   TrackerSetting,
   ApplicationTheme,
 } from '@/common/models/types';
-
-type SeriesWithRating = Series & {
-  rating?: number;
-};
 
 const BACKUP_FILE_PREFIX = 'houdoku_backup_';
 const BACKUP_FILE_EXTENSION = '.json';
@@ -186,7 +183,6 @@ const buildBackupPayload = () => {
   const sortedSeries = [...library.fetchSeriesList()].sort(compareSeriesForBackup);
 
   const series = sortedSeries.map((s: Series) => {
-    const rating = (s as SeriesWithRating).rating;
     const seriesEntry: Record<string, unknown> = {
       title: s.title,
       sourceId: s.sourceId,
@@ -205,7 +201,7 @@ const buildBackupPayload = () => {
       numberUnread: s.numberUnread,
       lastReadDate: s.lastReadDate,
       unread: s.unread,
-      rating: rating ?? 0,
+      rating: getSeriesRatingValue(s as Record<string, unknown>),
     };
 
     // Add any extra fields not in the standard order

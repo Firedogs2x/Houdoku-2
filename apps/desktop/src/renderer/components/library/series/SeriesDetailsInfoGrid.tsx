@@ -13,13 +13,10 @@ import {
 } from '@houdoku/ui/components/Select';
 import { seriesListState, seriesState } from '@/renderer/state/libraryStates';
 import library from '@/renderer/services/library';
+import { getSeriesRatingSelectValue, getSeriesRatingValue } from '@/renderer/util/seriesRating';
 
 type Props = {
   series: Series;
-};
-
-type SeriesWithRating = Series & {
-  rating?: number;
 };
 
 const SeriesDetailsInfoGrid: React.FC<Props> = (props: Props) => {
@@ -27,7 +24,8 @@ const SeriesDetailsInfoGrid: React.FC<Props> = (props: Props) => {
   const setSeriesList = useSetRecoilState(seriesListState);
   const language = Languages[props.series.originalLanguageKey];
   const languageStr = language !== undefined && 'name' in language ? language.name : 'Unknown';
-  const ratingValue = (props.series as SeriesWithRating).rating ?? 0;
+  const ratingValue = getSeriesRatingValue(props.series as Record<string, unknown>);
+  const ratingSelectValue = getSeriesRatingSelectValue(props.series as Record<string, unknown>);
 
   const getCreatorsText = () => {
     const creators = Array.from(new Set([...props.series.authors, ...props.series.artists]));
@@ -46,9 +44,9 @@ const SeriesDetailsInfoGrid: React.FC<Props> = (props: Props) => {
       <div className="col-span-full flex justify-end pr-1 -mb-1">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold">Series Rating:</span>
-          <Select value={`${ratingValue}`} onValueChange={handleRatingChange}>
+          <Select value={ratingSelectValue} onValueChange={handleRatingChange}>
             <SelectTrigger className="h-7 w-16 rounded-xl border border-border bg-card px-2 py-1 text-sm font-bold">
-              <SelectValue />
+              <SelectValue>{ratingValue}</SelectValue>
             </SelectTrigger>
             <SelectContent side="bottom">
               <SelectGroup>

@@ -2,10 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
 type Series = any;
-// Series extended with optional rating property for star rating feature
-interface SeriesWithRating extends Record<string, unknown> {
-  rating?: number;
-}
+import { getSeriesRatingValue } from '@/renderer/util/seriesRating';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -124,7 +121,7 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
         const hasUnreadFlag = series.unread === true;
         const hasNewDate = chapterMetadata?.hasNewChaptersSinceLastRead || false;
         const showNewIndicator = hasUnreadFlag || Boolean(hasNewDate);
-        const ratingValue = (series as SeriesWithRating).rating ?? 0;
+        const ratingValue = getSeriesRatingValue(series as Record<string, unknown>);
         const latestChapterAddedDate = chapterMetadata?.latestChapterAddedDate;
 
         return (
@@ -175,28 +172,27 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                       </svg>
                     </div>
                   )}
+
                   {/* Star rating indicator in bottom left corner of cover */}
-                  {ratingValue > 0 && (
-                    <div
-                      className="absolute flex items-center justify-center pointer-events-none"
-                      style={{ bottom: 2, left: 2, width: 48, height: 48 }}
+                  <div
+                    className="absolute flex items-center justify-center pointer-events-none"
+                    style={{ bottom: 2, left: 2, width: 48, height: 48 }}
+                  >
+                    <Star
+                      size={45}
+                      fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
+                      strokeWidth={0}
+                      className="absolute"
+                      style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
+                    />
+                    <span
+                      className="absolute text-center font-semibold"
+                      style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
                     >
-                      <Star
-                        size={45}
-                        fill="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                        stroke="var(--star-rating-fill-color, rgba(255, 255, 0, 1))"
-                        strokeWidth={0}
-                        className="absolute"
-                        style={{ color: 'var(--star-rating-fill-color, rgba(255, 255, 0, 1))' }}
-                      />
-                      <span
-                        className="absolute text-center font-semibold"
-                        style={{ color: 'var(--star-rating-font-color, rgba(255, 255, 255, 1))' }}
-                      >
-                        {ratingValue}
-                      </span>
-                    </div>
-                  )}
+                      {ratingValue}
+                    </span>
+                  </div>
 
                   {libraryView === LibraryView.GridCompact && (
                     <div
