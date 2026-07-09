@@ -26,6 +26,7 @@ import { CheckCheck, Play, Pointer, Tags, Trash2 } from 'lucide-react';
 type Props = {
   series: Series | null;
   showRemoveModal: (series: Series) => void;
+  beforeNavigateToSeries: () => void;
 };
 
 const LibraryGridContextMenu: React.FC<Props> = (props: Props) => {
@@ -41,7 +42,7 @@ const LibraryGridContextMenu: React.FC<Props> = (props: Props) => {
 
   const viewFunc = () => {
     if (props.series) {
-      goToSeries(props.series, navigate);
+      goToSeries(props.series, navigate, props.beforeNavigateToSeries);
     }
   };
 

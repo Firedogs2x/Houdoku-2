@@ -348,8 +348,14 @@ export function migrateSeriesTags() {
   });
 }
 
-export async function goToSeries(series: Series, navigate: (location: string) => void) {
+export async function goToSeries(
+  series: Series,
+  navigate: (location: string) => void,
+  beforeNavigate?: () => void,
+) {
   if (series.id !== undefined) {
+    beforeNavigate?.();
+
     if (
       (await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.GET, series.extensionId)) ===
       undefined

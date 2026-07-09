@@ -32,6 +32,7 @@ type Props = {
   seriesList: Series[];
   seriesChapterMetadata: Record<string, SeriesChapterMetadata>;
   showRemoveModal: (series: Series) => void;
+  beforeNavigateToSeries: () => void;
 };
 
 type ChapterCountIndicatorState = {
@@ -76,8 +77,8 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
   }, [multiSelectSeriesList]);
 
   const viewFunc = useCallback((series: Series) => {
-    goToSeries(series, navigate);
-  }, [navigate]);
+    goToSeries(series, navigate, props.beforeNavigateToSeries);
+  }, [navigate, props.beforeNavigateToSeries]);
 
   const toggleMultiSelectSeries = useCallback((series: Series) => {
     setMultiSelectSeriesList((prev) => {
@@ -211,7 +212,11 @@ const LibraryGrid: React.FC<Props> = (props: Props) => {
                   )}
                 </div>
               </ContextMenuTrigger>
-              <LibraryGridContextMenu series={series} showRemoveModal={props.showRemoveModal} />
+              <LibraryGridContextMenu
+                series={series}
+                showRemoveModal={props.showRemoveModal}
+                beforeNavigateToSeries={props.beforeNavigateToSeries}
+              />
             </ContextMenu>
 
             {libraryView === LibraryView.GridComfortable && (

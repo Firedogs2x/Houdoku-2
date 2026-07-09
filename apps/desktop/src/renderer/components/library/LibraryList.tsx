@@ -13,6 +13,7 @@ type Props = {
   seriesList: Series[];
   seriesChapterMetadata: Record<string, SeriesChapterMetadata>;
   showRemoveModal: (series: Series) => void;
+  beforeNavigateToSeries: () => void;
 };
 
 const LibraryList: React.FC<Props> = (props: Props) => {
@@ -24,7 +25,7 @@ const LibraryList: React.FC<Props> = (props: Props) => {
   };
 
   const viewFunc = (series: Series) => {
-    goToSeries(series, navigate);
+    goToSeries(series, navigate, props.beforeNavigateToSeries);
   };
 
   return (
@@ -49,7 +50,11 @@ const LibraryList: React.FC<Props> = (props: Props) => {
                   </TableCell>
                 </TableRow>
               </ContextMenuTrigger>
-              <LibraryGridContextMenu series={series} showRemoveModal={props.showRemoveModal} />
+              <LibraryGridContextMenu
+                series={series}
+                showRemoveModal={props.showRemoveModal}
+                beforeNavigateToSeries={props.beforeNavigateToSeries}
+              />
             </ContextMenu>
           );
         })}

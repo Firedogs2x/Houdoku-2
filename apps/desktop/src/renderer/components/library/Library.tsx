@@ -50,6 +50,7 @@ const Library: React.FC<Props> = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
   const hasRestoredScrollRef = useRef(false);
+  const restoreFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     setSeries(undefined);
@@ -61,39 +62,61 @@ const Library: React.FC<Props> = () => {
     return scrollViewportRef.current;
   }, []);
 
+  const persistCurrentScrollPosition = useCallback(() => {
+    const currentViewport = getViewport();
+    if (currentViewport) {
+      setScrollPosition(currentViewport.scrollTop);
+    }
+  }, [getViewport, setScrollPosition]);
+
+  const restoreScrollPositionWithRetry = useCallback((targetScrollTop: number) => {
+    const maxAttempts = 12;
+    let attempts = 0;
+
+    const tryRestore = () => {
+      const viewport = getViewport();
+      if (!viewport) return;
+
+      const maxScrollableTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
+      const canReachTarget = maxScrollableTop >= targetScrollTop;
+
+      if (canReachTarget || attempts >= maxAttempts) {
+        viewport.scrollTop = Math.min(targetScrollTop, maxScrollableTop);
+        hasRestoredScrollRef.current = true;
+        restoreFrameRef.current = null;
+        return;
+      }
+
+      attempts += 1;
+      restoreFrameRef.current = window.requestAnimationFrame(tryRestore);
+    };
+
+    restoreFrameRef.current = window.requestAnimationFrame(tryRestore);
+  }, [getViewport]);
+
   // Restore scroll position once when component mounts
   useEffect(() => {
     if (hasRestoredScrollRef.current) return;
 
-    const restoreTimer = window.setTimeout(() => {
-      const viewport = getViewport();
-      if (!viewport) return;
-
-      viewport.scrollTop = initialScrollPosition;
-      hasRestoredScrollRef.current = true;
-    }, 0);
+    restoreScrollPositionWithRetry(initialScrollPosition);
 
     return () => {
-      window.clearTimeout(restoreTimer);
+      if (restoreFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreFrameRef.current);
+        restoreFrameRef.current = null;
+      }
     };
-  }, [getViewport, initialScrollPosition]);
+  }, [initialScrollPosition, restoreScrollPositionWithRetry]);
 
   // Persist scroll position when navigating away without attaching a scroll handler.
   useEffect(() => {
-    const persistScrollPosition = () => {
-      const currentViewport = getViewport();
-      if (currentViewport) {
-        setScrollPosition(currentViewport.scrollTop);
-      }
-    };
-
-    window.addEventListener('beforeunload', persistScrollPosition);
+    window.addEventListener('beforeunload', persistCurrentScrollPosition);
 
     return () => {
-      window.removeEventListener('beforeunload', persistScrollPosition);
-      persistScrollPosition();
+      window.removeEventListener('beforeunload', persistCurrentScrollPosition);
+      persistCurrentScrollPosition();
     };
-  }, [getViewport, setScrollPosition]);
+  }, [persistCurrentScrollPosition]);
 
   const seriesChapterMetadata = useMemo(
     () => buildSeriesChapterMetadataMap(activeSeriesList, chapterLanguages),
@@ -208,12 +231,14 @@ const Library: React.FC<Props> = () => {
             seriesList={sortedFilteredList}
             seriesChapterMetadata={seriesChapterMetadata}
             showRemoveModal={onShowRemoveModal}
+            beforeNavigateToSeries={persistCurrentScrollPosition}
           />
         ) : (
           <LibraryGrid
             seriesList={sortedFilteredList}
             seriesChapterMetadata={seriesChapterMetadata}
             showRemoveModal={onShowRemoveModal}
+            beforeNavigateToSeries={persistCurrentScrollPosition}
           />
         )}
       </>

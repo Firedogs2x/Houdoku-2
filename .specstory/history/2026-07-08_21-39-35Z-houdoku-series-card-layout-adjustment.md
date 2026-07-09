@@ -20,3 +20,19 @@ Make sure any changes do not cause program errors. And do not cause errors in Li
 _**Agent (copilot/auto)**_
 
 I’ll locate the series card footer text rendering, make the smallest layout-only change to left/right align Last Read and Ch. Update, then run lint and a production build check to confirm no regressions.
+
+---
+
+_**User (2026-07-08 22:17:10Z)**_
+
+Can the Last Read and the Ch. Update ne locked to the very bottom of the Series card. Leave 2px space between the bottom of the card.
+Use functions or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’ll adjust the series card layout so the date row is anchored to the card bottom with a 2px inset, then rerun lint/build/release checks to confirm no regressions.
