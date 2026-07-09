@@ -77,6 +77,7 @@ const SeriesDetails: React.FC<Props> = () => {
   }
   return (
     <div
+      id="series-details-scroll-container"
       className={`relative flex flex-col h-full ${seriesPageScrollWhole ? 'overflow-auto' : 'overflow-hidden'}`}
     >
       <SeriesTrackerDialog

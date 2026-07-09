@@ -19,12 +19,13 @@ import { ChapterTablePagination } from './ChapterTablePagination';
 import {
   chapterDownloadStatusesState,
   chapterListState,
+  seriesChapterTableViewState,
   seriesListState,
   seriesState,
   sortedFilteredChapterListState,
 } from '@/renderer/state/libraryStates';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   chapterLanguagesState,
   chapterListChOrderState,
@@ -68,7 +69,7 @@ import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { ContextMenu, ContextMenuTrigger } from '@houdoku/ui/components/ContextMenu';
 import { interactiveCursor } from '@houdoku/ui/util';
 import { ChapterTableContextMenu } from './ChapterTableContextMenu';
-import { MouseEvent, useEffect, useRef, useState } from 'react';
+import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { currentTaskState } from '@/renderer/state/downloaderStates';
 
 const defaultDownloadsDir = await ipcRenderer.invoke(ipcChannels.GET_PATH.DEFAULT_DOWNLOADS_DIR);
@@ -108,13 +109,78 @@ export function ChapterTable(props: ChapterTableProps) {
   const [chapterDownloadStatuses, setChapterDownloadStatuses] = useRecoilState(
     chapterDownloadStatusesState,
   );
+  const [seriesChapterTableView, setSeriesChapterTableView] = useRecoilState(
+    seriesChapterTableViewState,
+  );
   const customDownloadsDir = useRecoilValue(customDownloadsDirState);
   const downloaderCurrentTask = useRecoilValue(currentTaskState);
   const chapterListPageSize = useRecoilValue(chapterListPageSizeState);
+  const tableScrollViewportRef = useRef<HTMLDivElement>(null);
+  const hasRestoredTableViewRef = useRef(false);
+  const restoreFrameRef = useRef<number | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: chapterListPageSize || 10,
   });
+
+  const getScrollContainer = useCallback((): HTMLElement | null => {
+    if (props.tableOnlyScroll) {
+      return tableScrollViewportRef.current;
+    }
+
+    return document.getElementById('series-details-scroll-container');
+  }, [props.tableOnlyScroll]);
+
+  const persistChapterTableViewState = useCallback(() => {
+    if (!props.series.id) return;
+
+    const scrollContainer = getScrollContainer();
+    const nextView = {
+      pageIndex: pagination.pageIndex,
+      scrollTop: scrollContainer?.scrollTop ?? 0,
+    };
+
+    setSeriesChapterTableView((previousState) => {
+      const currentView = previousState[props.series.id!];
+      if (
+        currentView &&
+        currentView.pageIndex === nextView.pageIndex &&
+        currentView.scrollTop === nextView.scrollTop
+      ) {
+        return previousState;
+      }
+
+      return {
+        ...previousState,
+        [props.series.id!]: nextView,
+      };
+    });
+  }, [getScrollContainer, pagination.pageIndex, props.series.id, setSeriesChapterTableView]);
+
+  const restoreTableScrollWithRetry = useCallback((targetScrollTop: number) => {
+    const maxAttempts = 12;
+    let attempts = 0;
+
+    const tryRestore = () => {
+      const scrollContainer = getScrollContainer();
+      if (!scrollContainer) return;
+
+      const maxScrollableTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+      const canReachTarget = maxScrollableTop >= targetScrollTop;
+
+      if (canReachTarget || attempts >= maxAttempts) {
+        scrollContainer.scrollTop = Math.min(targetScrollTop, maxScrollableTop);
+        hasRestoredTableViewRef.current = true;
+        restoreFrameRef.current = null;
+        return;
+      }
+
+      attempts += 1;
+      restoreFrameRef.current = window.requestAnimationFrame(tryRestore);
+    };
+
+    restoreFrameRef.current = window.requestAnimationFrame(tryRestore);
+  }, [getScrollContainer]);
 
   const columns: ColumnDef<Chapter>[] = [
     {
@@ -405,11 +471,63 @@ export function ChapterTable(props: ChapterTableProps) {
   }, [sortedFilteredChapterList.length]);
 
   useEffect(() => {
-    setPagination((currentPagination) => ({
-      pageIndex: 0,
-      pageSize: currentPagination.pageSize,
-    }));
+    const savedView = props.series.id ? seriesChapterTableView[props.series.id] : undefined;
+    hasRestoredTableViewRef.current = false;
+
+    setPagination((currentPagination) => {
+      const maxPageIndex = Math.max(
+        0,
+        Math.ceil(sortedFilteredChapterList.length / currentPagination.pageSize) - 1,
+      );
+      const savedPageIndex = savedView ? Math.min(savedView.pageIndex, maxPageIndex) : 0;
+
+      return {
+        pageIndex: savedPageIndex,
+        pageSize: currentPagination.pageSize,
+      };
+    });
   }, [props.series.id]);
+
+  useEffect(() => {
+    if (hasRestoredTableViewRef.current) return;
+    if (!props.series.id) return;
+
+    const savedView = seriesChapterTableView[props.series.id];
+    if (!savedView) {
+      hasRestoredTableViewRef.current = true;
+      return;
+    }
+
+    const maxPageIndex = Math.max(0, Math.ceil(sortedFilteredChapterList.length / pagination.pageSize) - 1);
+    const expectedPageIndex = Math.min(savedView.pageIndex, maxPageIndex);
+
+    if (pagination.pageIndex !== expectedPageIndex) {
+      return;
+    }
+
+    restoreTableScrollWithRetry(savedView.scrollTop);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    props.series.id,
+    restoreTableScrollWithRetry,
+    seriesChapterTableView,
+    sortedFilteredChapterList.length,
+  ]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', persistChapterTableViewState);
+
+    return () => {
+      window.removeEventListener('beforeunload', persistChapterTableViewState);
+      persistChapterTableViewState();
+
+      if (restoreFrameRef.current !== null) {
+        window.cancelAnimationFrame(restoreFrameRef.current);
+        restoreFrameRef.current = null;
+      }
+    };
+  }, [persistChapterTableViewState]);
 
   const updateDownloadStatuses = () => {
     ipcRenderer
@@ -523,6 +641,11 @@ export function ChapterTable(props: ChapterTableProps) {
     downloaderClient.start();
   };
 
+  const navigateToReader = useCallback((chapterId: string) => {
+    persistChapterTableViewState();
+    navigate(`${routes.READER}/${props.series.id}/${chapterId}`);
+  }, [navigate, persistChapterTableViewState, props.series.id]);
+
   return (
     <div
       className={
@@ -588,12 +711,17 @@ export function ChapterTable(props: ChapterTableProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
               {getNextUnreadChapter() && (
-                <Link to={`${routes.READER}/${props.series.id}/${getNextUnreadChapter()?.id}`}>
-                  <Button variant="outline">
-                    <Play className="w-4 h-4" />
-                    Continue
-                  </Button>
-                </Link>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const chapterId = getNextUnreadChapter()?.id;
+                    if (!chapterId) return;
+                    navigateToReader(chapterId);
+                  }}
+                >
+                  <Play className="w-4 h-4" />
+                  Continue
+                </Button>
               )}
             </div>
           </>
@@ -607,6 +735,7 @@ export function ChapterTable(props: ChapterTableProps) {
         }
       >
         <div
+          ref={props.tableOnlyScroll ? tableScrollViewportRef : undefined}
           className={
             props.tableOnlyScroll
               ? 'h-full overflow-auto overscroll-contain'
@@ -648,7 +777,7 @@ export function ChapterTable(props: ChapterTableProps) {
                         }
 
                         setSelectionAnchorChapterId(chapterId);
-                        navigate(`${routes.READER}/${props.series.id}/${chapterId}`);
+                        navigateToReader(chapterId);
                       }}
                     >
                       {row.getVisibleCells().map((cell) => {
@@ -671,6 +800,7 @@ export function ChapterTable(props: ChapterTableProps) {
                     series={props.series}
                     chapter={row.original}
                     selectFunc={(chapters: Chapter[]) => selectChapters(chapters, true)}
+                    beforeNavigateToReader={persistChapterTableViewState}
                   />
                 </ContextMenu>
               ))

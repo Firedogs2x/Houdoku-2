@@ -88,6 +88,16 @@ export const libraryScrollPositionState = atom<number>({
   default: 0,
 });
 
+export type SeriesChapterTableView = {
+  pageIndex: number;
+  scrollTop: number;
+};
+
+export const seriesChapterTableViewState = atom<Record<string, SeriesChapterTableView>>({
+  key: 'seriesChapterTableViewState',
+  default: {},
+});
+
 export const activeSeriesListState = selector({
   key: 'activeLibrarySeriesList',
   get: ({ get }) => {

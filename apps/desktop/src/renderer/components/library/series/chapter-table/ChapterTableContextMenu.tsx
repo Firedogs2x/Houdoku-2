@@ -23,6 +23,7 @@ type Props = {
   series: Series;
   chapter: Chapter;
   selectFunc: (chapters: Chapter[]) => void;
+  beforeNavigateToReader: () => void;
 };
 
 export const ChapterTableContextMenu: React.FC<Props> = (props: Props) => {
@@ -35,6 +36,7 @@ export const ChapterTableContextMenu: React.FC<Props> = (props: Props) => {
   const sortedFilteredChapterList = useRecoilValue(sortedFilteredChapterListState);
 
   const handleRead = () => {
+    props.beforeNavigateToReader();
     navigate(`${routes.READER}/${props.series.id}/${props.chapter.id}`);
   };
 
