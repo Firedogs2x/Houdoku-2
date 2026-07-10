@@ -1,10 +1,10 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { currentExtensionMetadataState } from '@/renderer/state/libraryStates';
-import { ScrollArea } from '@houdoku/ui/components/ScrollArea';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { getSeriesCoverUrl } from '../../../util/seriesCover';
 import ExtensionImage from '../../general/ExtensionImage';
+import SeriesDescriptionMarkdown from './SeriesDescriptionMarkdown';
 
 // `Series` type is imported dynamically in other modules; use `any` here to avoid type resolution issues.
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic import type resolution
@@ -13,6 +13,9 @@ type Series = any;
 type Props = {
   series: Series;
 };
+
+// Controls how far from the right page edge the description box should end.
+const DESCRIPTION_RIGHT_EDGE_GAP_PX = 100;
 
 const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
   const currentExtensionMetadata = useRecoilValue(currentExtensionMetadataState);
@@ -36,7 +39,14 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
                 {currentExtensionMetadata?.name}
               </Badge>
             </div>
-            <ScrollArea className="h-[60px] md:h-[90px]">{props.series.description}</ScrollArea>
+            <div
+              style={{ width: `calc(100% - ${DESCRIPTION_RIGHT_EDGE_GAP_PX}px)` }}
+              className="max-w-full"
+            >
+              <div className="h-[60px] md:h-[90px] overflow-auto pr-2">
+                <SeriesDescriptionMarkdown markdown={props.series.description || ''} />
+              </div>
+            </div>
           </div>
           <div>
             <div className="text-base font-bold text-white">Alternate Titles:</div>

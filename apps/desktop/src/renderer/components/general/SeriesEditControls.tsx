@@ -130,21 +130,25 @@ export const SeriesEditControls: React.FC<Props> = (props: Props) => {
             disabled={!props.editable}
           />
         </div>
-        <div className="flex space-x-2 items-center">
-          <Label className="min-w-20 text-right">Description</Label>
-          <Input
-            className="w-full"
-            placeholder={'Description'}
-            title={props.series.description}
-            value={props.series.description}
-            onChange={(e) =>
-              props.setSeries({
-                ...props.series,
-                description: e.target.value,
-              })
-            }
-            disabled={!props.editable}
-          />
+        <div className="flex space-x-2 items-start">
+          <Label className="min-w-20 text-right pt-2">Description</Label>
+          <div className="w-full space-y-1">
+            <textarea
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-y"
+              placeholder={'Description'}
+              value={props.series.description || ''}
+              onChange={(e) =>
+                props.setSeries({
+                  ...props.series,
+                  description: e.target.value,
+                })
+              }
+              disabled={!props.editable}
+            />
+            <p className="text-xs text-muted-foreground">
+              Markdown hint: **bold**, *italic*, `code`, - list item, [link](https://example.com)
+            </p>
+          </div>
         </div>
         <div className="flex space-x-2 items-center">
           <Label className="min-w-20 text-right">Author(s)</Label>

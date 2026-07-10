@@ -485,7 +485,11 @@ export const restoreBackup = (backupFileContent: string) => {
       const seriesArray = data.series as Array<Record<string, unknown>>;
       seriesArray.forEach((entry) => {
         const { chapters, ...seriesData } = entry;
-        const series = seriesData as Series;
+        const series = {
+          ...seriesData,
+          description:
+            typeof seriesData.description === 'string' ? seriesData.description : '',
+        } as Series;
 
         // Update series to database
         updateSeries(series);
