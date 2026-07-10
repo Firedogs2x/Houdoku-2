@@ -29,7 +29,7 @@ type Props = unknown;
 
 const SeriesDetails: React.FC<Props> = () => {
   const { id } = useParams<{ id: string }>();
-  let series: Series = library.fetchSeries(id!)!;
+  const [series, setLocalSeries] = useState<Series | null>(null);
 
   const location = useLocation();
   const setExtensionMetadata = useSetRecoilState(currentExtensionMetadataState);
@@ -38,6 +38,7 @@ const SeriesDetails: React.FC<Props> = () => {
   const [showingEditModal, setShowingEditModal] = useState(false);
   const [showingDownloadModal, setShowingDownloadModal] = useState(false);
   const setSeries = useSetRecoilState(seriesState);
+  const setSeriesList = useSetRecoilState(seriesListState);
   const seriesList = useRecoilValue(seriesListState);
   const seriesPageScrollWhole = useRecoilValue(seriesPageScrollWholeState);
   const setChapterList = useSetRecoilState(chapterListState);
@@ -46,18 +47,35 @@ const SeriesDetails: React.FC<Props> = () => {
   const loadContent = async () => {
     console.info(`Series page is loading details from database for series ${id}`);
 
-    series = library.fetchSeries(id!)!;
-    setSeries(series);
+    const loadedSeries = library.fetchSeries(id!);
+    setLocalSeries(loadedSeries);
+
+    if (!loadedSeries) {
+      return;
+    }
+
+    setSeries(loadedSeries);
     setChapterList(library.fetchChapters(id!));
 
+    ipcRenderer
+      .invoke(ipcChannels.EXTENSION_MANAGER.GET, loadedSeries.extensionId)
+      .then((metadata) => setExtensionMetadata(metadata))
+      .catch((err: Error) => console.error(err));
+  };
+
+  const saveSeriesDescription = (description: string) => {
     if (!series) {
       return;
     }
 
-    ipcRenderer
-      .invoke(ipcChannels.EXTENSION_MANAGER.GET, series.extensionId)
-      .then((metadata) => setExtensionMetadata(metadata))
-      .catch((err: Error) => console.error(err));
+    const updatedSeries = library.upsertSeries({
+      ...series,
+      description,
+    });
+
+    setLocalSeries(updatedSeries);
+    setSeries(updatedSeries);
+    setSeriesList(library.fetchSeriesList());
   };
 
   useEffect(() => {
@@ -97,7 +115,9 @@ const SeriesDetails: React.FC<Props> = () => {
               .then(() => downloadCover(newSeries))
               .catch(console.error);
           }
+          setLocalSeries(newSeries);
           setSeries(newSeries);
+          setSeriesList(library.fetchSeriesList());
         }}
       />
       <DownloadModal
@@ -123,7 +143,7 @@ const SeriesDetails: React.FC<Props> = () => {
           showRemoveModal={() => setShowingRemoveModal(true)}
         />
 
-        <SeriesDetailsIntro series={series} />
+        <SeriesDetailsIntro series={series} onDescriptionSave={saveSeriesDescription} />
 
         <SeriesDetailsInfoGrid series={series} />
       </div>
