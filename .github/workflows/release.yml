@@ -161,19 +161,49 @@ jobs:
             pnpm run dist:mac
           fi
 
-      # 🔧 FIX #2 — enforce tag-based release + proper title
-      - name: Upload release assets
+      # Upload Linux artifacts only from Linux runner to avoid cross-OS release asset races.
+      - name: Upload Linux release assets
+        if: runner.os == 'Linux'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.tag.outputs.tag_name }}
           name: ${{ needs.tag.outputs.release_name }}
           prerelease: ${{ needs.tag.outputs.prerelease }}
           overwrite_files: true
+          fail_on_unmatched_files: false
           files: |
             apps/desktop/release/*.AppImage
+            apps/desktop/release/latest-linux.yml
+            apps/desktop/release/*.blockmap
+
+      # Upload Windows artifacts only from Windows runner to avoid cross-OS release asset races.
+      - name: Upload Windows release assets
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.tag.outputs.tag_name }}
+          name: ${{ needs.tag.outputs.release_name }}
+          prerelease: ${{ needs.tag.outputs.prerelease }}
+          overwrite_files: true
+          fail_on_unmatched_files: false
+          files: |
             apps/desktop/release/*.exe
             apps/desktop/release/*.nsis
-            apps/desktop/release/*.dmg
             apps/desktop/release/*.zip
-            apps/desktop/release/*.yml
+            apps/desktop/release/latest.yml
+            apps/desktop/release/*.blockmap
+
+      # Upload macOS artifacts only from macOS runner to avoid cross-OS release asset races.
+      - name: Upload macOS release assets
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.tag.outputs.tag_name }}
+          name: ${{ needs.tag.outputs.release_name }}
+          prerelease: ${{ needs.tag.outputs.prerelease }}
+          overwrite_files: true
+          fail_on_unmatched_files: false
+          files: |
+            apps/desktop/release/*.dmg
+            apps/desktop/release/latest-mac.yml
             apps/desktop/release/*.blockmap
