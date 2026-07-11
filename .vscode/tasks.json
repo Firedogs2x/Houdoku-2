@@ -95,6 +95,12 @@
 			"type": "shell",
 			"command": "corepack pnpm --filter @houdoku/desktop build",
 			"isBackground": false
+		},
+		{
+			"label": "build-verify-tsconfig-fix",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"isBackground": false
 		}
 	]
 }

@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "paths": {
-      "@houdoku/ui/*": [
-        "./src/*"
-      ]
-    },
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
