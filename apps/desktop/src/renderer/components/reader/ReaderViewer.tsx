@@ -288,7 +288,6 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
       {/* {props.overlayPageNumber ? renderPageNumberOverlay() : <></>} */}
       <div
         ref={viewerContainer}
-        data-reader-viewer
         className={cn(
           styles.container,
           usesInternalScrollViewport && styles.scrollViewport,

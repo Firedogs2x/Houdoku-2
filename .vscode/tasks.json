@@ -95,6 +95,24 @@
 				"$tsc"
 			],
 			"group": "none"
+		},
+		{
+			"label": "build-clean-ctx",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "none"
+		},
+		{
+			"label": "build-native-theme",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "none"
 		}
 	]
 }

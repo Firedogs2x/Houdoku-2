@@ -7,6 +7,7 @@ import {
   BrowserWindow,
   shell,
   net,
+  nativeTheme,
   protocol,
   ipcMain,
   dialog,
@@ -30,6 +31,11 @@ log.transports.file.resolvePath = () => path.join(LOGS_DIR, 'main.log');
 
 console.info(`Starting Houdoku main process (client version ${packageJson.version})`);
 
+// Force Chromium's native theme to dark so context menus, scrollbars,
+// and other native UI widgets render with a dark appearance consistently
+// across Windows, macOS, and Linux.
+nativeTheme.themeSource = 'dark';
+
 let mainWindow: BrowserWindow | null = null;
 let spoofWindow: BrowserWindow | null = null;
 
@@ -51,63 +57,6 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-/**
- * Register IPC handler for context menu requests from the renderer.
- * The renderer blocks Chromium's default (white) context menu at the DOM level
- * and sends an IPC message here so we can show a consistent Electron-native
- * (dark) menu for every context — editable fields, selected text, etc.
- */
-const registerContextMenuIpc = () => {
-  ipcMain.on('houdoku:show-context-menu', (event, info: {
-    isEditable: boolean;
-    hasSelection: boolean;
-  }) => {
-    const window = BrowserWindow.fromWebContents(event.sender);
-    if (!window) return;
-
-    const template: Electron.MenuItemConstructorOptions[] = [
-      {
-        label: 'Cut',
-        role: 'cut',
-        enabled: info.isEditable,
-      },
-      {
-        label: 'Copy',
-        role: 'copy',
-        enabled: info.isEditable || info.hasSelection,
-      },
-      {
-        label: 'Paste',
-        role: 'paste',
-        enabled: info.isEditable,
-      },
-      {
-        label: 'Delete',
-        role: 'delete',
-        enabled: info.isEditable,
-      },
-      { type: 'separator' },
-      {
-        label: 'Select All',
-        role: 'selectAll',
-        enabled: true,
-      },
-    ];
-
-    const menu = Menu.buildFromTemplate(template);
-    setTimeout(() => {
-      menu.popup({ window });
-    }, 0);
-  });
-};
-
-// Legacy: still register a no-op context-menu handler to prevent Chromium's
-// default menu in edge cases where the renderer handler doesn't fire first.
-const registerContextMenuFallback = (window: BrowserWindow) => {
-  window.webContents.on('context-menu', (_event) => {
-    _event.preventDefault();
-  });
-};
 
 const createWindows = async () => {
   const RESOURCES_PATH = app.isPackaged
@@ -165,11 +114,9 @@ const createWindows = async () => {
     spoofWindow = null;
   });
 
-  // Enable right-click context menu (Cut/Copy/Paste/Delete/Select All) on all text inputs
-  // and selected text.  The renderer sends IPC to main which shows the Electron-native menu.
-  registerContextMenuIpc();
-  registerContextMenuFallback(mainWindow);
-  registerContextMenuFallback(spoofWindow);
+  // Right-click context menus are handled by Chromium's built-in menu
+  // (consistent OS-native appearance across all contexts).
+  // The reader viewer suppresses right-click via its own onContextMenu handler.
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
