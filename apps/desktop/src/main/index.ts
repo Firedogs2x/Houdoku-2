@@ -58,8 +58,9 @@ protocol.registerSchemesAsPrivileged([
  */
 const registerContextMenu = (window: BrowserWindow) => {
   window.webContents.on('context-menu', (_event, params) => {
-    // Prevent Chromium's default context menu so only our native menu renders,
-    // giving a consistent appearance (font, color, size) in every context.
+    // Suppress Chromium's built-in (white) context menu so only our
+    // Electron-native Menu renders — giving a consistent dark appearance
+    // across editable fields, selected text, and every other context.
     _event.preventDefault();
 
     const hasEditable = params.isEditable;
@@ -71,52 +72,43 @@ const registerContextMenu = (window: BrowserWindow) => {
       return;
     }
 
-    const menu = new Menu();
-
-    // Cut
-    menu.append(
-      new MenuItem({
+    const template: Electron.MenuItemConstructorOptions[] = [
+      {
         label: 'Cut',
         role: 'cut',
         enabled: hasEditable && params.editFlags.canCut,
-      }),
-    );
-    // Copy
-    menu.append(
-      new MenuItem({
+      },
+      {
         label: 'Copy',
         role: 'copy',
         enabled: hasEditable ? params.editFlags.canCopy : hasSelection,
-      }),
-    );
-    // Paste
-    menu.append(
-      new MenuItem({
+      },
+      {
         label: 'Paste',
         role: 'paste',
         enabled: hasEditable && params.editFlags.canPaste,
-      }),
-    );
-    // Delete
-    menu.append(
-      new MenuItem({
+      },
+      {
         label: 'Delete',
         role: 'delete',
         enabled: hasEditable && params.editFlags.canDelete,
-      }),
-    );
-    menu.append(new MenuItem({ type: 'separator' }));
-
-    // Select All
-    menu.append(
-      new MenuItem({
+      },
+      { type: 'separator' },
+      {
         label: 'Select All',
         role: 'selectAll',
         enabled: params.editFlags.canSelectAll,
-      }),
-    );
+      },
+    ];
 
-    menu.popup();
+    const menu = Menu.buildFromTemplate(template);
+
+    // Defer popup() with setTimeout to avoid a known Electron timing issue
+    // where the menu is immediately closed when called synchronously inside
+    // the 'context-menu' event handler.
+    setTimeout(() => {
+      menu.popup({ window });
+    }, 0);
   });
 };
 
