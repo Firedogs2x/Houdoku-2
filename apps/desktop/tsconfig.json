@@ -5,10 +5,8 @@
     "lib": [
       "dom",
       "DOM.Iterable",
-      "esnext"
+      "es2022"
     ],
-    "declaration": true,
-    "declarationMap": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
@@ -23,10 +21,9 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },
