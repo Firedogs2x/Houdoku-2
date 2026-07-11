@@ -196,7 +196,7 @@
     "rimraf": "^6.0.1",
     "semver": "^7.5.2",
     "source-map-support": "^0.5.21",
-    "typescript": "^5.4.5",
+    "typescript": "~7.0.2",
     "uuid": "^8.3.2",
     "vite": "^5.4.10",
     "vite-plugin-electron-renderer": "^0.14.5",

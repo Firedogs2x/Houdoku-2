@@ -59,6 +59,30 @@
 			"type": "shell",
 			"command": "corepack pnpm install",
 			"isBackground": false
+		},
+		{
+			"label": "install-ts-upgrade",
+			"type": "shell",
+			"command": "corepack pnpm install",
+			"isBackground": false
+		},
+		{
+			"label": "build-desktop-only",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"isBackground": false
+		},
+		{
+			"label": "install-ts7",
+			"type": "shell",
+			"command": "corepack pnpm install",
+			"isBackground": false
+		},
+		{
+			"label": "build-ts7",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"isBackground": false
 		}
 	]
 }
