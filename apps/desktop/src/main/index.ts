@@ -11,10 +11,9 @@ import {
   protocol,
   ipcMain,
   dialog,
-  Menu,
-  MenuItem,
   OpenDialogReturnValue,
 } from 'electron';
+import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
 import { walk } from '@/main/util/filesystem';
 import { createExtensionIpcHandlers, loadPlugins } from './services/extension';
@@ -58,38 +57,23 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 /**
- * Register a single, consistent Electron-native context menu on the given
- * BrowserWindow's webContents. The same menu (Cut / Copy / Paste / Delete /
- * Select All) is shown for every right-click — inside editable fields and on
- * selected text alike — with unavailable actions greyed out.
- *
- * The menu is shown synchronously so it is the only menu that ever renders
- * (Chromium's built-in menu never gets a chance to appear), and
- * nativeTheme.themeSource = 'dark' keeps it dark. Works on Windows, macOS,
- * and Linux.
+ * A single, consistent native Electron context menu for every right-click —
+ * inside editable fields and on selected text alike. Using the well-tested
+ * `electron-context-menu` package guarantees the same dark Electron menu is
+ * the only menu that ever appears (Chromium's built-in menu is suppressed),
+ * across Windows, macOS, and Linux. nativeTheme.themeSource = 'dark' keeps it
+ * dark, and the reader viewer suppresses its own menu via onContextMenu.
  */
-const registerContextMenu = (window: BrowserWindow) => {
-  window.webContents.on('context-menu', (_event, params) => {
-    const isEditable = params.isEditable;
-    const hasSelection = params.selectionText.trim().length > 0;
-
-    const template: Electron.MenuItemConstructorOptions[] = [
-      { label: 'Cut', role: 'cut', enabled: isEditable && params.editFlags.canCut },
-      {
-        label: 'Copy',
-        role: 'copy',
-        enabled: params.editFlags.canCopy && (isEditable || hasSelection),
-      },
-      { label: 'Paste', role: 'paste', enabled: isEditable && params.editFlags.canPaste },
-      { label: 'Delete', role: 'delete', enabled: isEditable && params.editFlags.canDelete },
-      { type: 'separator' },
-      { label: 'Select All', role: 'selectAll', enabled: params.editFlags.canSelectAll },
-    ];
-
-    const menu = Menu.buildFromTemplate(template);
-    menu.popup({ window });
-  });
-};
+contextMenu({
+  showCopyImage: false,
+  showSaveImageAs: false,
+  showSelectAll: true,
+  showInspectElement: false,
+  // Show the menu whenever the context is editable OR there is selected text,
+  // so right-click works everywhere outside the reader.
+  shouldShowMenu: (_event, params) =>
+    params.isEditable || params.selectionText.trim().length > 0,
+});
 
 
 const createWindows = async () => {
@@ -148,10 +132,8 @@ const createWindows = async () => {
     spoofWindow = null;
   });
 
-  // Right-click context menus: consistent Electron-native dark menu for
-  // all text inputs and selected text. Reader viewer suppresses its own.
-  registerContextMenu(mainWindow);
-  registerContextMenu(spoofWindow);
+  // Right-click context menus are provided globally by electron-context-menu
+  // (configured above), so no per-window registration is required.
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
