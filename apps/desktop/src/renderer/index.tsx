@@ -9,6 +9,35 @@ import { themeState } from './state/settingStates';
 import { ApplicationTheme } from '@/common/models/types';
 import { useEffect } from 'react';
 
+const { ipcRenderer } = require('electron');
+
+document.addEventListener(
+  'contextmenu',
+  (e: MouseEvent) => {
+    // Skip reader viewer — it has its own onContextMenu handler that suppresses
+    // context menus entirely inside the reader.
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('[data-reader-viewer]')) {
+      return;
+    }
+
+    // Block Chromium's default (white) context menu.
+    e.preventDefault();
+
+    const el = e.target as HTMLElement | null;
+    const isEditable =
+      el instanceof HTMLInputElement ||
+      el instanceof HTMLTextAreaElement ||
+      el?.isContentEditable === true;
+
+    const selection = window.getSelection();
+    const hasSelection = (selection?.toString().trim().length ?? 0) > 0;
+
+    // Ask the main process to show the Electron-native (dark) menu.
+    ipcRenderer.send('houdoku:show-context-menu', { isEditable, hasSelection });
+  },
+);
+
 const main = document.createElement('main');
 document.body.appendChild(main);
 const root = createRoot(main);

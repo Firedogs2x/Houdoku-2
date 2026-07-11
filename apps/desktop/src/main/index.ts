@@ -52,63 +52,60 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 /**
- * Register a native context menu on the given BrowserWindow's webContents.
- * Enables right-click Cut/Copy/Paste/Select All on all text inputs, textareas,
- * and selected text across Windows, macOS, and Linux.
+ * Register IPC handler for context menu requests from the renderer.
+ * The renderer blocks Chromium's default (white) context menu at the DOM level
+ * and sends an IPC message here so we can show a consistent Electron-native
+ * (dark) menu for every context — editable fields, selected text, etc.
  */
-const registerContextMenu = (window: BrowserWindow) => {
-  window.webContents.on('context-menu', (_event, params) => {
-    // Suppress Chromium's built-in (white) context menu so only our
-    // Electron-native Menu renders — giving a consistent dark appearance
-    // across editable fields, selected text, and every other context.
-    _event.preventDefault();
-
-    const hasEditable = params.isEditable;
-    const hasSelection = params.selectionText.trim().length > 0;
-
-    // Suppress the menu entirely when there is nothing to act on
-    // (e.g. right-clicking on an image or blank area).
-    if (!hasEditable && !hasSelection) {
-      return;
-    }
+const registerContextMenuIpc = () => {
+  ipcMain.on('houdoku:show-context-menu', (event, info: {
+    isEditable: boolean;
+    hasSelection: boolean;
+  }) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return;
 
     const template: Electron.MenuItemConstructorOptions[] = [
       {
         label: 'Cut',
         role: 'cut',
-        enabled: hasEditable && params.editFlags.canCut,
+        enabled: info.isEditable,
       },
       {
         label: 'Copy',
         role: 'copy',
-        enabled: hasEditable ? params.editFlags.canCopy : hasSelection,
+        enabled: info.isEditable || info.hasSelection,
       },
       {
         label: 'Paste',
         role: 'paste',
-        enabled: hasEditable && params.editFlags.canPaste,
+        enabled: info.isEditable,
       },
       {
         label: 'Delete',
         role: 'delete',
-        enabled: hasEditable && params.editFlags.canDelete,
+        enabled: info.isEditable,
       },
       { type: 'separator' },
       {
         label: 'Select All',
         role: 'selectAll',
-        enabled: params.editFlags.canSelectAll,
+        enabled: true,
       },
     ];
 
     const menu = Menu.buildFromTemplate(template);
-
-    // Defer popup() with setTimeout to avoid a known Electron timing issue
-    // where the menu is immediately closed when called synchronously inside
-    // the 'context-menu' event handler.
     setTimeout(() => {
       menu.popup({ window });
     }, 0);
+  });
+};
+
+// Legacy: still register a no-op context-menu handler to prevent Chromium's
+// default menu in edge cases where the renderer handler doesn't fire first.
+const registerContextMenuFallback = (window: BrowserWindow) => {
+  window.webContents.on('context-menu', (_event) => {
+    _event.preventDefault();
   });
 };
 
@@ -168,9 +165,11 @@ const createWindows = async () => {
     spoofWindow = null;
   });
 
-  // Enable right-click context menu (Cut/Copy/Paste/Select All) on all text inputs
-  registerContextMenu(mainWindow);
-  registerContextMenu(spoofWindow);
+  // Enable right-click context menu (Cut/Copy/Paste/Delete/Select All) on all text inputs
+  // and selected text.  The renderer sends IPC to main which shows the Electron-native menu.
+  registerContextMenuIpc();
+  registerContextMenuFallback(mainWindow);
+  registerContextMenuFallback(spoofWindow);
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
