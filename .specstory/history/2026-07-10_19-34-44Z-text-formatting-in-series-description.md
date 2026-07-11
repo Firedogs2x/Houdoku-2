@@ -80,3 +80,453 @@ Please increase the height size of the desription text box by moving the markdow
 _**User (2026-07-10 21:29:41Z)**_
 
 Please increase the height size of the desription text box by moving the markdown hints 5px above the Alternate Titles text.
+
+_**User (2026-07-10 22:22:25Z)**_
+
+When you added the spacing between the Alternate Title text and the description text box you moved the Alternate Title text from where I had previously specified, I wanted it placed.
+I want the Alternate Title text and the two Alt 1 and Alt 2 relocated so that the bottom of the Alt 2 text is horizontally even with the bottom of the image box. Then the description text box height will be determined by the gap between the Alternate Title text and the bottom of the markdown hints.
+ Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-10 22:45:29Z)**_
+
+Failed to build programs. See log data.
+
+2026-07-10T22:33:53.3685440Z Current runner version: '2.335.1'
+2026-07-10T22:33:53.3703040Z ##[group]Runner Image Provisioner
+2026-07-10T22:33:53.3703610Z Hosted Compute Agent
+2026-07-10T22:33:53.3704010Z Version: 20260624.560
+2026-07-10T22:33:53.3704440Z Commit: 925d229a51159bc391ae97e54a2dd1fe20af789d
+2026-07-10T22:33:53.3704900Z Build Date: 2026-06-24T18:26:47Z
+2026-07-10T22:33:53.3705350Z Worker ID: {8b7167e5-ad2c-4096-a794-419a8971657e}
+2026-07-10T22:33:53.3705820Z Azure Region: westus
+2026-07-10T22:33:53.3706210Z ##[endgroup]
+2026-07-10T22:33:53.3707130Z ##[group]Operating System
+2026-07-10T22:33:53.3707530Z macOS
+2026-07-10T22:33:53.3707850Z 26.4
+2026-07-10T22:33:53.3708170Z 25E246
+2026-07-10T22:33:53.3708500Z ##[endgroup]
+2026-07-10T22:33:53.3708850Z ##[group]Runner Image
+2026-07-10T22:33:53.3709230Z Image: macos-26-arm64
+2026-07-10T22:33:53.3709610Z Version: 20260630.0213.1
+2026-07-10T22:33:53.3710450Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20260630.0213/images/macos/macos-26-arm64-Readme.md
+2026-07-10T22:33:53.3711490Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20260630.0213
+2026-07-10T22:33:53.3712130Z ##[endgroup]
+2026-07-10T22:33:53.3712850Z ##[group]GITHUB_TOKEN Permissions
+2026-07-10T22:33:53.3713980Z Contents: write
+2026-07-10T22:33:53.3714330Z Metadata: read
+2026-07-10T22:33:53.3714660Z ##[endgroup]
+2026-07-10T22:33:53.3716060Z Secret source: Actions
+2026-07-10T22:33:53.3716480Z Prepare workflow directory
+2026-07-10T22:33:53.3962100Z Prepare all required actions
+2026-07-10T22:33:53.4014340Z Getting action download info
+2026-07-10T22:33:53.8576070Z Download action repository 'actions/checkout@v5.0.1' (SHA:93cb6efe18208431cddfb8368fd83d5badbf9bfd)
+2026-07-10T22:33:54.3667560Z Download action repository 'pnpm/action-setup@v4' (SHA:b906affcce14559ad1aafd4ab0e942779e9f58b1)
+2026-07-10T22:33:55.0181820Z Download action repository 'actions/setup-node@v5.0.0' (SHA:a0853c24544627f65ddf259abe73b1d18a591444)
+2026-07-10T22:33:55.1897610Z Download action repository 'softprops/action-gh-release@v2' (SHA:3bb12739c298aeb8a4eeaf626c5b8d85266b0e65)
+2026-07-10T22:33:55.7400540Z Complete job name: build (macos-latest)
+2026-07-10T22:33:55.8459960Z ##[group]Run actions/checkout@v5.0.1
+2026-07-10T22:33:55.8476480Z with:
+2026-07-10T22:33:55.8477030Z   ref: nightly-20260710-2233
+2026-07-10T22:33:55.8477520Z   repository: Firedogs2x/Houdoku-2
+2026-07-10T22:33:55.8497970Z   token: ***
+2026-07-10T22:33:55.8498620Z   ssh-strict: true
+2026-07-10T22:33:55.8499090Z   ssh-user: git
+2026-07-10T22:33:55.8499490Z   persist-credentials: true
+2026-07-10T22:33:55.8499910Z   clean: true
+2026-07-10T22:33:55.8500300Z   sparse-checkout-cone-mode: true
+2026-07-10T22:33:55.8500790Z   fetch-depth: 1
+2026-07-10T22:33:55.8501180Z   fetch-tags: false
+2026-07-10T22:33:55.8501660Z   show-progress: true
+2026-07-10T22:33:55.8502120Z   lfs: false
+2026-07-10T22:33:55.8502580Z   submodules: false
+2026-07-10T22:33:55.8503120Z   set-safe-directory: true
+2026-07-10T22:33:55.8504710Z ##[endgroup]
+2026-07-10T22:33:56.4530760Z Syncing repository: Firedogs2x/Houdoku-2
+2026-07-10T22:33:56.4532400Z ##[group]Getting Git version info
+2026-07-10T22:33:56.4533080Z Working directory is '/Users/runner/work/Houdoku-2/Houdoku-2'
+2026-07-10T22:33:56.4533920Z [command]/opt/homebrew/bin/git version
+2026-07-10T22:33:56.4787840Z git version 2.55.0
+2026-07-10T22:33:56.4805270Z ##[endgroup]
+2026-07-10T22:33:56.4813900Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/a0b09f8a-68e2-4ca8-8ef7-bff31152b122/.gitconfig'
+2026-07-10T22:33:56.4849830Z Temporarily overriding HOME='/Users/runner/work/_temp/a0b09f8a-68e2-4ca8-8ef7-bff31152b122' before making global git config changes
+2026-07-10T22:33:56.4853170Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-10T22:33:56.4855960Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Houdoku-2/Houdoku-2
+2026-07-10T22:33:56.4962550Z Deleting the contents of '/Users/runner/work/Houdoku-2/Houdoku-2'
+2026-07-10T22:33:56.5013140Z ##[group]Initializing the repository
+2026-07-10T22:33:56.5016200Z [command]/opt/homebrew/bin/git init /Users/runner/work/Houdoku-2/Houdoku-2
+2026-07-10T22:33:56.5230080Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-10T22:33:56.5231610Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-10T22:33:56.5232640Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-10T22:33:56.5233480Z hint: call:
+2026-07-10T22:33:56.5234080Z hint:
+2026-07-10T22:33:56.5234660Z hint: 	git config --global init.defaultBranch <name>
+2026-07-10T22:33:56.5235300Z hint:
+2026-07-10T22:33:56.5236010Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-10T22:33:56.5236920Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-10T22:33:56.5238500Z hint:
+2026-07-10T22:33:56.5239000Z hint: 	git branch -m <name>
+2026-07-10T22:33:56.5240790Z hint:
+2026-07-10T22:33:56.5241660Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-10T22:33:56.5242980Z Initialized empty Git repository in /Users/runner/work/Houdoku-2/Houdoku-2/.git/
+2026-07-10T22:33:56.5260150Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Firedogs2x/Houdoku-2
+2026-07-10T22:33:56.5353830Z ##[endgroup]
+2026-07-10T22:33:56.5354620Z ##[group]Disabling automatic garbage collection
+2026-07-10T22:33:56.5355400Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-07-10T22:33:56.5424780Z ##[endgroup]
+2026-07-10T22:33:56.5425470Z ##[group]Setting up auth
+2026-07-10T22:33:56.5428470Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-10T22:33:56.5500720Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-10T22:33:56.6554150Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-10T22:33:56.6651370Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-10T22:33:56.8438500Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-10T22:33:56.8520820Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-10T22:33:57.0245040Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-10T22:33:57.0340290Z ##[endgroup]
+2026-07-10T22:33:57.0347080Z ##[group]Fetching the repository
+2026-07-10T22:33:57.0351700Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/nightly-20260710-2233*:refs/remotes/origin/nightly-20260710-2233* +refs/tags/nightly-20260710-2233*:refs/tags/nightly-20260710-2233*
+2026-07-10T22:33:57.8761630Z From https://github.com/Firedogs2x/Houdoku-2
+2026-07-10T22:33:57.8763860Z  * [new tag]         nightly-20260710-2233 -> nightly-20260710-2233
+2026-07-10T22:33:57.8768220Z ##[endgroup]
+2026-07-10T22:33:57.8769510Z ##[group]Determining the checkout info
+2026-07-10T22:33:57.8770790Z [command]/opt/homebrew/bin/git branch --list --remote origin/nightly-20260710-2233
+2026-07-10T22:33:57.8856130Z [command]/opt/homebrew/bin/git tag --list nightly-20260710-2233
+2026-07-10T22:33:57.8939060Z nightly-20260710-2233
+2026-07-10T22:33:57.8942170Z ##[endgroup]
+2026-07-10T22:33:57.8945880Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-07-10T22:33:57.9031580Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-10T22:33:57.9117880Z ##[group]Checking out the ref
+2026-07-10T22:33:57.9124690Z [command]/opt/homebrew/bin/git checkout --progress --force refs/tags/nightly-20260710-2233
+2026-07-10T22:33:57.9993260Z HEAD is now at d1d59f0 Repaired the positioning of the Alternate Title.
+2026-07-10T22:33:58.0218230Z ##[endgroup]
+2026-07-10T22:33:58.0220700Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-07-10T22:33:58.0221910Z d1d59f074254fce552f3640f4c57b7f0b259ec9e
+2026-07-10T22:33:58.0774600Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T22:33:58.0779390Z ##[group]Run pnpm/action-setup@v4
+2026-07-10T22:33:58.0780320Z with:
+2026-07-10T22:33:58.0781140Z   version: 9.0.0
+2026-07-10T22:33:58.0781890Z   dest: ~/setup-pnpm
+2026-07-10T22:33:58.0782560Z   run_install: null
+2026-07-10T22:33:58.0783230Z   cache: false
+2026-07-10T22:33:58.0784080Z   cache_dependency_path: pnpm-lock.yaml
+2026-07-10T22:33:58.0785020Z   package_json_file: package.json
+2026-07-10T22:33:58.0785850Z   standalone: false
+2026-07-10T22:33:58.0786510Z ##[endgroup]
+2026-07-10T22:33:58.3194310Z ##[group]Running self-installer...
+2026-07-10T22:33:58.8363430Z (node:7052) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-07-10T22:33:58.8380350Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-10T22:33:59.1844810Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-07-10T22:33:59.1990980Z Packages: +1
+2026-07-10T22:33:59.1998660Z +
+2026-07-10T22:34:00.2024580Z Progress: resolved 1, reused 0, downloaded 1, added 0
+2026-07-10T22:34:00.3689290Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2026-07-10T22:34:00.4764390Z 
+2026-07-10T22:34:00.4875920Z dependencies:
+2026-07-10T22:34:00.5184260Z + pnpm 9.0.0 (11.11.0 is available)
+2026-07-10T22:34:00.5272990Z 
+2026-07-10T22:34:00.5316020Z Done in 2s
+2026-07-10T22:34:00.5418400Z ##[endgroup]
+2026-07-10T22:34:00.5521100Z Installation Completed!
+2026-07-10T22:34:00.5807180Z ##[group]Run actions/setup-node@v5.0.0
+2026-07-10T22:34:00.5807610Z with:
+2026-07-10T22:34:00.5807820Z   node-version: 20
+2026-07-10T22:34:00.5808100Z   cache: pnpm
+2026-07-10T22:34:00.5808350Z   cache-dependency-path: pnpm-lock.yaml
+2026-07-10T22:34:00.5808690Z   always-auth: false
+2026-07-10T22:34:00.5808920Z   check-latest: false
+2026-07-10T22:34:00.5812640Z   token: ***
+2026-07-10T22:34:00.5812880Z   package-manager-cache: true
+2026-07-10T22:34:00.5813160Z env:
+2026-07-10T22:34:00.5813430Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:34:00.5813820Z ##[endgroup]
+2026-07-10T22:34:00.8999990Z Attempting to download 20...
+2026-07-10T22:34:00.9184460Z (node:7171) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-10T22:34:00.9218830Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-10T22:34:01.6511880Z Acquiring 20.20.2 - arm64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-darwin-arm64.tar.gz
+2026-07-10T22:34:02.2734280Z Extracting ...
+2026-07-10T22:34:02.3009620Z [command]/usr/bin/tar xz --strip 1 -C /Users/runner/work/_temp/4a5679f1-7df4-401f-a5cd-91ee46918cb2 -f /Users/runner/work/_temp/da51746c-7766-4161-8fa3-4b12467afbec
+2026-07-10T22:34:03.7319790Z Adding to the cache ...
+2026-07-10T22:34:05.9364130Z ##[group]Environment details
+2026-07-10T22:34:06.4592710Z node: v20.20.2
+2026-07-10T22:34:06.4593540Z npm: 10.8.2
+2026-07-10T22:34:06.4621250Z yarn: 1.22.22
+2026-07-10T22:34:06.4624590Z ##[endgroup]
+2026-07-10T22:34:06.4625280Z [command]/Users/runner/setup-pnpm/node_modules/.bin/pnpm store path --silent
+2026-07-10T22:34:06.8665180Z /Users/runner/setup-pnpm/node_modules/.bin/store/v3
+2026-07-10T22:34:07.1580670Z Cache hit for: node-cache-macOS-arm64-pnpm-ebd3c3a33e912b3b182ed90347468cbf706615a6a5124ca091496a7e6ed924fb
+2026-07-10T22:34:07.1723250Z (node:7171) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-07-10T22:34:08.4540380Z Received 0 of 252006948 (0.0%), 0.0 MBs/sec
+2026-07-10T22:34:09.4604710Z Received 58720256 of 252006948 (23.3%), 27.9 MBs/sec
+2026-07-10T22:34:10.5282470Z Received 134217728 of 252006948 (53.3%), 41.6 MBs/sec
+2026-07-10T22:34:11.5355350Z Received 197132288 of 252006948 (78.2%), 46.1 MBs/sec
+2026-07-10T22:34:12.2554950Z Received 252006948 of 252006948 (100.0%), 50.1 MBs/sec
+2026-07-10T22:34:12.2674840Z Cache Size: ~240 MB (252006948 B)
+2026-07-10T22:34:12.3032170Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/8e220d4b-9173-453f-8370-0ac2bfa5294c/cache.tzst -P -C /Users/runner/work/Houdoku-2/Houdoku-2 --delay-directory-restore --use-compress-program unzstd
+2026-07-10T22:34:21.0768200Z Cache restored successfully
+2026-07-10T22:34:21.1184600Z Cache restored from key: node-cache-macOS-arm64-pnpm-ebd3c3a33e912b3b182ed90347468cbf706615a6a5124ca091496a7e6ed924fb
+2026-07-10T22:34:21.2100340Z ##[group]Run pnpm install
+2026-07-10T22:34:21.2100940Z  [36;1mpnpm install [0m
+2026-07-10T22:34:21.2249890Z shell: /bin/bash -e {0}
+2026-07-10T22:34:21.2250380Z env:
+2026-07-10T22:34:21.2252180Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:34:21.2253000Z ##[endgroup]
+2026-07-10T22:34:22.2937860Z Scope: all 4 workspace projects
+2026-07-10T22:34:22.3981330Z Lockfile is up to date, resolution step is skipped
+2026-07-10T22:34:22.5175630Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-07-10T22:34:22.7244730Z Packages: +858
+2026-07-10T22:34:22.7348290Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-07-10T22:34:23.5181670Z Progress: resolved 858, reused 359, downloaded 0, added 0
+2026-07-10T22:34:24.5259470Z Progress: resolved 858, reused 858, downloaded 0, added 206
+2026-07-10T22:34:25.5412890Z Progress: resolved 858, reused 858, downloaded 0, added 324
+2026-07-10T22:34:26.5371310Z Progress: resolved 858, reused 858, downloaded 0, added 520
+2026-07-10T22:34:27.5342380Z Progress: resolved 858, reused 858, downloaded 0, added 698
+2026-07-10T22:34:28.2681980Z Progress: resolved 858, reused 858, downloaded 0, added 858, done
+2026-07-10T22:34:28.6061240Z .../node_modules/register-scheme install$ node-gyp rebuild
+2026-07-10T22:34:28.6068500Z .../core-js@3.46.0/node_modules/core-js postinstall$ node -e "try{require('./postinstall')}catch(e){}"
+2026-07-10T22:34:28.6297900Z .../node_modules/electron postinstall$ node install.js
+2026-07-10T22:34:28.6428550Z .../esbuild@0.21.5/node_modules/esbuild postinstall$ node install.js
+2026-07-10T22:34:28.7164870Z .../node_modules/@biomejs/biome postinstall$ node scripts/postinstall.js
+2026-07-10T22:34:28.8813710Z .../core-js@3.46.0/node_modules/core-js postinstall: Done
+2026-07-10T22:34:28.8916930Z .../node_modules/@biomejs/biome postinstall: Done
+2026-07-10T22:34:28.9455210Z .../node_modules/register-scheme install: gyp info it worked if it ends with ok
+2026-07-10T22:34:28.9457490Z .../node_modules/register-scheme install: gyp info using node-gyp@10.1.0
+2026-07-10T22:34:28.9566690Z .../node_modules/register-scheme install: gyp info using node@20.20.2 | darwin | arm64
+2026-07-10T22:34:28.9763820Z .../esbuild@0.21.5/node_modules/esbuild postinstall: Done
+2026-07-10T22:34:29.3660160Z .../node_modules/register-scheme install: gyp info find Python using Python version 3.14.6 found at "/opt/homebrew/opt/python@3.14/bin/python3.14"
+2026-07-10T22:34:29.8769410Z .../node_modules/register-scheme install: gyp http GET https://nodejs.org/download/release/v20.20.2/node-v20.20.2-headers.tar.gz
+2026-07-10T22:34:29.9999090Z .../node_modules/register-scheme install: gyp http 200 https://nodejs.org/download/release/v20.20.2/node-v20.20.2-headers.tar.gz
+2026-07-10T22:34:33.0866570Z .../node_modules/register-scheme install: gyp http GET https://nodejs.org/download/release/v20.20.2/SHASUMS256.txt
+2026-07-10T22:34:33.0960630Z .../node_modules/register-scheme install: gyp http 200 https://nodejs.org/download/release/v20.20.2/SHASUMS256.txt
+2026-07-10T22:34:33.1371120Z .../node_modules/register-scheme install: gyp info spawn /opt/homebrew/opt/python@3.14/bin/python3.14
+2026-07-10T22:34:33.2099840Z .../node_modules/register-scheme install: gyp info spawn args [
+2026-07-10T22:34:33.2206110Z .../node_modules/register-scheme install: gyp info spawn args '/Users/runner/setup-pnpm/node_modules/.pnpm/pnpm@9.0.0/node_modules/pnpm/dist/node_modules/node-gyp/gyp/gyp_main.py',
+2026-07-10T22:34:33.2308940Z .../node_modules/register-scheme install: gyp info spawn args 'binding.gyp',
+2026-07-10T22:34:33.2421590Z .../node_modules/register-scheme install: gyp info spawn args '-f',
+2026-07-10T22:34:33.2755430Z .../node_modules/register-scheme install: gyp info spawn args 'make',
+2026-07-10T22:34:33.2756570Z .../node_modules/register-scheme install: gyp info spawn args '-I',
+2026-07-10T22:34:33.2861530Z .../node_modules/register-scheme install: gyp info spawn args '/Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/register-scheme@https+++codeload.github.com+devsnek+node-register-scheme+tar.gz+e7cc9a63a1f512565da44cb57316d9fb10750e17/node_modules/register-scheme/build/config.gypi',
+2026-07-10T22:34:33.2968480Z .../node_modules/register-scheme install: gyp info spawn args '-I',
+2026-07-10T22:34:33.3071540Z .../node_modules/register-scheme install: gyp info spawn args '/Users/runner/setup-pnpm/node_modules/.pnpm/pnpm@9.0.0/node_modules/pnpm/dist/node_modules/node-gyp/addon.gypi',
+2026-07-10T22:34:33.3174120Z .../node_modules/register-scheme install: gyp info spawn args '-I',
+2026-07-10T22:34:33.3281290Z .../node_modules/register-scheme install: gyp info spawn args '/Users/runner/Library/Caches/node-gyp/20.20.2/include/node/common.gypi',
+2026-07-10T22:34:33.3385780Z .../node_modules/register-scheme install: gyp info spawn args '-Dlibrary=shared_library',
+2026-07-10T22:34:33.3489980Z .../node_modules/register-scheme install: gyp info spawn args '-Dvisibility=default',
+2026-07-10T22:34:33.3598290Z .../node_modules/register-scheme install: gyp info spawn args '-Dnode_root_dir=/Users/runner/Library/Caches/node-gyp/20.20.2',
+2026-07-10T22:34:33.3717570Z .../node_modules/register-scheme install: gyp info spawn args '-Dnode_gyp_dir=/Users/runner/setup-pnpm/node_modules/.pnpm/pnpm@9.0.0/node_modules/pnpm/dist/node_modules/node-gyp',
+2026-07-10T22:34:33.3827750Z .../node_modules/register-scheme install: gyp info spawn args '-Dnode_lib_file=/Users/runner/Library/Caches/node-gyp/20.20.2/<(target_arch)/node.lib',
+2026-07-10T22:34:33.3932840Z .../node_modules/register-scheme install: gyp info spawn args '-Dmodule_root_dir=/Users/runner/work/Houdoku-2/Houdoku-2/node_modules/.pnpm/register-scheme@https+++codeload.github.com+devsnek+node-register-scheme+tar.gz+e7cc9a63a1f512565da44cb57316d9fb10750e17/node_modules/register-scheme',
+2026-07-10T22:34:33.4036800Z .../node_modules/register-scheme install: gyp info spawn args '-Dnode_engine=v8',
+2026-07-10T22:34:33.4096160Z .../node_modules/register-scheme install: gyp info spawn args '--depth=.',
+2026-07-10T22:34:33.4202240Z .../node_modules/register-scheme install: gyp info spawn args '--no-parallel',
+2026-07-10T22:34:33.4328680Z .../node_modules/register-scheme install: gyp info spawn args '--generator-output',
+2026-07-10T22:34:33.4541000Z .../node_modules/register-scheme install: gyp info spawn args 'build',
+2026-07-10T22:34:33.4660150Z .../node_modules/register-scheme install: gyp info spawn args '-Goutput_dir=.'
+2026-07-10T22:34:33.4743270Z .../node_modules/register-scheme install: gyp info spawn args ]
+2026-07-10T22:34:34.6852220Z .../node_modules/register-scheme install: gyp info spawn make
+2026-07-10T22:34:34.6957870Z .../node_modules/register-scheme install: gyp info spawn args [ 'BUILDTYPE=Release', '-C', 'build' ]
+2026-07-10T22:34:35.0391330Z .../node_modules/electron postinstall: Done
+2026-07-10T22:34:39.0626760Z .../node_modules/register-scheme install:   CC(target) Release/obj.target/nothing/../../../node-addon-api@1.7.2/node_modules/node-addon-api/src/nothing.o
+2026-07-10T22:34:41.4888630Z .../node_modules/register-scheme install:   LIBTOOL-STATIC Release/nothing.a
+2026-07-10T22:34:43.7712090Z .../node_modules/register-scheme install: libtool: warning: 'nothing.o' has no symbols
+2026-07-10T22:34:43.8041140Z .../node_modules/register-scheme install:   CXX(target) Release/obj.target/register-protocol-handler/src/addon.o
+2026-07-10T22:34:47.5164900Z .../node_modules/register-scheme install: ../src/addon.cc:5:24: warning: object backing the pointer will be destroyed at the end of the full-expression [-Wdangling-gsl]
+2026-07-10T22:34:47.5173860Z .../node_modules/register-scheme install:     5 |   const char* scheme = info[0].As<Napi::String>().Utf8Value().c_str();
+2026-07-10T22:34:47.5179080Z .../node_modules/register-scheme install:       |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-07-10T22:34:47.5186300Z .../node_modules/register-scheme install: ../src/addon.cc:6:25: warning: object backing the pointer will be destroyed at the end of the full-expression [-Wdangling-gsl]
+2026-07-10T22:34:47.5194830Z .../node_modules/register-scheme install:     6 |   const char* command = info[0].As<Napi::String>().Utf8Value().c_str();
+2026-07-10T22:34:47.5198500Z .../node_modules/register-scheme install:       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2026-07-10T22:34:47.9886100Z .../node_modules/register-scheme install: 2 warnings generated.
+2026-07-10T22:34:48.1667750Z .../node_modules/register-scheme install:   CXX(target) Release/obj.target/register-protocol-handler/src/register_mac.o
+2026-07-10T22:34:51.0771170Z .../node_modules/register-scheme install:   SOLINK_MODULE(target) Release/register-protocol-handler.node
+2026-07-10T22:34:51.4214490Z .../node_modules/register-scheme install: gyp info ok 
+2026-07-10T22:34:51.4643560Z .../node_modules/register-scheme install: Done
+2026-07-10T22:34:51.8051460Z 
+2026-07-10T22:34:51.8054920Z devDependencies:
+2026-07-10T22:34:51.8056080Z + @biomejs/biome 1.9.4
+2026-07-10T22:34:51.8057070Z + prettier 3.6.2
+2026-07-10T22:34:51.8062430Z + turbo 2.6.1
+2026-07-10T22:34:51.8070920Z + typescript 5.5.4
+2026-07-10T22:34:51.8073220Z 
+2026-07-10T22:34:51.8570650Z Done in 30.1s
+2026-07-10T22:34:51.9309320Z ##[group]Run VERSION="2.17.9-nightly.295"
+2026-07-10T22:34:51.9321560Z  [36;1mVERSION="2.17.9-nightly.295" [0m
+2026-07-10T22:34:51.9321880Z  [36;1m [0m
+2026-07-10T22:34:51.9323870Z  [36;1m# Update apps/desktop/package.json using Node.js directly [0m
+2026-07-10T22:34:51.9324330Z  [36;1m# This is more reliable in pnpm monorepos than using npm version [0m
+2026-07-10T22:34:51.9324770Z  [36;1mnode -e " [0m
+2026-07-10T22:34:51.9325010Z  [36;1m  const fs = require('fs'); [0m
+2026-07-10T22:34:51.9325380Z  [36;1m  const path = 'apps/desktop/package.json'; [0m
+2026-07-10T22:34:51.9325880Z  [36;1m  const pkg = JSON.parse(fs.readFileSync(path, 'utf-8')); [0m
+2026-07-10T22:34:51.9326260Z  [36;1m  pkg.version = '$VERSION'; [0m
+2026-07-10T22:34:51.9326600Z  [36;1m  fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n'); [0m
+2026-07-10T22:34:51.9327160Z  [36;1m  console.log('Updated ' + path + ' version to ' + pkg.version); [0m
+2026-07-10T22:34:51.9327520Z  [36;1m" [0m
+2026-07-10T22:34:52.0289130Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-07-10T22:34:52.0289540Z env:
+2026-07-10T22:34:52.0289910Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:34:52.0290290Z ##[endgroup]
+2026-07-10T22:34:52.2386910Z Updated apps/desktop/package.json version to 2.17.9-nightly.295
+2026-07-10T22:34:52.2533570Z ##[group]Run pnpm --filter @houdoku/desktop build
+2026-07-10T22:34:52.2535080Z  [36;1mpnpm --filter @houdoku/desktop build [0m
+2026-07-10T22:34:52.2675570Z shell: /bin/bash -e {0}
+2026-07-10T22:34:52.2676460Z env:
+2026-07-10T22:34:52.2677170Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:34:52.2689540Z ##[endgroup]
+2026-07-10T22:34:52.8815150Z 
+2026-07-10T22:34:52.8821880Z > @houdoku/desktop@2.17.9-nightly.295 build /Users/runner/work/Houdoku-2/Houdoku-2/apps/desktop
+2026-07-10T22:34:52.8822610Z > electron-vite build
+2026-07-10T22:34:52.8822890Z 
+2026-07-10T22:34:53.9932140Z  [36mvite v5.4.21  [32mbuilding SSR bundle for production... [36m [39m
+2026-07-10T22:34:54.8277250Z transforming...
+2026-07-10T22:34:55.0600240Z  [32m✓ [39m 23 modules transformed.
+2026-07-10T22:34:55.0980410Z rendering chunks...
+2026-07-10T22:34:55.1023500Z  [2mout/main/ [22m [36mindex.js   [39m [1m [2m93.19 kB [22m [1m [22m
+2026-07-10T22:34:55.1025040Z  [32m✓ built in 1.08s [39m
+2026-07-10T22:34:55.1076400Z  [36mvite v5.4.21  [32mbuilding SSR bundle for production... [36m [39m
+2026-07-10T22:34:55.1109590Z transforming...
+2026-07-10T22:34:55.1112640Z  [32m✓ [39m 1 modules transformed.
+2026-07-10T22:34:55.1124130Z Generated an empty chunk: "index".
+2026-07-10T22:34:55.1132440Z rendering chunks...
+2026-07-10T22:34:55.1143050Z  [2mout/preload/ [22m [36mindex.js   [39m [1m [2m0.01 kB [22m [1m [22m
+2026-07-10T22:34:55.1143930Z  [32m✓ built in 7ms [39m
+2026-07-10T22:34:55.1268430Z  [36mvite v5.4.21  [32mbuilding for production... [36m [39m
+2026-07-10T22:34:55.1573340Z transforming...
+2026-07-10T22:34:55.2820360Z Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+2026-07-10T22:34:55.2821250Z   npx update-browserslist-db@latest
+2026-07-10T22:34:55.2821890Z   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-07-10T22:34:58.6801760Z ../../node_modules/.pnpm/@radix-ui+react-accordion@1.2.12_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@1_vvlje7rcsevlesucexkmrekjym/node_modules/@radix-ui/react-accordion/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-accordion@1.2.12_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@1_vvlje7rcsevlesucexkmrekjym/node_modules/@radix-ui/react-accordion/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.0395950Z ../../node_modules/.pnpm/@radix-ui+react-collection@1.1.7_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@1_lbijfpqemp2tufo4lpca4xxlj4/node_modules/@radix-ui/react-collection/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-collection@1.1.7_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@1_lbijfpqemp2tufo4lpca4xxlj4/node_modules/@radix-ui/react-collection/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.0573260Z ../../node_modules/.pnpm/@radix-ui+react-collapsible@1.1.12_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react_hlyu2jvze5hptjexvtqfpxudxm/node_modules/@radix-ui/react-collapsible/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-collapsible@1.1.12_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react_hlyu2jvze5hptjexvtqfpxudxm/node_modules/@radix-ui/react-collapsible/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.1564520Z ../../node_modules/.pnpm/@radix-ui+react-presence@1.1.5_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._d3zxqxru2ebh7buoqxxfn57g3a/node_modules/@radix-ui/react-presence/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-presence@1.1.5_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._d3zxqxru2ebh7buoqxxfn57g3a/node_modules/@radix-ui/react-presence/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.5754980Z ../../node_modules/.pnpm/@radix-ui+react-toast@1.2.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._ecndgjgawsv7jmx5fi4hux2ciq/node_modules/@radix-ui/react-toast/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-toast@1.2.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._ecndgjgawsv7jmx5fi4hux2ciq/node_modules/@radix-ui/react-toast/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.6535590Z ../../node_modules/.pnpm/@radix-ui+react-dismissable-layer@1.1.11_@types+react-dom@18.3.7_@types+react@18.3.26__@types_u3omdtktiyciorlc3biczl6lty/node_modules/@radix-ui/react-dismissable-layer/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-dismissable-layer@1.1.11_@types+react-dom@18.3.7_@types+react@18.3.26__@types_u3omdtktiyciorlc3biczl6lty/node_modules/@radix-ui/react-dismissable-layer/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.6989090Z ../../node_modules/.pnpm/@radix-ui+react-portal@1.1.9_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._eovg7vmkm7qeukhntcywmaf2ge/node_modules/@radix-ui/react-portal/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-portal@1.1.9_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._eovg7vmkm7qeukhntcywmaf2ge/node_modules/@radix-ui/react-portal/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.7417930Z ../../node_modules/.pnpm/@radix-ui+react-dialog@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3_prwlfx73v6vozzp2zygzs3qvl4/node_modules/@radix-ui/react-dialog/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-dialog@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3_prwlfx73v6vozzp2zygzs3qvl4/node_modules/@radix-ui/react-dialog/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.8156070Z ../../node_modules/.pnpm/@radix-ui+react-focus-guards@1.1.3_@types+react@18.3.26_react@18.3.1/node_modules/@radix-ui/react-focus-guards/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-focus-guards@1.1.3_@types+react@18.3.26_react@18.3.1/node_modules/@radix-ui/react-focus-guards/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.8168700Z ../../node_modules/.pnpm/@radix-ui+react-focus-scope@1.1.7_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@_qvpqlzswbz6ijtvpyryqq2dwma/node_modules/@radix-ui/react-focus-scope/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-focus-scope@1.1.7_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@_qvpqlzswbz6ijtvpyryqq2dwma/node_modules/@radix-ui/react-focus-scope/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.9450870Z ../../node_modules/.pnpm/@radix-ui+react-dropdown-menu@2.1.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+rea_iaecsfbcg4zg4kegr2ujb7doey/node_modules/@radix-ui/react-dropdown-menu/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-dropdown-menu@2.1.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+rea_iaecsfbcg4zg4kegr2ujb7doey/node_modules/@radix-ui/react-dropdown-menu/dist/index.mjs" was ignored.
+2026-07-10T22:34:59.9826650Z ../../node_modules/.pnpm/@radix-ui+react-menu@2.1.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_y3hbfiku5rjtwg3ibyxwi2eup4/node_modules/@radix-ui/react-menu/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-menu@2.1.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_y3hbfiku5rjtwg3ibyxwi2eup4/node_modules/@radix-ui/react-menu/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.0794460Z ../../node_modules/.pnpm/@radix-ui+react-context-menu@2.2.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_rsufyao5q2fjqfywqe47csb5gm/node_modules/@radix-ui/react-context-menu/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-context-menu@2.2.16_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_rsufyao5q2fjqfywqe47csb5gm/node_modules/@radix-ui/react-context-menu/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.0905060Z ../../node_modules/.pnpm/@radix-ui+react-popper@1.2.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._j4adou5czefutbu467ky4i42f4/node_modules/@radix-ui/react-popper/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-popper@1.2.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._j4adou5czefutbu467ky4i42f4/node_modules/@radix-ui/react-popper/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.1290980Z ../../node_modules/.pnpm/@radix-ui+react-roving-focus@1.1.11_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_ipyy2w45uopecj6ozew45icviu/node_modules/@radix-ui/react-roving-focus/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-roving-focus@1.1.11_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_ipyy2w45uopecj6ozew45icviu/node_modules/@radix-ui/react-roving-focus/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.1491560Z ../../node_modules/.pnpm/@radix-ui+react-tooltip@1.2.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3_d4s3skutltvxkbr2sejqqykjri/node_modules/@radix-ui/react-tooltip/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-tooltip@1.2.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3_d4s3skutltvxkbr2sejqqykjri/node_modules/@radix-ui/react-tooltip/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.2612800Z ../../node_modules/.pnpm/@radix-ui+react-scroll-area@1.2.10_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react_hx746zlkeyur56g4gtuh7zv6ym/node_modules/@radix-ui/react-scroll-area/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-scroll-area@1.2.10_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react_hx746zlkeyur56g4gtuh7zv6ym/node_modules/@radix-ui/react-scroll-area/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.2750650Z ../../node_modules/.pnpm/@radix-ui+react-radio-group@1.3.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@_sn5j65r3xt5uq27p74gmvzdfc4/node_modules/@radix-ui/react-radio-group/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-radio-group@1.3.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@_sn5j65r3xt5uq27p74gmvzdfc4/node_modules/@radix-ui/react-radio-group/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3040850Z ../../node_modules/.pnpm/@radix-ui+react-label@2.1.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_bnb3d2sjnjpcexibho34jz2szu/node_modules/@radix-ui/react-label/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-label@2.1.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_bnb3d2sjnjpcexibho34jz2szu/node_modules/@radix-ui/react-label/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3058090Z ../../node_modules/.pnpm/@radix-ui+react-select@2.2.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._uubkcfyojl5ommmbvrvq5xlyty/node_modules/@radix-ui/react-select/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-select@2.2.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._uubkcfyojl5ommmbvrvq5xlyty/node_modules/@radix-ui/react-select/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3224290Z ../../node_modules/.pnpm/@radix-ui+react-switch@1.2.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._uyoivee4xwsvbfyfgii53j6tly/node_modules/@radix-ui/react-switch/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-switch@1.2.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._uyoivee4xwsvbfyfgii53j6tly/node_modules/@radix-ui/react-switch/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3378610Z ../../node_modules/.pnpm/@radix-ui+react-progress@1.1.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._elh6qcnm3dd4itf66oshvqfble/node_modules/@radix-ui/react-progress/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-progress@1.1.8_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._elh6qcnm3dd4itf66oshvqfble/node_modules/@radix-ui/react-progress/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3467030Z ../../node_modules/.pnpm/@radix-ui+react-checkbox@1.3.3_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._7ma6pc4n53vrra5orvu6iegahq/node_modules/@radix-ui/react-checkbox/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-checkbox@1.3.3_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._7ma6pc4n53vrra5orvu6iegahq/node_modules/@radix-ui/react-checkbox/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.3526220Z ../../node_modules/.pnpm/@radix-ui+react-alert-dialog@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_cx3kjfmxainkgn4247rledpaj4/node_modules/@radix-ui/react-alert-dialog/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-alert-dialog@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+reac_cx3kjfmxainkgn4247rledpaj4/node_modules/@radix-ui/react-alert-dialog/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.4262400Z ../../node_modules/.pnpm/@radix-ui+react-tabs@1.1.13_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_knbm5anaxnoq7mek3zsykyd4x4/node_modules/@radix-ui/react-tabs/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-tabs@1.1.13_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.2_knbm5anaxnoq7mek3zsykyd4x4/node_modules/@radix-ui/react-tabs/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.4306520Z ../../node_modules/.pnpm/@radix-ui+react-slider@1.3.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._7cb5yssoq4oyevucsamr33wot4/node_modules/@radix-ui/react-slider/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-slider@1.3.6_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3._7cb5yssoq4oyevucsamr33wot4/node_modules/@radix-ui/react-slider/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.5709170Z ../../node_modules/.pnpm/@radix-ui+react-popover@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._djujh6xgdzdv3k3cpqcisnndzm/node_modules/@radix-ui/react-popover/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/@radix-ui+react-popover@1.1.15_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18._djujh6xgdzdv3k3cpqcisnndzm/node_modules/@radix-ui/react-popover/dist/index.mjs" was ignored.
+2026-07-10T22:35:00.5814840Z ../../node_modules/.pnpm/cmdk@1.1.1_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.26_react-dom@18.3._mobei3gr4dmoljvcpfiv4igxay/node_modules/cmdk/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../../node_modules/.pnpm/cmdk@1.1.1_@types+react-dom@18.3.7_@types+react@18.3.26__@types+react@18.3.26_react-dom@18.3._mobei3gr4dmoljvcpfiv4igxay/node_modules/cmdk/dist/index.mjs" was ignored.
+2026-07-10T22:35:02.5384670Z  [32m✓ [39m 1935 modules transformed.
+2026-07-10T22:35:03.0991030Z rendering chunks...
+2026-07-10T22:35:03.8406170Z  [2m../../out/renderer/ [22m [32mindex.html                            [39m [1m [2m    0.28 kB [22m [1m [22m
+2026-07-10T22:35:03.8431550Z  [2m../../out/renderer/ [22m [2massets/ [22m [32mInterVariable-DiVDrmQJ.woff2   [39m [1m [2m  352.24 kB [22m [1m [22m
+2026-07-10T22:35:03.8441840Z  [2m../../out/renderer/ [22m [2massets/ [22m [35mindex-BOgM88pN.css             [39m [1m [2m  268.02 kB [22m [1m [22m
+2026-07-10T22:35:03.8472820Z  [2m../../out/renderer/ [22m [2massets/ [22m [36mindex-D4M_1uMv.js              [39m [1m [33m1,805.81 kB [39m [22m [2m │ map: 3,628.07 kB [22m
+2026-07-10T22:35:03.8481430Z  [32m✓ built in 8.71s [39m
+2026-07-10T22:35:03.9505650Z ##[group]Run cd apps/desktop
+2026-07-10T22:35:03.9506360Z  [36;1mcd apps/desktop [0m
+2026-07-10T22:35:03.9506630Z  [36;1mif [[ "$RUNNER_OS" == "Linux" ]]; then [0m
+2026-07-10T22:35:03.9507030Z  [36;1m  pnpm run dist:linux [0m
+2026-07-10T22:35:03.9507350Z  [36;1melif [[ "$RUNNER_OS" == "Windows" ]]; then [0m
+2026-07-10T22:35:03.9507770Z  [36;1m  pnpm run dist:win [0m
+2026-07-10T22:35:03.9508140Z  [36;1melse [0m
+2026-07-10T22:35:03.9508370Z  [36;1m  pnpm run dist:mac [0m
+2026-07-10T22:35:03.9509560Z  [36;1mfi [0m
+2026-07-10T22:35:03.9622800Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-07-10T22:35:03.9623390Z env:
+2026-07-10T22:35:03.9625840Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:35:03.9628320Z ##[endgroup]
+2026-07-10T22:35:04.7340860Z 
+2026-07-10T22:35:04.7343460Z > @houdoku/desktop@2.17.9-nightly.295 dist:mac /Users/runner/work/Houdoku-2/Houdoku-2/apps/desktop
+2026-07-10T22:35:04.7345020Z > electron-builder --mac --publish never
+2026-07-10T22:35:04.7345810Z 
+2026-07-10T22:35:05.9902900Z   • electron-builder  version=25.1.8 os=25.4.0
+2026-07-10T22:35:06.0010320Z   • loaded configuration  file=package.json ("build" field)
+2026-07-10T22:35:06.1724260Z   • skipped dependencies rebuild  reason=npmRebuild is set to false
+2026-07-10T22:35:06.1726360Z   • packaging       platform=darwin arch=arm64 electron=32.3.3 appOutDir=release/mac-arm64
+2026-07-10T22:35:06.4228820Z   • downloading     url=https://github.com/electron/electron/releases/download/v32.3.3/electron-v32.3.3-darwin-arm64.zip size=99 MB parts=6
+2026-07-10T22:35:07.1431520Z   • downloaded      url=https://github.com/electron/electron/releases/download/v32.3.3/electron-v32.3.3-darwin-arm64.zip duration=851ms
+2026-07-10T22:35:23.8461280Z   • skipped macOS code signing  reason=identity explicitly is set to null
+2026-07-10T22:35:23.8466550Z   • building        target=DMG arch=arm64 file=release/Houdoku-macOS-arm64-2.17.9-nightly.295.dmg
+2026-07-10T22:35:23.8498780Z   • skipped dependencies rebuild  reason=npmRebuild is set to false
+2026-07-10T22:35:23.8502380Z   • packaging       platform=darwin arch=x64 electron=32.3.3 appOutDir=release/mac
+2026-07-10T22:35:23.8613880Z   • Detected arm64 process, HFS+ is unavailable. Creating dmg with APFS - supports Mac OSX 10.12+
+2026-07-10T22:35:24.1809630Z   • downloading     url=https://github.com/electron/electron/releases/download/v32.3.3/electron-v32.3.3-darwin-x64.zip size=104 MB parts=6
+2026-07-10T22:35:25.3297700Z   • downloaded      url=https://github.com/electron/electron/releases/download/v32.3.3/electron-v32.3.3-darwin-x64.zip duration=1.458s
+2026-07-10T22:35:38.9454710Z   • skipped macOS code signing  reason=identity explicitly is set to null
+2026-07-10T22:35:38.9470840Z   • building        target=DMG arch=x64 file=release/Houdoku-macOS-x64-2.17.9-nightly.295.dmg
+2026-07-10T22:35:38.9472400Z   • Detected arm64 process, HFS+ is unavailable. Creating dmg with APFS - supports Mac OSX 10.12+
+2026-07-10T22:36:05.8182140Z   • building block map  blockMapFile=release/Houdoku-macOS-arm64-2.17.9-nightly.295.dmg.blockmap
+2026-07-10T22:36:11.4766070Z   • building block map  blockMapFile=release/Houdoku-macOS-x64-2.17.9-nightly.295.dmg.blockmap
+2026-07-10T22:36:12.7654930Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T22:36:12.7658500Z ##[group]Run softprops/action-gh-release@v2
+2026-07-10T22:36:12.7659920Z with:
+2026-07-10T22:36:12.7660440Z   tag_name: nightly-20260710-2233
+2026-07-10T22:36:12.7669410Z   name: Nightly - 10/07/2026 10:33 pm UTC
+2026-07-10T22:36:12.7669610Z   prerelease: true
+2026-07-10T22:36:12.7669900Z   overwrite_files: true
+2026-07-10T22:36:12.7670630Z   files: apps/desktop/release/*.AppImage
+apps/desktop/release/*.exe
+apps/desktop/release/*.nsis
+apps/desktop/release/*.dmg
+apps/desktop/release/*.zip
+apps/desktop/release/*.yml
+apps/desktop/release/*.blockmap
+
+2026-07-10T22:36:12.7673870Z   token: ***
+2026-07-10T22:36:12.7674250Z env:
+2026-07-10T22:36:12.7674820Z   PNPM_HOME: /Users/runner/setup-pnpm/node_modules/.bin
+2026-07-10T22:36:12.7675420Z ##[endgroup]
+2026-07-10T22:36:13.3182920Z 🤔 Pattern 'apps/desktop/release/*.AppImage' does not match any files.
+2026-07-10T22:36:13.3184430Z 🤔 Pattern 'apps/desktop/release/*.exe' does not match any files.
+2026-07-10T22:36:13.3185130Z 🤔 Pattern 'apps/desktop/release/*.nsis' does not match any files.
+2026-07-10T22:36:13.3185800Z 🤔 Pattern 'apps/desktop/release/*.zip' does not match any files.
+2026-07-10T22:36:13.7487470Z Found release Nightly - 10/07/2026 10:33 pm UTC (with id=352358672)
+2026-07-10T22:36:14.0212890Z ⬆️ Uploading Houdoku-macOS-x64-2.17.9-nightly.295.dmg...
+2026-07-10T22:36:14.0222070Z ⬆️ Uploading Houdoku-macOS-arm64-2.17.9-nightly.295.dmg...
+2026-07-10T22:36:14.0223370Z ⬆️ Uploading latest-mac.yml...
+2026-07-10T22:36:14.0244230Z ♻️ Deleting previously uploaded asset builder-debug.yml...
+2026-07-10T22:36:14.0245220Z ⬆️ Uploading Houdoku-macOS-x64-2.17.9-nightly.295.dmg.blockmap...
+2026-07-10T22:36:14.0246250Z ⬆️ Uploading Houdoku-macOS-arm64-2.17.9-nightly.295.dmg.blockmap...
+2026-07-10T22:36:14.5962830Z ✅ Uploaded latest-mac.yml
+2026-07-10T22:36:14.6166780Z ✅ Uploaded Houdoku-macOS-x64-2.17.9-nightly.295.dmg.blockmap
+2026-07-10T22:36:14.6271430Z ✅ Uploaded Houdoku-macOS-arm64-2.17.9-nightly.295.dmg.blockmap
+2026-07-10T22:36:21.3570450Z ✅ Uploaded Houdoku-macOS-arm64-2.17.9-nightly.295.dmg
+2026-07-10T22:36:24.4362000Z ##[error]Server Error
+2026-07-10T22:36:26.0473210Z ✅ Uploaded Houdoku-macOS-x64-2.17.9-nightly.295.dmg
+2026-07-10T22:36:26.2314860Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T22:36:26.2316080Z Post job cleanup.
+2026-07-10T22:36:26.3926160Z Pruning is unnecessary.
+2026-07-10T22:36:26.4087640Z Post job cleanup.
+2026-07-10T22:36:26.5115610Z [command]/opt/homebrew/bin/git version
+2026-07-10T22:36:26.5990820Z git version 2.55.0
+2026-07-10T22:36:26.6048370Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/f269d0de-d7d6-4c90-8710-b3b01db209af/.gitconfig'
+2026-07-10T22:36:26.6050470Z Temporarily overriding HOME='/Users/runner/work/_temp/f269d0de-d7d6-4c90-8710-b3b01db209af' before making global git config changes
+2026-07-10T22:36:26.6051220Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-10T22:36:26.6051980Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Houdoku-2/Houdoku-2
+2026-07-10T22:36:26.6199790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-10T22:36:26.6381930Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-10T22:36:26.8414390Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-10T22:36:26.8580770Z http.https://github.com/.extraheader
+2026-07-10T22:36:26.8740420Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-07-10T22:36:26.8955160Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-10T22:36:27.0914350Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-10T22:36:27.1186430Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-10T22:36:27.3288080Z Cleaning up orphan processes
+2026-07-10T22:36:28.8116130Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: pnpm/action-setup@v4, softprops/action-gh-release@v2. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I reviewed your log and the build itself succeeded; the failure happened in the GitHub release upload step, so I’ll inspect the workflow file and patch the release logic to avoid this server-error race.

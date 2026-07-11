@@ -10,6 +10,8 @@ import {
   protocol,
   ipcMain,
   dialog,
+  Menu,
+  MenuItem,
   OpenDialogReturnValue,
 } from 'electron';
 import log from 'electron-log';
@@ -48,6 +50,63 @@ protocol.registerSchemesAsPrivileged([
     },
   },
 ]);
+
+/**
+ * Register a native context menu on the given BrowserWindow's webContents.
+ * Enables right-click Cut/Copy/Paste/Select All on all text inputs, textareas,
+ * and selected text across Windows, macOS, and Linux.
+ */
+const registerContextMenu = (window: BrowserWindow) => {
+  window.webContents.on('context-menu', (_event, params) => {
+    const menu = new Menu();
+
+    if (params.isEditable) {
+      menu.append(
+        new MenuItem({
+          label: 'Cut',
+          role: 'cut',
+          enabled: params.editFlags.canCut,
+          visible: params.isEditable,
+        }),
+      );
+      menu.append(
+        new MenuItem({
+          label: 'Copy',
+          role: 'copy',
+          enabled: params.editFlags.canCopy,
+          visible: params.isEditable,
+        }),
+      );
+      menu.append(
+        new MenuItem({
+          label: 'Paste',
+          role: 'paste',
+          enabled: params.editFlags.canPaste,
+          visible: params.isEditable,
+        }),
+      );
+      menu.append(new MenuItem({ type: 'separator' }));
+    } else if (params.selectionText.trim().length > 0) {
+      menu.append(
+        new MenuItem({
+          label: 'Copy',
+          role: 'copy',
+          enabled: true,
+        }),
+      );
+    }
+
+    menu.append(
+      new MenuItem({
+        label: 'Select All',
+        role: 'selectAll',
+        enabled: params.editFlags.canSelectAll,
+      }),
+    );
+
+    menu.popup();
+  });
+};
 
 const createWindows = async () => {
   const RESOURCES_PATH = app.isPackaged
@@ -104,6 +163,10 @@ const createWindows = async () => {
   spoofWindow.on('closed', () => {
     spoofWindow = null;
   });
+
+  // Enable right-click context menu (Cut/Copy/Paste/Select All) on all text inputs
+  registerContextMenu(mainWindow);
+  registerContextMenu(spoofWindow);
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
