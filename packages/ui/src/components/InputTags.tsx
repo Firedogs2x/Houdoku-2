@@ -3,15 +3,9 @@
 import * as React from 'react';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { Button } from '@houdoku/ui/components/Button';
-import { Clipboard, Copy, Scissors, Trash2, Type, XIcon } from 'lucide-react';
+import { XIcon } from 'lucide-react';
 import { cn } from '@houdoku/ui/util';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@houdoku/ui/components/ContextMenu';
-import { createInputContextMenuOperations } from '@houdoku/ui/hooks/use-input-context-menu';
+import { EditableContextMenu } from '@houdoku/ui/components/EditableContextMenu';
 
 type InputTagsProps = Omit<React.ComponentProps<'input'>, 'value' | 'onChange'> & {
   value: string[];
@@ -22,7 +16,6 @@ type InputTagsProps = Omit<React.ComponentProps<'input'>, 'value' | 'onChange'> 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
   ({ className, value, onChange, showContextMenu = true, ...props }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
-    const [targetElement, setTargetElement] = React.useState<HTMLInputElement | null>(null);
 
     React.useEffect(() => {
       if (pendingDataPoint.includes(',')) {
@@ -43,20 +36,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
       }
     };
 
-    const handleContextMenu = React.useCallback(
-      (e: React.MouseEvent<HTMLInputElement>) => {
-        if (!showContextMenu || props.disabled) return;
-        setTargetElement(e.currentTarget);
-      },
-      [showContextMenu, props.disabled],
-    );
-
-    const operations = React.useMemo(
-      () => createInputContextMenuOperations(targetElement, props.disabled),
-      [targetElement, props.disabled],
-    );
-
-    const inputContent = (
+    return (
       <div
         className={cn(
           'flex flex-wrap min-h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 gap-2 shadow-sm transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -82,68 +62,25 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
             </Button>
           </Badge>
         ))}
-        <input
-          className="flex-1 outline-none placeholder:text-muted-foreground bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
-          value={pendingDataPoint}
-          onChange={(e) => setPendingDataPoint(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ',') {
-              e.preventDefault();
-              addPendingDataPoint();
-            } else if (e.key === 'Backspace' && pendingDataPoint.length === 0 && value.length > 0) {
-              e.preventDefault();
-              onChange(value.slice(0, -1));
-            }
-          }}
-          onContextMenu={handleContextMenu}
-          {...props}
-          ref={ref}
-        />
+        <EditableContextMenu disabled={props.disabled} showContextMenu={showContextMenu}>
+          <input
+            className="flex-1 outline-none placeholder:text-muted-foreground bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+            value={pendingDataPoint}
+            onChange={(e) => setPendingDataPoint(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addPendingDataPoint();
+              } else if (e.key === 'Backspace' && pendingDataPoint.length === 0 && value.length > 0) {
+                e.preventDefault();
+                onChange(value.slice(0, -1));
+              }
+            }}
+            {...props}
+            ref={ref}
+          />
+        </EditableContextMenu>
       </div>
-    );
-
-    if (!showContextMenu) {
-      return inputContent;
-    }
-
-    return (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>{inputContent}</ContextMenuTrigger>
-        <ContextMenuContent className="w-40">
-          <ContextMenuItem
-            onClick={operations.cut}
-            disabled={props.disabled || !targetElement || targetElement.value.length === 0}
-          >
-            <Scissors className="h-4 w-4 mr-2" />
-            Cut
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={operations.copy}
-            disabled={!targetElement || targetElement.value.length === 0}
-          >
-            <Copy className="h-4 w-4 mr-2" />
-            Copy
-          </ContextMenuItem>
-          <ContextMenuItem onClick={operations.paste} disabled={props.disabled || !targetElement}>
-            <Clipboard className="h-4 w-4 mr-2" />
-            Paste
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={operations.selectAll}
-            disabled={!targetElement || targetElement.value.length === 0}
-          >
-            <Type className="h-4 w-4 mr-2" />
-            Select All
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={operations.delete}
-            disabled={props.disabled || !targetElement || targetElement.value.length === 0}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
     );
   },
 );
