@@ -57,6 +57,37 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
+/**
+ * Register a native context menu on the given BrowserWindow's webContents.
+ * Shows a single consistent Electron-native menu for editable fields and
+ * selected text.  nativeTheme.themeSource = 'dark' ensures dark appearance.
+ */
+const registerContextMenu = (window: BrowserWindow) => {
+  window.webContents.on('context-menu', (_event, params) => {
+    // Prevent Chromium's default so only our native menu renders.
+    _event.preventDefault();
+
+    const hasEditable = params.isEditable;
+    const hasSelection = params.selectionText.trim().length > 0;
+
+    if (!hasEditable && !hasSelection) {
+      return;
+    }
+
+    const template: Electron.MenuItemConstructorOptions[] = [
+      { label: 'Cut',    role: 'cut',    enabled: hasEditable && params.editFlags.canCut },
+      { label: 'Copy',   role: 'copy',   enabled: hasEditable ? params.editFlags.canCopy : hasSelection },
+      { label: 'Paste',  role: 'paste',  enabled: hasEditable && params.editFlags.canPaste },
+      { label: 'Delete', role: 'delete', enabled: hasEditable && params.editFlags.canDelete },
+      { type: 'separator' },
+      { label: 'Select All', role: 'selectAll', enabled: params.editFlags.canSelectAll },
+    ];
+
+    const menu = Menu.buildFromTemplate(template);
+    setTimeout(() => menu.popup({ window }), 0);
+  });
+};
+
 
 const createWindows = async () => {
   const RESOURCES_PATH = app.isPackaged
@@ -114,9 +145,10 @@ const createWindows = async () => {
     spoofWindow = null;
   });
 
-  // Right-click context menus are handled by Chromium's built-in menu
-  // (consistent OS-native appearance across all contexts).
-  // The reader viewer suppresses right-click via its own onContextMenu handler.
+  // Right-click context menus: consistent Electron-native dark menu for
+  // all text inputs and selected text. Reader viewer suppresses its own.
+  registerContextMenu(mainWindow);
+  registerContextMenu(spoofWindow);
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);
