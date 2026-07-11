@@ -83,6 +83,18 @@
 			"type": "shell",
 			"command": "corepack pnpm --filter @houdoku/desktop build",
 			"isBackground": false
+		},
+		{
+			"label": "install-phase4",
+			"type": "shell",
+			"command": "corepack pnpm install",
+			"isBackground": false
+		},
+		{
+			"label": "build-phase4",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"isBackground": false
 		}
 	]
 }
