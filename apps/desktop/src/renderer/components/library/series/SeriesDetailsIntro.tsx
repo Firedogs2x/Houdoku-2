@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { currentExtensionMetadataState } from '@/renderer/state/libraryStates';
 import { Badge } from '@houdoku/ui/components/Badge';
+import { Textarea } from '@houdoku/ui/components/Textarea';
 import { getSeriesCoverUrl } from '../../../util/seriesCover';
 import ExtensionImage from '../../general/ExtensionImage';
 
@@ -53,8 +54,8 @@ const SeriesDetailsIntro: React.FC<Props> = (props: Props) => {
             style={{ width: `calc(100% - ${DESCRIPTION_RIGHT_EDGE_GAP_PX}px)` }}
             className="max-w-full mt-[4px] flex flex-col flex-1 min-h-0"
           >
-            <textarea
-              className="w-full flex-1 min-h-[72px] md:min-h-[102px] overflow-auto rounded-md border border-input bg-transparent px-3 py-2 text-sm leading-5 text-white shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+            <Textarea
+              className="w-full flex-1 min-h-[72px] md:min-h-[102px] overflow-auto resize-none text-sm leading-5 text-white"
               value={descriptionDraft}
               placeholder="Description"
               onChange={(e) => setDescriptionDraft(e.target.value)}
