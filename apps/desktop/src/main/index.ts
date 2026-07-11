@@ -58,44 +58,56 @@ protocol.registerSchemesAsPrivileged([
  */
 const registerContextMenu = (window: BrowserWindow) => {
   window.webContents.on('context-menu', (_event, params) => {
-    const menu = new Menu();
+    // Prevent Chromium's default context menu so only our native menu renders,
+    // giving a consistent appearance (font, color, size) in every context.
+    _event.preventDefault();
 
-    if (params.isEditable) {
-      menu.append(
-        new MenuItem({
-          label: 'Cut',
-          role: 'cut',
-          enabled: params.editFlags.canCut,
-          visible: params.isEditable,
-        }),
-      );
-      menu.append(
-        new MenuItem({
-          label: 'Copy',
-          role: 'copy',
-          enabled: params.editFlags.canCopy,
-          visible: params.isEditable,
-        }),
-      );
-      menu.append(
-        new MenuItem({
-          label: 'Paste',
-          role: 'paste',
-          enabled: params.editFlags.canPaste,
-          visible: params.isEditable,
-        }),
-      );
-      menu.append(new MenuItem({ type: 'separator' }));
-    } else if (params.selectionText.trim().length > 0) {
-      menu.append(
-        new MenuItem({
-          label: 'Copy',
-          role: 'copy',
-          enabled: true,
-        }),
-      );
+    const hasEditable = params.isEditable;
+    const hasSelection = params.selectionText.trim().length > 0;
+
+    // Suppress the menu entirely when there is nothing to act on
+    // (e.g. right-clicking on an image or blank area).
+    if (!hasEditable && !hasSelection) {
+      return;
     }
 
+    const menu = new Menu();
+
+    // Cut
+    menu.append(
+      new MenuItem({
+        label: 'Cut',
+        role: 'cut',
+        enabled: hasEditable && params.editFlags.canCut,
+      }),
+    );
+    // Copy
+    menu.append(
+      new MenuItem({
+        label: 'Copy',
+        role: 'copy',
+        enabled: hasEditable ? params.editFlags.canCopy : hasSelection,
+      }),
+    );
+    // Paste
+    menu.append(
+      new MenuItem({
+        label: 'Paste',
+        role: 'paste',
+        enabled: hasEditable && params.editFlags.canPaste,
+      }),
+    );
+    // Delete
+    menu.append(
+      new MenuItem({
+        label: 'Delete',
+        role: 'delete',
+        enabled: hasEditable && params.editFlags.canDelete,
+      }),
+    );
+    menu.append(new MenuItem({ type: 'separator' }));
+
+    // Select All
     menu.append(
       new MenuItem({
         label: 'Select All',

@@ -53,6 +53,21 @@
 			"type": "shell",
 			"command": "corepack pnpm --filter @houdoku/desktop exec electron-builder --win zip --publish never",
 			"isBackground": false
+		},
+		{
+			"label": "build-verify-contextmenu",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"group": "none"
+		},
+		{
+			"label": "build-cm",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "none"
 		}
 	]
 }
