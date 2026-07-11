@@ -295,6 +295,7 @@ const ReaderViewer: React.FC<Props> = (props: Props) => {
         )}
         style={{ ['--USER-MAX-PAGE-WIDTH' as string]: `${maxPageWidth}${pageWidthMetric}` }}
         onClick={(e) => viewerContainerClickHandler(e)}
+        onContextMenu={(e) => e.preventDefault()}
       >
         {pageStyle === PageStyle.LongStrip ? getSeparatePageContainers() : getSinglePageContainer()}
       </div>

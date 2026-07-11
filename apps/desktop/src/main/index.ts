@@ -87,6 +87,13 @@ const registerContextMenu = (window: BrowserWindow) => {
         }),
       );
       menu.append(new MenuItem({ type: 'separator' }));
+      menu.append(
+        new MenuItem({
+          label: 'Select All',
+          role: 'selectAll',
+          enabled: params.editFlags.canSelectAll,
+        }),
+      );
     } else if (params.selectionText.trim().length > 0) {
       menu.append(
         new MenuItem({
@@ -95,15 +102,18 @@ const registerContextMenu = (window: BrowserWindow) => {
           enabled: true,
         }),
       );
+      menu.append(
+        new MenuItem({
+          label: 'Select All',
+          role: 'selectAll',
+          enabled: params.editFlags.canSelectAll,
+        }),
+      );
     }
 
-    menu.append(
-      new MenuItem({
-        label: 'Select All',
-        role: 'selectAll',
-        enabled: params.editFlags.canSelectAll,
-      }),
-    );
+    if (!menu.items.length) {
+      return;
+    }
 
     menu.popup();
   });
