@@ -53,6 +53,12 @@
 			"type": "shell",
 			"command": "corepack pnpm --filter @houdoku/desktop exec electron-builder --win zip --publish never",
 			"isBackground": false
+		},
+		{
+			"label": "install-updated-deps",
+			"type": "shell",
+			"command": "corepack pnpm install",
+			"isBackground": false
 		}
 	]
 }
