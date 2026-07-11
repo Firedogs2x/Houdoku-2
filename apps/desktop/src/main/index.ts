@@ -58,33 +58,36 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 /**
- * Register a native context menu on the given BrowserWindow's webContents.
- * Shows a single consistent Electron-native menu for editable fields and
- * selected text.  nativeTheme.themeSource = 'dark' ensures dark appearance.
+ * Register a single, consistent Electron-native context menu on the given
+ * BrowserWindow's webContents. The same menu (Cut / Copy / Paste / Delete /
+ * Select All) is shown for every right-click — inside editable fields and on
+ * selected text alike — with unavailable actions greyed out.
+ *
+ * The menu is shown synchronously so it is the only menu that ever renders
+ * (Chromium's built-in menu never gets a chance to appear), and
+ * nativeTheme.themeSource = 'dark' keeps it dark. Works on Windows, macOS,
+ * and Linux.
  */
 const registerContextMenu = (window: BrowserWindow) => {
   window.webContents.on('context-menu', (_event, params) => {
-    // Prevent Chromium's default so only our native menu renders.
-    _event.preventDefault();
-
-    const hasEditable = params.isEditable;
+    const isEditable = params.isEditable;
     const hasSelection = params.selectionText.trim().length > 0;
 
-    if (!hasEditable && !hasSelection) {
-      return;
-    }
-
     const template: Electron.MenuItemConstructorOptions[] = [
-      { label: 'Cut',    role: 'cut',    enabled: hasEditable && params.editFlags.canCut },
-      { label: 'Copy',   role: 'copy',   enabled: hasEditable ? params.editFlags.canCopy : hasSelection },
-      { label: 'Paste',  role: 'paste',  enabled: hasEditable && params.editFlags.canPaste },
-      { label: 'Delete', role: 'delete', enabled: hasEditable && params.editFlags.canDelete },
+      { label: 'Cut', role: 'cut', enabled: isEditable && params.editFlags.canCut },
+      {
+        label: 'Copy',
+        role: 'copy',
+        enabled: params.editFlags.canCopy && (isEditable || hasSelection),
+      },
+      { label: 'Paste', role: 'paste', enabled: isEditable && params.editFlags.canPaste },
+      { label: 'Delete', role: 'delete', enabled: isEditable && params.editFlags.canDelete },
       { type: 'separator' },
       { label: 'Select All', role: 'selectAll', enabled: params.editFlags.canSelectAll },
     ];
 
     const menu = Menu.buildFromTemplate(template);
-    setTimeout(() => menu.popup({ window }), 0);
+    menu.popup({ window });
   });
 };
 

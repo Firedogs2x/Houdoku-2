@@ -122,6 +122,15 @@
 				"$tsc"
 			],
 			"group": "none"
+		},
+		{
+			"label": "build-sync-menu",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "none"
 		}
 	]
 }
