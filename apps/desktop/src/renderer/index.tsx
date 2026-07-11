@@ -9,6 +9,15 @@ import { themeState } from './state/settingStates';
 import { ApplicationTheme } from '@/common/models/types';
 import { useEffect } from 'react';
 
+// Block Chromium's default (white) context menu everywhere in the renderer.
+// The main-process registerContextMenu handler builds the same Electron-native
+// (dark) menu for every context — editable fields, selected text, etc.
+// Preventing the DOM-level contextmenu event ensures Chromium's white menu
+// never leaks through, so only the consistent Electron Menu is seen.
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
 const main = document.createElement('main');
 document.body.appendChild(main);
 const root = createRoot(main);

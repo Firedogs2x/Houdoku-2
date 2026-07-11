@@ -68,6 +68,15 @@
 				"$tsc"
 			],
 			"group": "none"
+		},
+		{
+			"label": "build-verify-ctx",
+			"type": "shell",
+			"command": "corepack pnpm --filter @houdoku/desktop build",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "none"
 		}
 	]
 }
