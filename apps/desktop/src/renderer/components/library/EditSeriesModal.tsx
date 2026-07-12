@@ -36,7 +36,7 @@ const EditSeriesModal: React.FC<Props> = (props: Props) => {
 
   return (
     <AlertDialog open={props.showing} onOpenChange={props.setShowing}>
-      <AlertDialogContent className="overflow-y-scroll max-h-screen [@media(min-height:600px)]:max-h-[600px] md:max-w-[700px] lg:max-w-[800px]">
+      <AlertDialogContent className="md:max-w-[700px] lg:max-w-[800px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Edit series</AlertDialogTitle>
         </AlertDialogHeader>

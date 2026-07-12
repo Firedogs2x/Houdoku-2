@@ -20,3 +20,65 @@ If any temporary files were created for verification and or tests, please remove
 _**Agent (copilot/auto)**_
 
 I’ll inspect the UI tsconfig deprecation first, then scan for similar TypeScript config issues across the workspace, apply the smallest safe fixes, and run lint plus cross-platform build checks to verify no regressions.
+
+---
+
+_**User (2026-07-11 15:48:50Z)**_
+
+I had you fix all of the depreciated TypeScript errors earlier, but for some reason you added more faulty code under apps / desktop tsconfig.json. Please get rid of the error.
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’m reverting the problematic change in the desktop TypeScript config and validating the file directly so the deprecation error is removed without introducing a new config issue.
+
+---
+
+_**User (2026-07-11 16:36:01Z)**_
+
+Can you tell me why I am seeing another depreciation error this time in packages \ UI tsconfig.json?
+I had you this one before but now it is bad again. This should not be happening.
+While at it can you see the in VS Code the Problems tab?
+According to the list there is 32 problems:
+If you can see the Problems tab, can you fix all 32 issues?
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+---
+
+_**Agent (copilot/auto)**_
+
+I’m checking the current diagnostics and the UI tsconfig contents side by side so I can pinpoint the reintroduced deprecation and address the broader Problems list systematically.
+
+---
+
+_**User (2026-07-11 16:39:54Z)**_
+
+What about the 31 errors showing in the Problems tab? Can you see those error messages?
+
+---
+
+_**Agent (copilot/auto)**_
+
+<think><details><summary>Thought Process</summary>
+I’m checking the workspace diagnostics directly so I can report what the Problems view is actually showing and address any remaining issues instead of guessing from the tsconfig alone.
+</details></think>
+
+_**Agent (copilot/auto)**_
+
+<tool-use data-tool-type="generic" data-tool-name="get_errors"><details>
+<summary>Tool use: **get_errors**</summary>
+
+**Input:**
+
+- filePaths: `[c:\Users\dnvm8\Documents\GitHub\Houdoku-2.17.0]`
+
+</details></tool-use>
+
+_**Agent (copilot/auto)**_
+
+I’m checking the workspace diagnostics directly so I can report what the Problems view is actually showing and address any remaining issues instead of guessing from the tsconfig alone.

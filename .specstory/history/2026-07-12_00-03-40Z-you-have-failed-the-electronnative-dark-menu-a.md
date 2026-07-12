@@ -13,3 +13,34 @@ Use functions and/or methods to repair and optimize the code.
 Verify changes can be used for PC, Apple, and Linux/Ubuntu.
 Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
 If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-12 00:05:28Z)**_
+
+@agent Try Again
+
+---
+
+_**Agent (deepseek/deepseek-v4-flash)**_
+
+Let me understand the user's request:
+
+1. There's an Electron app (Houdoku) that has context menus
+2. Currently, an "Electron-native dark menu" appears when clicking in a text box, and a different menu appears when right-clicking on highlighted text outside of a text box
+3. The user wants the Chromium (browser default) context menu to be the standard one, styled black with white font color
+4. They want this to work across PC, Apple, and Linux/Ubuntu
+5. No errors in lint/release, and remove any temp files
+
+Let me first explore the codebase to understand how context menus are currently handled.
+
+---
+
+_**User (2026-07-12 00:10:54Z)**_
+
+@agent Continue: "Continue to iterate?"
+
+---
+
+_**Agent (deepseek/deepseek-v4-flash)**_
+
+Found it. Now let me run biome check.
