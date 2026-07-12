@@ -9,19 +9,16 @@ declare module '*.css' {
 }
 
 declare module '*.png' {
-  // biome-ignore lint/suspicious/noExplicitAny: arbitrary
-  const value: any;
-  export = value;
+  const value: string;
+  export default value;
 }
 
 declare module '*.jpg' {
-  // biome-ignore lint/suspicious/noExplicitAny: arbitrary
-  const value: any;
-  export = value;
+  const value: string;
+  export default value;
 }
 
 declare module '*.svg' {
-  // biome-ignore lint/suspicious/noExplicitAny: arbitrary
-  const value: any;
-  export = value;
+  const value: string;
+  export default value;
 }
