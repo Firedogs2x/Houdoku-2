@@ -2,37 +2,36 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import fs from 'fs';
 import path, { join } from 'path';
+import ipcChannels from '@/common/constants/ipcChannels.json';
+import { walk } from '@/main/util/filesystem';
 import {
-  app,
-  BrowserWindow,
-  shell,
   net,
+  BrowserWindow,
+  OpenDialogReturnValue,
+  app,
+  dialog,
+  ipcMain,
   nativeTheme,
   protocol,
-  ipcMain,
-  dialog,
-  OpenDialogReturnValue,
+  shell,
 } from 'electron';
-import contextMenu from 'electron-context-menu';
 import log from 'electron-log';
-import { walk } from '@/main/util/filesystem';
-import { createExtensionIpcHandlers, loadPlugins } from './services/extension';
-import ipcChannels from '@/common/constants/ipcChannels.json';
 import packageJson from '../../package.json';
-import { createTrackerIpcHandlers } from './services/tracker';
 import { createDiscordIpcHandlers } from './services/discord';
-import { createUpdaterIpcHandlers } from './services/updater';
-import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, PLUGINS_DIR, THUMBNAILS_DIR } from './util/appdata';
+import { createExtensionIpcHandlers, loadPlugins } from './services/extension';
 import { createFilesystemIpcHandlers } from './services/filesystem';
 import { createSeriesAutoIpcHandlers } from './services/seriesAuto';
+import { createTrackerIpcHandlers } from './services/tracker';
+import { createUpdaterIpcHandlers } from './services/updater';
+import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, PLUGINS_DIR, THUMBNAILS_DIR } from './util/appdata';
 
 log.transports.file.resolvePath = () => path.join(LOGS_DIR, 'main.log');
 
 console.info(`Starting Houdoku main process (client version ${packageJson.version})`);
 
-// Force Chromium's native theme to dark so context menus, scrollbars,
-// and other native UI widgets render with a dark appearance consistently
-// across Windows, macOS, and Linux.
+// Keep Chromium's native theme dark so scrollbars and other native UI
+// widgets render consistently across Windows, macOS, and Linux.
+// Context menus are now handled entirely in the renderer via Radix UI.
 nativeTheme.themeSource = 'dark';
 
 let mainWindow: BrowserWindow | null = null;
@@ -55,26 +54,6 @@ protocol.registerSchemesAsPrivileged([
     },
   },
 ]);
-
-/**
- * A single, consistent native Electron context menu for every right-click —
- * inside editable fields and on selected text alike. Using the well-tested
- * `electron-context-menu` package guarantees the same dark Electron menu is
- * the only menu that ever appears (Chromium's built-in menu is suppressed),
- * across Windows, macOS, and Linux. nativeTheme.themeSource = 'dark' keeps it
- * dark, and the reader viewer suppresses its own menu via onContextMenu.
- */
-contextMenu({
-  showCopyImage: false,
-  showSaveImageAs: false,
-  showSelectAll: true,
-  showInspectElement: false,
-  // Show the menu whenever the context is editable OR there is selected text,
-  // so right-click works everywhere outside the reader.
-  shouldShowMenu: (_event, params) =>
-    params.isEditable || params.selectionText.trim().length > 0,
-});
-
 
 const createWindows = async () => {
   const RESOURCES_PATH = app.isPackaged
@@ -132,8 +111,9 @@ const createWindows = async () => {
     spoofWindow = null;
   });
 
-  // Right-click context menus are provided globally by electron-context-menu
-  // (configured above), so no per-window registration is required.
+  // Context menus are handled entirely in the renderer via Radix UI
+  // (EditableContextMenu, LibraryGridContextMenu, etc.) and a global
+  // fallback in GlobalContextMenu — no main-process registration needed.
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url);

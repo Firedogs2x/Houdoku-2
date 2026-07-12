@@ -1,35 +1,36 @@
 import { useEffect, useState } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 const { ipcRenderer } = require('electron');
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import ipcChannels from '@/common/constants/ipcChannels.json';
 import routes from '@/common/constants/routes.json';
 import storeKeys from '@/common/constants/storeKeys.json';
-import DashboardPage from './components/general/DashboardPage';
-import ReaderPage from './components/reader/ReaderPage';
-import ipcChannels from '@/common/constants/ipcChannels.json';
-import { migrateSeriesTags } from './features/library/utils';
-import AppLoading from './components/general/AppLoading';
+import { DefaultSettings, GeneralSetting } from '@/common/models/types';
+import { invalidateSeriesCoverUrlCache } from '@/renderer/util/seriesCover';
 import { Toaster } from '@houdoku/ui/components/Toaster';
 import { toast } from '@houdoku/ui/hooks/use-toast';
-import { categoryListState, seriesListState } from './state/libraryStates';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { GlobalContextMenu } from './components/GlobalContextMenu';
+import AppLoading from './components/general/AppLoading';
+import DashboardPage from './components/general/DashboardPage';
+import ReaderPage from './components/reader/ReaderPage';
+import { migrateSeriesTags } from './features/library/utils';
 import { downloaderClient } from './services/downloader';
+import {
+  createRendererIpcHandlers,
+  loadStoredExtensionSettings,
+  loadStoredTrackerTokens,
+} from './services/ipc';
+import library from './services/library';
 import {
   currentTaskState,
   downloadErrorsState,
   queueState,
   runningState,
 } from './state/downloaderStates';
+import { categoryListState, seriesListState } from './state/libraryStates';
 import { autoCheckForUpdatesState } from './state/settingStates';
-import library from './services/library';
-import {
-  createRendererIpcHandlers,
-  loadStoredExtensionSettings,
-  loadStoredTrackerTokens,
-} from './services/ipc';
 import { getNumberUnreadChapters } from './util/comparison';
-import { DefaultSettings, GeneralSetting } from '@/common/models/types';
 import { formatDateToMMDDYYYY } from './util/date';
-import { invalidateSeriesCoverUrlCache } from '@/renderer/util/seriesCover';
 
 loadStoredExtensionSettings();
 loadStoredTrackerTokens();
@@ -174,6 +175,7 @@ export default function App() {
   return (
     <>
       <Toaster />
+      <GlobalContextMenu />
 
       {loading ? (
         <AppLoading />
