@@ -6,12 +6,7 @@ export default defineConfig({
   main: {
     plugins: [
       externalizeDepsPlugin({
-        exclude: [
-          '@houdoku/common',
-          '@houdoku/online-reader',
-          'jsdom',
-          'node-fetch',
-        ],
+        exclude: ['@houdoku/common', '@houdoku/online-reader'],
       }),
     ],
     resolve: {

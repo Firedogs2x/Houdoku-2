@@ -22,6 +22,7 @@
     "files": [
       "out/**/*"
     ],
+    "includeSubNodeModules": true,
     "mac": {
       "target": [
         {
