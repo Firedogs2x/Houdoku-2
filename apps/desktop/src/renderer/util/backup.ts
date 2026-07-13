@@ -14,6 +14,7 @@ import {
   saveTrackerSetting,
 } from '@/renderer/features/settings/utils';
 import {
+  Category,
   DefaultSettings,
   GeneralSetting,
   IntegrationSetting,
@@ -126,6 +127,10 @@ const buildBackupPayload = () => {
       LibraryCropCovers: getSettingValue<string | boolean>(GeneralSetting.LibraryCropCovers),
       CustomDownloadsDir: getSettingValue<string>(GeneralSetting.CustomDownloadsDir),
     },
+    Category: library.fetchCategoryList().map((cat: Category) => ({
+      id: cat.id,
+      label: cat.label,
+    })),
     Reader: {
       PageStyle: getSettingValue<string>(ReaderSetting.PageStyle),
       PageGap: getSettingValue<string | boolean>(ReaderSetting.PageGap),
@@ -198,6 +203,7 @@ const buildBackupPayload = () => {
       tags: s.tags,
       remoteCoverUrl: s.remoteCoverUrl,
       trackerKeys: s.trackerKeys,
+      categories: Array.isArray(s.categories) ? [...s.categories] : [],
       numberUnread: s.numberUnread,
       lastReadDate: s.lastReadDate,
       unread: s.unread,
@@ -409,6 +415,16 @@ export const restoreBackup = (backupFileContent: string) => {
         saveGeneralSetting(GeneralSetting.CustomDownloadsDir, settings.Library.CustomDownloadsDir);
       }
 
+      // Restore categories
+      if (Array.isArray(settings.Category)) {
+        const restoredCategories = settings.Category as Array<{ id: string; label: string }>;
+        for (const cat of restoredCategories) {
+          if (typeof cat.id === 'string' && cat.id.length > 0 && typeof cat.label === 'string') {
+            library.upsertCategory({ id: cat.id, label: cat.label });
+          }
+        }
+      }
+
       if (settings.Reader) {
         saveReaderSetting(ReaderSetting.PageStyle, settings.Reader.PageStyle);
         saveReaderSetting(ReaderSetting.PageGap, settings.Reader.PageGap);
@@ -489,6 +505,7 @@ export const restoreBackup = (backupFileContent: string) => {
           ...seriesData,
           description:
             typeof seriesData.description === 'string' ? seriesData.description : '',
+          categories: Array.isArray(seriesData.categories) ? seriesData.categories : [],
         } as Series;
 
         // Update series to database
