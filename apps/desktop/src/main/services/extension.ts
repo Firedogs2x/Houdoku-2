@@ -282,10 +282,6 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
 
   initializeExtensionClient(spoofWindow);
 
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.RELOAD, async (event) => {
-    initializeExtensionClient(spoofWindow);
-    return event.sender.send(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS);
-  });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET, async (_event, extensionId: string) => {
     if (extensionId === FS_METADATA.id) {
       return FS_METADATA;
@@ -301,9 +297,6 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
       result.push(...Object.values(TIYO_CLIENT.getExtensions()).map((e) => e.metadata));
     }
     return result;
-  });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_ONLINE_READER_VERSION, () => {
-    return TIYO_CLIENT ? TIYO_CLIENT.getVersion() : undefined;
   });
 
   ipcMain.handle(

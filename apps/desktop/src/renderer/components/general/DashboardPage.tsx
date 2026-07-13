@@ -6,7 +6,6 @@ import Search from '../search/Search';
 import routes from '@/common/constants/routes.json';
 import { importSeries, reloadSeriesList } from '@/renderer/features/library/utils';
 import Library from '../library/Library';
-import Plugins from '../plugins/Plugins';
 import Downloads from '../downloads/Downloads';
 import {
   activeSeriesListState,
@@ -90,7 +89,6 @@ const DashboardPage: React.FC<Props> = () => {
         <Routes>
           <Route path={`${routes.SERIES}/:id`} element={<SeriesDetails />} />
           <Route path={`${routes.SEARCH}/*`} element={<Search />} />
-          <Route path={`${routes.PLUGINS}/*`} element={<Plugins />} />
           <Route path={`${routes.DOWNLOADS}/*`} element={<Downloads />} />
           <Route path="*" element={<Library />} />
         </Routes>

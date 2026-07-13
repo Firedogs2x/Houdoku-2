@@ -54,9 +54,6 @@ export const createRendererIpcHandlers = (
 ) => {
   console.debug('Creating renderer IPC handlers...');
 
-  ipcRenderer.on(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS, () => {
-    loadStoredExtensionSettings();
-  });
   ipcRenderer.on(ipcChannels.WINDOW.SET_FULLSCREEN, (_event, fullscreen) => {
     if (fullscreen) {
       document.getElementById('titlebar')?.classList.add('hidden');

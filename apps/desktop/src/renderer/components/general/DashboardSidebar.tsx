@@ -18,7 +18,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import routes from '@/common/constants/routes.json';
 import {
-  Blocks,
   ChevronRight,
   FolderDown,
   GitFork,
@@ -190,12 +189,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
               <SidebarMenuButton onClick={() => navigate(routes.SEARCH)}>
                 <SquarePlus />
                 <span>Add Series</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => navigate(routes.PLUGINS)}>
-                <Blocks />
-                <span>Online Reader</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>

@@ -1,17 +1,5 @@
 import { LanguageKey, Series, SeriesStatus, SettingType } from '@houdoku/common';
 
-export type ExtensionTableRow = {
-  pkgName: string;
-  friendlyName: string;
-  id: string;
-  url: string;
-  languageKey: LanguageKey;
-  availableVersion: string;
-  installedVersion: string | undefined;
-  canUpdate: boolean;
-  hasSettings: boolean;
-};
-
 export type TrackerMetadata = {
   id: string;
   name: string;
