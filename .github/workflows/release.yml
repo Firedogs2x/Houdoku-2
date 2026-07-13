@@ -51,26 +51,27 @@ jobs:
           fi
 
           base_version=${latest#V}
+          IFS='.' read -r major minor patch <<< "$base_version"
+
+          # ── Apply version bump (shared by official AND nightly) ──
+          case "${{ inputs.bump }}" in
+            major)
+              major=$((major+1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor+1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch+1))
+              ;;
+          esac
+
           release_type="${{ inputs.release_type }}"
 
           if [ "$release_type" = "official" ]; then
-            IFS='.' read -r major minor patch <<< "$base_version"
-
-            case "${{ inputs.bump }}" in
-              major)
-                major=$((major+1))
-                minor=0
-                patch=0
-                ;;
-              minor)
-                minor=$((minor+1))
-                patch=0
-                ;;
-              patch)
-                patch=$((patch+1))
-                ;;
-            esac
-
             tag_name="V$major.$minor.$patch"
             release_name="Houdoku $tag_name"
             app_version="${tag_name#V}"
@@ -82,7 +83,7 @@ jobs:
             # Keep git ref safe while exposing a friendly release title.
             tag_name="nightly-$nightly_stamp"
             release_name="Nightly - $nightly_display UTC"
-            app_version="$base_version-nightly.${GITHUB_RUN_NUMBER:-0}"
+            app_version="$major.$minor.$patch-nightly.${GITHUB_RUN_NUMBER:-0}"
             prerelease="true"
           fi
 
