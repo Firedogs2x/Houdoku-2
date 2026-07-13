@@ -4,7 +4,11 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [
+      externalizeDepsPlugin({
+        exclude: ['@houdoku/common', '@houdoku/online-reader'],
+      }),
+    ],
     resolve: {
       alias: {
         '@': path.join(__dirname, 'src'),
