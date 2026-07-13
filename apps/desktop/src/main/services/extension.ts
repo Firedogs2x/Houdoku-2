@@ -15,7 +15,7 @@ import { FSExtensionClient } from './extensions/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { EXTRACT_DIR } from '../util/appdata';
 
-let TIYO_CLIENT: TiyoClient | null = null;
+let onlineReaderClient: TiyoClient | null = null;
 let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
 
 /**
@@ -23,18 +23,18 @@ let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
  * No network downloads occur — all content sources are bundled as workspace packages.
  */
 export function initializeExtensionClient(spoofWindow: BrowserWindow): void {
-  if (TIYO_CLIENT !== null) {
-    TIYO_CLIENT = null;
+  if (onlineReaderClient !== null) {
+    onlineReaderClient = null;
   }
   if (FILESYSTEM_EXTENSION !== null) {
     FILESYSTEM_EXTENSION = null;
   }
 
   console.info('Initializing Online Reader content sources...');
-  TIYO_CLIENT = new TiyoClient(spoofWindow);
+  onlineReaderClient = new TiyoClient(spoofWindow);
   console.info(
-    `Online Reader v${TIYO_CLIENT.getVersion()} initialized with ${
-      Object.keys(TIYO_CLIENT.getExtensions()).length
+    `Online Reader v${onlineReaderClient.getVersion()} initialized with ${
+      Object.keys(onlineReaderClient.getExtensions()).length
     } content sources`,
   );
 
@@ -44,12 +44,12 @@ export function initializeExtensionClient(spoofWindow: BrowserWindow): void {
 }
 
 export function getOnlineReaderClient(): TiyoClient | null {
-  return TIYO_CLIENT;
+  return onlineReaderClient;
 }
 
 function getExtensionClient(extensionId: string) {
   if (extensionId === FS_METADATA.id) return FILESYSTEM_EXTENSION as ExtensionClientInterface;
-  return TIYO_CLIENT!.getExtensions()[extensionId].client;
+  return onlineReaderClient!.getExtensions()[extensionId].client;
 }
 
 /**
@@ -286,15 +286,15 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
     if (extensionId === FS_METADATA.id) {
       return FS_METADATA;
     }
-    if (TIYO_CLIENT && Object.keys(TIYO_CLIENT.getExtensions()).includes(extensionId)) {
-      return TIYO_CLIENT.getExtensions()[extensionId].metadata;
+    if (onlineReaderClient && Object.keys(onlineReaderClient.getExtensions()).includes(extensionId)) {
+      return onlineReaderClient.getExtensions()[extensionId].metadata;
     }
     return undefined;
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_ALL, () => {
     const result = [FS_METADATA];
-    if (TIYO_CLIENT) {
-      result.push(...Object.values(TIYO_CLIENT.getExtensions()).map((e) => e.metadata));
+    if (onlineReaderClient) {
+      result.push(...Object.values(onlineReaderClient.getExtensions()).map((e) => e.metadata));
     }
     return result;
   });

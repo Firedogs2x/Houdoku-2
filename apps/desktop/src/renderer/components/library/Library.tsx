@@ -250,11 +250,7 @@ const Library: React.FC<Props> = () => {
       <div className="flex items-center justify-center pt-[30vh]">
         <div className="max-w-[460px]">
           <p className="text-center">
-            Your library is empty. Install{' '}
-            <code className="relative bg-muted px-[0.3rem] py-[0.2rem] text-sm font-semibold">
-              Plugins
-            </code>{' '}
-            from the tab on the left, and then go to{' '}
+            Your library is empty. Go to{' '}
             <code className="relative bg-muted px-[0.3rem] py-[0.2rem] text-sm font-semibold">
               Add Series
             </code>{' '}

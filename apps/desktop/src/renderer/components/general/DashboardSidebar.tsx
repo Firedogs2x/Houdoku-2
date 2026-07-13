@@ -255,11 +255,6 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                       Add Series
                     </code>{' '}
                     tab on the left panel and search for the series from a supported content source.
-                    To add more content sources, install a{' '}
-                    <code className="relative bg-muted px-[0.3rem] py-[0.2rem] text-sm font-semibold">
-                      Plugin
-                    </code>
-                    .
                   </p>
                 </div>
                 <DialogFooter>

@@ -363,7 +363,7 @@ export async function goToSeries(
       toast({
         title: 'Content source not found',
         description:
-          'The content source for this series was not found. Please update your plugins.',
+          'The content source for this series was not found. Please try adding the series again.',
         duration: 5000,
       });
     } else {
