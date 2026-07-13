@@ -6,7 +6,9 @@
     "lint": "biome lint src"
   },
   "dependencies": {
-    "@houdoku/common": "workspace:*"
+    "@houdoku/common": "workspace:*",
+    "jsdom": "^25.0.1",
+    "node-fetch": "^2.6.7"
   },
   "type": "commonjs",
   "main": "./src/index.ts",

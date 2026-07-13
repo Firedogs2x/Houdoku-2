@@ -269,6 +269,12 @@ importers:
       '@houdoku/common':
         specifier: workspace:*
         version: link:../common
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      node-fetch:
+        specifier: ^2.6.7
+        version: 2.7.0(encoding@0.1.13)
 
   packages/ui:
     dependencies:
