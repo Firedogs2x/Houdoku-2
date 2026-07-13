@@ -5,9 +5,7 @@
   "scripts": {
     "lint": "biome lint src"
   },
-  "dependencies": {
-    "electron": "40.6.1"
-  },
+  "dependencies": {},
   "type": "commonjs",
   "main": "./src/index.ts",
   "typings": "./src/index.d.ts",
