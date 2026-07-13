@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { ipcRenderer } = require('electron');
-import { Chapter, LanguageKey, Series } from '@tiyo/common';
+import { Chapter, LanguageKey, Series } from '@houdoku/common';
 import { toast } from '@houdoku/ui/hooks/use-toast';
 import { downloadCover } from '@/renderer/util/download';
 import { FS_METADATA } from '@/common/temp_fs_metadata';

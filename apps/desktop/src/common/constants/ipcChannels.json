@@ -21,20 +21,15 @@
   },
   "GET_PATH": {
     "THUMBNAILS_DIR": "get-thumbnails-dir",
-    "PLUGINS_DIR": "get-plugins-dir",
     "DEFAULT_DOWNLOADS_DIR": "get-default-downloads-dir",
     "LOGS_DIR": "get-logs-dir"
   },
   "GET_ALL_FILES": "get-all-files",
   "EXTENSION_MANAGER": {
     "RELOAD": "extension-manager-reload",
-    "INSTALL": "extension-manager-install",
-    "UNINSTALL": "extension-manager-uninstall",
-    "LIST": "extension-manager-list",
     "GET": "extension-manager-get",
     "GET_ALL": "extension-manager-get-all",
-    "CHECK_FOR_UPDATES": "extension-manager-check-for-updates",
-    "GET_TIYO_VERSION": "extension-manager-get-tiyo-version"
+    "GET_ONLINE_READER_VERSION": "extension-manager-get-online-reader-version"
   },
   "EXTENSION": {
     "GET_SERIES": "extension-getSeries",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Language, Series, SeriesStatus, Languages, LanguageKey } from '@tiyo/common';
+import { Language, Series, SeriesStatus, Languages, LanguageKey } from '@houdoku/common';
 const { ipcRenderer } = require('electron');
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';

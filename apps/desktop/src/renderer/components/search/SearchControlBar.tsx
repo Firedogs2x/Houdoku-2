@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExtensionMetadata, Series } from '@tiyo/common';
+import { ExtensionMetadata, Series } from '@houdoku/common';
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 const { ipcRenderer } = require('electron');
 import { useNavigate } from 'react-router-dom';

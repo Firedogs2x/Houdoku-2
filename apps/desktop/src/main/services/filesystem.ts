@@ -1,5 +1,5 @@
 import { IpcMain } from 'electron';
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 import {
   getChapterDownloadPath,
   deleteDownloadedChapter,

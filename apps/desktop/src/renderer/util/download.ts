@@ -1,4 +1,4 @@
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 const { ipcRenderer } = require('electron');
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import {

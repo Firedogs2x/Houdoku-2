@@ -1,5 +1,5 @@
 import React from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import {

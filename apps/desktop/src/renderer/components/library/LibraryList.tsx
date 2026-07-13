@@ -1,5 +1,5 @@
 import React from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useNavigate } from 'react-router-dom';
 import { goToSeries } from '@/renderer/features/library/utils';
 import { Table, TableBody, TableCell, TableRow } from '@houdoku/ui/components/Table';

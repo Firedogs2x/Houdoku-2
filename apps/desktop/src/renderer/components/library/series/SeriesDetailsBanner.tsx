@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-// @ts-expect-error: @tiyo/common exports this type but TS cannot resolve it here.
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import {
   reloadingSeriesListState,
   seriesListState,

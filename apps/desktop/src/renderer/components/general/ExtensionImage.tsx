@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 import React, { useEffect, useState } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import blankCover from '@/renderer/img/blank_cover.png';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { Loader2 } from 'lucide-react';

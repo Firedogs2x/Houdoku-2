@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 const { ipcRenderer } = require('electron');
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { SeriesTrackerDialog } from './tracker/SeriesTrackerDialog';

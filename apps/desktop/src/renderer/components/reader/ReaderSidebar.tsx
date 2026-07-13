@@ -54,7 +54,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@houdoku/ui/components/Select';
-import { Chapter, Languages } from '@tiyo/common';
+import { Chapter, Languages } from '@houdoku/common';
 import { PageStyle, ReadingDirection } from '@/common/models/types';
 import {
   Collapsible,

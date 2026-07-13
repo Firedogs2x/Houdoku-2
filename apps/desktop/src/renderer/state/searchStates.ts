@@ -1,4 +1,4 @@
-import { Series, FilterValues } from '@tiyo/common';
+import { Series, FilterValues } from '@houdoku/common';
 import { atom } from 'recoil';
 import { SearchResult } from '@/common/models/types';
 import { FS_METADATA } from '@/common/temp_fs_metadata';

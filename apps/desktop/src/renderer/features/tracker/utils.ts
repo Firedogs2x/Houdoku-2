@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { TrackEntry } from '@/common/models/types';
 

@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 import React, { useEffect, useState } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import {
   AniListTrackerMetadata,
   MALTrackerMetadata,

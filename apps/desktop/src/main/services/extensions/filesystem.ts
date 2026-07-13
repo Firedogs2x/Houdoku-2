@@ -18,7 +18,7 @@ import {
   GetSettingTypesFunc,
   SeriesListResponse,
   GetFilterOptionsFunc,
-} from '@tiyo/common';
+} from '@houdoku/common';
 import { extract } from '@/main/util/archives';
 import { walk } from '@/main/util/filesystem';
 import constants from '@/common/constants/constants.json';

@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-import { ExtensionMetadata } from '@tiyo/common';
+import { ExtensionMetadata } from '@houdoku/common';
 import persistantStore from '@/renderer/util/persistantStore';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import storeKeys from '@/common/constants/storeKeys.json';

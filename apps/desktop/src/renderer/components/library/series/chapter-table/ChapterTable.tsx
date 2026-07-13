@@ -34,7 +34,7 @@ import {
   chapterListPageSizeState,
   customDownloadsDirState,
 } from '@/renderer/state/settingStates';
-import { Chapter, Languages, Series } from '@tiyo/common';
+import { Chapter, Languages, Series } from '@houdoku/common';
 import { formatDateToMMDDYYYY } from '@/renderer/util/date';
 import routes from '@/common/constants/routes.json';
 import {

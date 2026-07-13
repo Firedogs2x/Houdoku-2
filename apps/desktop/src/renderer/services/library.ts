@@ -1,4 +1,4 @@
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 import { v4 as uuidv4 } from 'uuid';
 import persistantStore from '../util/persistantStore';
 import storeKeys from '@/common/constants/storeKeys.json';

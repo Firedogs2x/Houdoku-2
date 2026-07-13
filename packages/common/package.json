@@ -1,0 +1,19 @@
+{
+  "name": "@houdoku/common",
+  "version": "1.50.0",
+  "private": true,
+  "scripts": {
+    "lint": "biome lint src"
+  },
+  "dependencies": {
+    "electron": "40.6.1"
+  },
+  "type": "commonjs",
+  "main": "./src/index.ts",
+  "typings": "./src/index.d.ts",
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ]
+}

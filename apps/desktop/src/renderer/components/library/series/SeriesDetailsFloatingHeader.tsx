@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { downloadCover } from '@/renderer/util/download';
 import library from '@/renderer/services/library';
 import { seriesListState } from '@/renderer/state/libraryStates';

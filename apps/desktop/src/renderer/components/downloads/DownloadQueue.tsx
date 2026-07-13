@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { downloaderClient, DownloadTask } from '@/renderer/services/downloader';
 import { currentTaskState, queueState } from '@/renderer/state/downloaderStates';
-import { Languages } from '@tiyo/common';
+import { Languages } from '@houdoku/common';
 import {
   Card,
   CardContent,

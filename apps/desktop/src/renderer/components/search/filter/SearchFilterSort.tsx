@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterSortValue, SortDirection } from '@tiyo/common';
+import { FilterSortValue, SortDirection } from '@houdoku/common';
 import {
   DropdownMenu,
   DropdownMenuContent,

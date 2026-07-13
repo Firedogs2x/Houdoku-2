@@ -13,7 +13,7 @@ import {
 } from '@houdoku/ui/components/Command';
 import { Popover, PopoverContent, PopoverTrigger } from '@houdoku/ui/components/Popover';
 import { Separator } from '@houdoku/ui/components/Separator';
-import { Language, LanguageKey, Languages } from '@tiyo/common';
+import { Language, LanguageKey, Languages } from '@houdoku/common';
 import { useRecoilState } from 'recoil';
 import { chapterLanguagesState } from '@/renderer/state/settingStates';
 

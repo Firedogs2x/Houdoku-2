@@ -1,5 +1,5 @@
 import React from 'react';
-import { Series, SeriesStatus } from '@tiyo/common';
+import { Series, SeriesStatus } from '@houdoku/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { reloadSeriesList } from '@/renderer/features/library/utils';
 import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';

@@ -1,4 +1,4 @@
-import { Chapter, ExtensionMetadata, Series } from '@tiyo/common';
+import { Chapter, ExtensionMetadata, Series } from '@houdoku/common';
 import { atom, selector } from 'recoil';
 import { Category, ImportTask, TableColumnSortOrder } from '@/common/models/types';
 import {

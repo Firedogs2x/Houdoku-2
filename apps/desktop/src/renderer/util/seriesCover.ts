@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { ipcRenderer } = require('electron');
 import path from 'path';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import blankCover from '@/renderer/img/blank_cover.png';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';

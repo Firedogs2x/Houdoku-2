@@ -1,4 +1,4 @@
-import { SettingType } from '@tiyo/common';
+import { SettingType } from '@houdoku/common';
 import {
   GeneralSetting,
   IntegrationSetting,

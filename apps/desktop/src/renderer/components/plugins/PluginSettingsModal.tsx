@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron');
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import storeKeys from '@/common/constants/storeKeys.json';
 import persistantStore from '../../util/persistantStore';
-import { ExtensionMetadata, SettingType } from '@tiyo/common';
+import { ExtensionMetadata, SettingType } from '@houdoku/common';
 import {
   Dialog,
   DialogContent,
@@ -152,7 +152,7 @@ const PluginSettingsModal: React.FC<Props> = (props: Props) => {
     <Dialog open={props.showing} onOpenChange={props.setShowing} defaultOpen={false}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Tiyo settings</DialogTitle>
+          <DialogTitle>Online Reader settings</DialogTitle>
         </DialogHeader>
         {loading ? (
           <div className="w-full flex justify-center">

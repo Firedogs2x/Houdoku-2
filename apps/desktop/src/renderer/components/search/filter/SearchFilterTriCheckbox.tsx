@@ -1,5 +1,5 @@
 import React from 'react';
-import { TriState } from '@tiyo/common';
+import { TriState } from '@houdoku/common';
 import { Check, XIcon } from 'lucide-react';
 import { Checkbox } from '@houdoku/ui/components/Checkbox';
 import { Label } from '@houdoku/ui/components/Label';

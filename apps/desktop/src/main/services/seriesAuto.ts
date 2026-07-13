@@ -1,7 +1,7 @@
 import { IpcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import { Series, SeriesStatus, LanguageKey } from '@tiyo/common';
+import { Series, SeriesStatus, LanguageKey } from '@houdoku/common';
 import { v4 as uuidv4 } from 'uuid';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import constants from '@/common/constants/constants.json';

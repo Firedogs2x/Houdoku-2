@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import LibraryControlBar from './LibraryControlBar';
 import { LibrarySort, LibraryView, ProgressFilter, LibraryDisplayMode } from '@/common/models/types';

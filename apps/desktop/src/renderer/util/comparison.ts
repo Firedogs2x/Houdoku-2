@@ -1,4 +1,4 @@
-import { Chapter } from '@tiyo/common';
+import { Chapter } from '@houdoku/common';
 
 /**
  * Find a similar chapter from a list.

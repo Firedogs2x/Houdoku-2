@@ -7,58 +7,44 @@ import {
   SeriesListResponse,
   FilterValues,
   FilterOption,
-  TiyoClientInterface,
-} from '@tiyo/common';
-const aki = require('aki-plugin-manager');
+} from '@houdoku/common';
+import { TiyoClient } from '@houdoku/online-reader';
 import { BrowserWindow, IpcMain } from 'electron';
 import { FS_METADATA } from '@/common/temp_fs_metadata';
 import { FSExtensionClient } from './extensions/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
-import { EXTRACT_DIR, PLUGINS_DIR } from '../util/appdata';
+import { EXTRACT_DIR } from '../util/appdata';
 
-const TIYO_PACKAGE_NAME = '@tiyo/core';
-
-let TIYO_CLIENT: TiyoClientInterface | null = null;
+let TIYO_CLIENT: TiyoClient | null = null;
 let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
 
-export async function loadPlugins(spoofWindow: BrowserWindow) {
+/**
+ * Initialize the Online Reader content sources and filesystem extension.
+ * No network downloads occur — all content sources are bundled as workspace packages.
+ */
+export function initializeExtensionClient(spoofWindow: BrowserWindow): void {
   if (TIYO_CLIENT !== null) {
     TIYO_CLIENT = null;
-
-    Object.keys(require.cache).forEach((name) => {
-      if (name.includes(`/${TIYO_PACKAGE_NAME}/`)) {
-        delete require.cache[name];
-      }
-    });
   }
   if (FILESYSTEM_EXTENSION !== null) {
     FILESYSTEM_EXTENSION = null;
   }
 
-  console.info('Checking for Tiyo plugin...');
-  aki.list(PLUGINS_DIR).forEach((pluginDetails: [string, string]) => {
-    const pluginName = pluginDetails[0];
-    if (pluginName === TIYO_PACKAGE_NAME) {
-      const mod = aki.load(
-        PLUGINS_DIR,
-        pluginName,
-        require as NodeRequire,
-      );
-
-      TIYO_CLIENT = new mod.TiyoClient(spoofWindow);
-      console.info(
-        `Loaded Tiyo plugin v${TIYO_CLIENT!.getVersion()}; it has ${
-          Object.keys(TIYO_CLIENT!.getExtensions()).length
-        } extensions`,
-      );
-    } else {
-      console.warn(`Ignoring unsupported plugin: ${pluginName}`);
-    }
-  });
+  console.info('Initializing Online Reader content sources...');
+  TIYO_CLIENT = new TiyoClient(spoofWindow);
+  console.info(
+    `Online Reader v${TIYO_CLIENT.getVersion()} initialized with ${
+      Object.keys(TIYO_CLIENT.getExtensions()).length
+    } content sources`,
+  );
 
   console.info('Initializing filesystem extension...');
   FILESYSTEM_EXTENSION = new FSExtensionClient(() => new Promise((_resolve, reject) => reject()));
   FILESYSTEM_EXTENSION.extractPath = EXTRACT_DIR;
+}
+
+export function getOnlineReaderClient(): TiyoClient | null {
+  return TIYO_CLIENT;
 }
 
 function getExtensionClient(extensionId: string) {
@@ -294,26 +280,11 @@ function getFilterOptions(extensionId: string): FilterOption[] {
 export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: BrowserWindow) => {
   console.debug('Creating extension IPC handlers in main...');
 
+  initializeExtensionClient(spoofWindow);
+
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.RELOAD, async (event) => {
-    await loadPlugins(spoofWindow);
+    initializeExtensionClient(spoofWindow);
     return event.sender.send(ipcChannels.APP.LOAD_STORED_EXTENSION_SETTINGS);
-  });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.INSTALL, (_event, name: string, version: string) => {
-    return new Promise<void>((resolve) => {
-      aki.install(name, version, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
-  });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.UNINSTALL, (_event, name: string) => {
-    return new Promise<void>((resolve) => {
-      aki.uninstall(name, PLUGINS_DIR, () => {
-        resolve();
-      });
-    });
-  });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.LIST, async () => {
-    return aki.list(PLUGINS_DIR);
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET, async (_event, extensionId: string) => {
     if (extensionId === FS_METADATA.id) {
@@ -331,12 +302,8 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
     }
     return result;
   });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION, () => {
+  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_ONLINE_READER_VERSION, () => {
     return TIYO_CLIENT ? TIYO_CLIENT.getVersion() : undefined;
-  });
-  ipcMain.handle(ipcChannels.EXTENSION_MANAGER.CHECK_FOR_UPDATES, async () => {
-    // TODO: check registry
-    return {};
   });
 
   ipcMain.handle(

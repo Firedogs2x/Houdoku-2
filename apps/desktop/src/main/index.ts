@@ -18,12 +18,12 @@ import {
 import log from 'electron-log';
 import packageJson from '../../package.json';
 import { createDiscordIpcHandlers } from './services/discord';
-import { createExtensionIpcHandlers, loadPlugins } from './services/extension';
+import { createExtensionIpcHandlers } from './services/extension';
 import { createFilesystemIpcHandlers } from './services/filesystem';
 import { createSeriesAutoIpcHandlers } from './services/seriesAuto';
 import { createTrackerIpcHandlers } from './services/tracker';
 import { createUpdaterIpcHandlers } from './services/updater';
-import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, PLUGINS_DIR, THUMBNAILS_DIR } from './util/appdata';
+import { DEFAULT_DOWNLOADS_DIR, LOGS_DIR, THUMBNAILS_DIR } from './util/appdata';
 
 log.transports.file.resolvePath = () => path.join(LOGS_DIR, 'main.log');
 
@@ -142,8 +142,8 @@ app
     await createWindows();
 
     // create ipc handlers for specific extension functionality
+    // initializeExtensionClient is called inside createExtensionIpcHandlers
     createExtensionIpcHandlers(ipcMain, spoofWindow!);
-    loadPlugins(spoofWindow!);
 
     protocol.handle('atom', (req) => {
       const newPath = decodeURIComponent(req.url.slice('atom://'.length));
@@ -186,10 +186,6 @@ ipcMain.handle(ipcChannels.WINDOW.TOGGLE_FULLSCREEN, () => {
 
 ipcMain.handle(ipcChannels.GET_PATH.THUMBNAILS_DIR, () => {
   return THUMBNAILS_DIR;
-});
-
-ipcMain.handle(ipcChannels.GET_PATH.PLUGINS_DIR, () => {
-  return PLUGINS_DIR;
 });
 
 ipcMain.handle(ipcChannels.GET_PATH.DEFAULT_DOWNLOADS_DIR, () => {

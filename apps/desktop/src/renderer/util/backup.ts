@@ -1,4 +1,4 @@
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 const fs = require('fs');
 const path = require('path');
 import { toast } from '@houdoku/ui/hooks/use-toast';

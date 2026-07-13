@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MultiToggleValues, TriState } from '@tiyo/common';
+import { MultiToggleValues, TriState } from '@houdoku/common';
 import {
   Select,
   SelectContent,

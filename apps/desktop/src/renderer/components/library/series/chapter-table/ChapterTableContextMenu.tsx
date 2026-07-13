@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 const { ipcRenderer } = require('electron');
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';

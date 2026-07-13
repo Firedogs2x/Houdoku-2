@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* @ts-nocheck: @tiyo/common types cannot be resolved by TS Language Server despite being exported.
-   All property accesses are valid at runtime; this file works correctly despite LS errors. */
 import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Mousetrap from 'mousetrap';
 const { ipcRenderer } = require('electron');
-// @ts-expect-error: @tiyo/common exports these types but TS cannot resolve them
-import { Chapter, Series } from '@tiyo/common';
-// Type imports workaround for @tiyo/common TS resolution issue
+import { Chapter, Series } from '@houdoku/common';
 type PageRequesterData = { server: string; hash: string; numPages: number; pageFilenames: string[] };
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import routes from '@/common/constants/routes.json';

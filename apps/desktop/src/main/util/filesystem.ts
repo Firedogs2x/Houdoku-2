@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { nativeImage } from 'electron';
 import { createHash } from 'crypto';
 import { rimraf } from 'rimraf';
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 
 const THUMBNAIL_MAX_WIDTH = 420;
 const THUMBNAIL_JPEG_QUALITY = 80;

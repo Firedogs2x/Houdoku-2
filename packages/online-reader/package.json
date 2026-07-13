@@ -1,0 +1,22 @@
+{
+  "name": "@houdoku/online-reader",
+  "version": "1.50.0",
+  "private": true,
+  "scripts": {
+    "lint": "biome lint src"
+  },
+  "dependencies": {
+    "@houdoku/common": "workspace:*",
+    "electron": "40.6.1",
+    "jsdom": "28.1.0",
+    "node-fetch": "3.3.2"
+  },
+  "type": "commonjs",
+  "main": "./src/index.ts",
+  "typings": "./src/index.d.ts",
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ]
+}

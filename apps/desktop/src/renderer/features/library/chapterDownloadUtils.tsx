@@ -1,4 +1,4 @@
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 import { downloaderClient, DownloadTask } from '@/renderer/services/downloader';
 const { ipcRenderer } = require('electron');
 import ipcChannels from '@/common/constants/ipcChannels.json';

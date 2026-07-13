@@ -1,4 +1,4 @@
-import { Chapter, LanguageKey, Series } from '@tiyo/common';
+import { Chapter, LanguageKey, Series } from '@houdoku/common';
 import library from '@/renderer/services/library';
 import { getNumberUnreadChapters, getTotalWholeChapters } from '@/renderer/util/comparison';
 

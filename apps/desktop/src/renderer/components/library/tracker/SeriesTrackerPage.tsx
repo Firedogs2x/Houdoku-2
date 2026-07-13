@@ -8,7 +8,7 @@ import {
   TrackScoreFormat,
 } from '@/common/models/types';
 import React, { useEffect, useState } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { Button } from '@houdoku/ui/components/Button';
 import { Input } from '@houdoku/ui/components/Input';

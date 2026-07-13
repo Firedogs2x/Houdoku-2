@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@houdoku/ui/components/Select';
-import { Chapter } from '@tiyo/common';
+import { Chapter } from '@houdoku/common';
 import { chapterListPageSizeState } from '@/renderer/state/settingStates';
 
 interface ChapterTablePagination {

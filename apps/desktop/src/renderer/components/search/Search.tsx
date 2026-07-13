@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ExtensionMetadata, FilterOption, Series, SeriesListResponse } from '@tiyo/common';
+import { ExtensionMetadata, FilterOption, Series, SeriesListResponse } from '@houdoku/common';
 const { ipcRenderer } = require('electron');
 import { useRecoilState, useRecoilValue } from 'recoil';
 import AddSeriesModal from './AddSeriesModal';

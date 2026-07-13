@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { updateSeries } from '@/renderer/features/library/utils';
 import { SeriesEditControls } from '../general/SeriesEditControls';
 import { Button } from '@houdoku/ui/components/Button';

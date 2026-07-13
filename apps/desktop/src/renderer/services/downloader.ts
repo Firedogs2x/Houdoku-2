@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { ipcRenderer } = require('electron');
-import { Chapter, PageRequesterData, Series } from '@tiyo/common';
+import { Chapter, PageRequesterData, Series } from '@houdoku/common';
 import path from 'path';
 import { toast } from '@houdoku/ui/hooks/use-toast';
 import ipcChannels from '@/common/constants/ipcChannels.json';

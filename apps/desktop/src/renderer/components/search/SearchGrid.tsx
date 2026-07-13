@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { libraryColumnsState, libraryCropCoversState } from '@/renderer/state/settingStates';
 import {

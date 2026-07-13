@@ -1,5 +1,4 @@
-// @ts-expect-error: @tiyo/common exports this type but TS cannot resolve it
-import { ExtensionMetadata } from '@tiyo/common';
+import { ExtensionMetadata } from '@houdoku/common';
 
 // TODO move this
 export const FS_METADATA: ExtensionMetadata = {

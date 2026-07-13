@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil';
-import { Languages, Series } from '@tiyo/common';
+import { Languages, Series } from '@houdoku/common';
 import { Badge } from '@houdoku/ui/components/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@houdoku/ui/components/Card';
 import {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 const { ipcRenderer } = require('electron');
-import { Series } from '@tiyo/common';
+import { Series } from '@houdoku/common';
 import { useRecoilState } from 'recoil';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { SeriesEditControls } from '../general/SeriesEditControls';

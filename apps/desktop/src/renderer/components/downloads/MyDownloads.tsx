@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Chapter, Series } from '@tiyo/common';
+import { Chapter, Series } from '@houdoku/common';
 const { ipcRenderer } = require('electron');
 import { useRecoilValue } from 'recoil';
 import ipcChannels from '@/common/constants/ipcChannels.json';
