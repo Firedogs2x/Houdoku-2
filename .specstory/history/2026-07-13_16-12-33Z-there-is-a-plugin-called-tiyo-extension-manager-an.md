@@ -151,3 +151,239 @@ _**Agent (deepseek/deepseek-v4-flash)**_
 > **[Configure Vision Proxy](vscode://vizards.deepseek-v4-for-copilot/setVisionModel?windowId%3D1) · [Error Details](vscode://vizards.deepseek-v4-for-copilot/showLogs?windowId%3D1)**
 
 [deepseek-copilot-vision-proxy-notice-end]: #
+
+
+---
+
+_**User (2026-07-13 18:23:33Z)**_
+
+When I tried to start Houdoku this time I got another Java error.
+See Startup Java Error 2 Screenshot 2026-07-12 224814.jpg
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 18:48:11Z)**_
+
+Another Java error upon trying to start the program. See Startup Java Error 3 Screenshot 2026-07-13 114321.jpg
+Review all of the code and fix any and all Java errors.
+You are supposed to testing the code why are you not catching the same errors?
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 19:07:04Z)**_
+
+See Startup Java Error 4 Screenshot 2026-07-13 120510.jpg
+Again, another Java error.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 19:57:50Z)**_
+
+So, the portable program started finally. I started it as a fresh install.
+I went to Add Series and selected the file series drop down menu (See Add Series Upper Left Screenshot 2026-07-13 125057.jpg), I selected MangaDex in the menu, then I saw the program trying to search the MangaDex website and download the requested information. It timed out without retrieving any info.
+I know it was working in Revision 2.17.10.
+Please review the code and determine why it is not working now.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+---
+
+_**Agent (deepseek/deepseek-v4-pro)**_
+
+The user says the program started successfully (yay!), but the Add Series dropdown only shows "filesystem" and not the MangaDex and other content sources. The MangaDex search times out without retrieving info.
+
+The screenshot description says: "Main area shows a dropdown labeled 'filesystem', a 'Select Directory' button" - this means only the filesystem extension is visible, not the 45 content sources from the Online Reader.
+
+This is a critical issue. After our changes:
+1. `initializeExtensionClient()` creates a `TiyoClient` from `@houdoku/online-reader`
+2. The `TiyoClient.getExtensions()` should return all 45 content sources
+3. These are exposed via `EXTENSION_MANAGER.GET_ALL` IPC handler
+4. The Add Series page uses this to populate the dropdown
+
+The problem is likely that `TiyoClient` requires a `BrowserWindow` (spoofWindow) to work properly. Looking at the TiyoClient constructor:
+
+```typescript
+constructor(spoofWindow: BrowserWindow) {
+    super(spoofWindow);
+}
+```
+
+And `TiyoClientAbstract`:
+```typescript
+export abstract class TiyoClientAbstract implements TiyoClientInterface {
+  spoofWindow: BrowserWindow;
+  constructor(spoofWindow: BrowserWindow) {
+    this.spoofWindow = spoofWindow;
+  }
+}
+```
+
+The `getExtensions()` method in `TiyoClient`:
+```typescript
+override getExtensions = () => {
+    const allowedIds = this._getApkModeAllowedExtensionIds();
+    const baseExtensions = this._buildBaseExtensions(allowedIds);
+    return this._applyApkModeFiltering(
+      this._applyApkAdapterProfiles(this._applyApkSelectionOverrides(baseExtensions))
+    );
+};
+```
+
+And `_buildBaseExtensions` creates extension entries. Each extension's `ExtensionClient` needs `_webviewFn`:
+
+```typescript
+private _createExtensionEntry = (extensionModule) => {
+    return {
+      metadata: extensionModule.METADATA,
+      client: new extensionModule.ExtensionClient(this._webviewFn),
+    };
+};
+```
+
+And `_webviewFn` is:
+```typescript
+_webviewFn: WebviewFunc = (url, options) => loadInWebView(this.spoofWindow, url, options);
+```
+
+So the issue might be that `spoofWindow` is not properly set up. Let me look at how `TiyoClient` is instantiated:
+
+```typescript
+export function initializeExtensionClient(spoofWindow: BrowserWindow): void {
+  TIYO_CLIENT = new TiyoClient(spoofWindow);
+}
+```
+
+And `createExtensionIpcHandlers` calls `initializeExtensionClient(spoofWindow)`.
+
+In `main/index.ts`:
+```typescript
+createExtensionIpcHandlers(ipcMain, spoofWindow!);
+```
+
+The `spoofWindow!` is the BrowserWindow created in `createWindows()`. It should be valid.
+
+But wait - looking at the `getExtensions()` method, it checks `_getApkModeAllowedExtensionIds()`. This checks the runtime config for `apkOnlyMode` and `adapterRequiredMode`. If both are false, it returns `undefined` meaning all extensions are included. So that shouldn't filter anything.
+
+Let me also check: does `_buildBaseExtensions` actually work? It creates extensions from the imported extension modules. If an extension's `METADATA` or `ExtensionClient` is undefined, it might silently skip it. But since we copied all the source files, this should work.
+
+Wait, let me think about this differently. The user says "I selected MangaDex" - so MangaDex IS visible in the dropdown. But "it timed out without retrieving any info." So the issue is NOT that extensions aren't visible - they ARE visible. The issue is that searching/downloading from MangaDex doesn't work.
+
+This means `TiyoClient.getExtensions()` IS working and returning extensions. The issue is in the actual HTTP/webview fetching functionality.
+
+The MangaDex extension uses `node-fetch` and `jsdom` for scraping. Let me check if the MangaDex extension's `getSearch` function works correctly.
+
+Actually, let me re-read the screenshot description: "I selected MangaDex in the menu, then I saw the program trying to search the MangaDex website and download the requested information. It timed out without retrieving any info."
+
+This means:
+1. MangaDex is visible in the dropdown ✓
+2. User selected it
+3. Program started searching MangaDex
+4. It timed out
+
+The timeout could be caused by:
+1. Network issues (MangaDex API not reachable)
+2. The `WebviewFunc` not working correctly
+3. `node-fetch` not working in the packaged app
+
+Since `node-fetch` is externalized (loaded via `require()` at runtime), and the app was packaged with `includeSubNodeModules: true`, it should be available.
+
+But wait - in the packaged app, `node-fetch` needs to be accessible. Let me check if `node-fetch` is in the desktop's `dependencies`. Yes it is: `"node-fetch": "^2.6.7"`. 
+
+The MangaDex extension uses `node-fetch` for API calls:
+```typescript
+import fetch from 'node-fetch';
+```
+
+This should work since `node-fetch@2.x` is CJS-compatible.
+
+But there's a potential issue: the MangaDex extension code was copied from the Tiyo project which used `node-fetch@3.x` with ESM syntax. The extension file has:
+```typescript
+import fetch, { Response } from 'node-fetch';
+```
+
+But `node-fetch@2.x` (CJS) only supports:
+```typescript
+const fetch = require('node-fetch');
+```
+
+The ESM-style `import fetch from 'node-fetch'` with `node-fetch@2.x` might fail because `node-fetch@2.x` uses `exports.default` differently from `node-fetch@3.x`.
+
+Wait, but this code is being compiled by Vite. Vite can handle the CJS interop. When Vite sees `import fetch from 'node-fetch'`, it wraps the CJS module correctly.
+
+Actually, let me look at the built output to see how node-fetch is imported.
+
+---
+
+_**User (2026-07-13 21:43:38Z)**_
+
+Need to fix a couple issue before continuing to upgrade the Online Reading.
+1)	I noticed that when I restored a backup file my created categories were not restored. There does not seem to be a “Category”: section. I want it to be placed after the "Library": section.
+2)	Also missing were the Series that I had set to those categories, even after recreating them. For all of the Series please add a “category”: position. Place it under the "trackerKeys": row. The default is All Series.
+Make sure not only is the data backed up but it must be able to be restored.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+---
+
+_**Agent (deepseek/deepseek-v4-pro)**_
+
+The user wants to fix the backup/restore functionality. Two issues:
+
+1. Categories are not being saved/restored in the backup file - need to add a "Category" section after the "Library" section
+2. Series aren't being restored to
+
+---
+
+_**User (2026-07-13 22:02:16Z)**_
+
+Okay now that the two different codes are one it is time to continue cleaning up the rest.
+Things that are no longer need: Description, version, and remove all of the settings, as long as they are not required for the program to function. I do not need the Reload Content Source code, as long as they are not required for the program to function.
+Can completely remove the Online Reader tab, on the side panel, and the whole page is no longer required.
+Please look back at the past plan that was created to merge the code. Review what we had planned, what we have done, and make a detailed plan how we need to continue.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 22:08:34Z)**_
+
+Okay start with Steps one through five.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 22:10:17Z)**_
+
+Okay start with Steps one through five.
+Use functions and/or methods to repair and optimize the code.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
+
+
+_**User (2026-07-13 22:49:28Z)**_
+
+Okay finish with Steps six through nine.
+Do a thorough final scan for any leftover code. 
+Use functions and/or methods to repair and optimize the code. If there is some and it can be deleted without causing issues go a head.
+Verify changes can be used for PC, Apple, and Linux/Ubuntu.
+Make sure any changes do not cause program errors. And do not cause errors in Lint and Release.
+If any temporary files were created for verification and or tests, please remove them.
