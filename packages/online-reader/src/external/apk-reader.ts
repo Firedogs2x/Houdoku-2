@@ -30,8 +30,8 @@ const CHUNK_TYPE_END_ELEMENT = 0x00100103;
 
 // Attribute type constants
 const ATTR_TYPE_STRING = 0x03000008;
-const ATTR_TYPE_INT_DEC = 0x10000000;
-const ATTR_TYPE_INT_HEX = 0x11000000;
+const _ATTR_TYPE_INT_DEC = 0x10000000;
+const _ATTR_TYPE_INT_HEX = 0x11000000;
 
 const MANIFEST_NAMESPACE = 'http://schemas.android.com/apk/res/android';
 
@@ -120,7 +120,7 @@ class AxmlReader {
     const styleCount = this.readU32();
     const flags = this.readU32();
     const stringPoolOffset = this.readU32();
-    const stylePoolOffset = this.readU32();
+    const _stylePoolOffset = this.readU32();
 
     const isUtf8 = (flags & 0x0100) !== 0;
 
@@ -144,7 +144,7 @@ class AxmlReader {
 
       if (isUtf8) {
         // UTF-8 string: 1-byte char count, 1-byte byte count, then data
-        const charCount = this.buf.readUInt8(strOffset);
+        const _charCount = this.buf.readUInt8(strOffset);
         const byteCount = this.buf.readUInt8(strOffset + 1);
         const strData = this.buf.subarray(strOffset + 2, strOffset + 2 + byteCount);
         // Null-terminated
@@ -171,16 +171,16 @@ class AxmlReader {
   private parseStartElement(strings: string[]): AxmlElement {
     const chunkStart = this.pos - 4;
     const chunkSize = this.readU32();
-    const lineNumber = this.readU32();
-    const commentIndex = this.readU32();
+    const _lineNumber = this.readU32();
+    const _commentIndex = this.readU32();
     const nsIndex = this.readU32();
     const nameIndex = this.readU32();
-    const attrStart = this.readU16();
+    const _attrStart = this.readU16();
     const attrSize = this.readU16();
     const attrCount = this.readU16();
-    const idIndex = this.readU16();
-    const classIndex = this.readU16();
-    const styleIndex = this.readU16();
+    const _idIndex = this.readU16();
+    const _classIndex = this.readU16();
+    const _styleIndex = this.readU16();
 
     const name = strings[nameIndex] || '';
 

@@ -208,17 +208,82 @@ import {
   hasApkAdapterProfile,
 } from './external/apk-adapters';
 import { buildSourceKeyToExtensionInfo, toCanonicalSourceKey } from './external/apk-source-keys';
+import { ExtensionRegistry } from './extension-registry';
 import { loadInWebView } from './util/webview';
 
 export class TiyoClient extends TiyoClientAbstract {
+  private _registry = new ExtensionRegistry();
   private _apkExtensionsCache: ApkExtensionInfo[] | undefined;
   private _apkSelectionStateCache: ApkSelectionState | undefined;
   private _apkRuntimeConfigCache: ApkRuntimeConfig | undefined;
 
   constructor(spoofWindow: BrowserWindow) {
     super(spoofWindow);
+    this._registerBuiltInExtensions();
     this._initializeApkSupport();
   }
+
+  /**
+   * Register all 46 hardcoded content-source extensions into the registry.
+   * Each extension module exports METADATA and ExtensionClient.
+   */
+  private _registerBuiltInExtensions = (): void => {
+    const extensionModules = [
+      anatanomotokare,
+      arcrelight,
+      assortedscans,
+      comick,
+      deathtollscans,
+      disasterscans,
+      guya,
+      hniscantrad,
+      immortalupdates,
+      isekaiscan,
+      kireicake,
+      komga,
+      komikcast,
+      kouhaiwork,
+      lecercleduscan,
+      leviatanscans,
+      lilyreader,
+      lupiteam,
+      manga347,
+      mangabat,
+      mangadex,
+      mangakakalot,
+      mangakatana,
+      mangakik,
+      mangalife,
+      manganato,
+      mangapill,
+      mangasee,
+      mangatellers,
+      menudofansub,
+      nana,
+      nhentai,
+      nifteam,
+      phoenixscans,
+      readcomiconline,
+      sensescans,
+      silentsky,
+      sleepingknightscans,
+      tcbscans,
+      toonily,
+      tortugaceviri,
+      tritiniascans,
+      tuttoanimemanga,
+      yuriism,
+      zandynofansub,
+    ] as const;
+
+    for (const extensionModule of extensionModules) {
+      this._registry.registerBuiltIn(
+        extensionModule.METADATA.id,
+        extensionModule.METADATA,
+        new extensionModule.ExtensionClient(this._webviewFn),
+      );
+    }
+  };
 
   /**
    * Ensure the APK extensions directory exists (creates on new install)
@@ -388,54 +453,8 @@ export class TiyoClient extends TiyoClientAbstract {
     return this.getApkRuntimeConfig();
   };
 
-  private _getBuiltInMetadataList = () => {
-    return [
-      anatanomotokare.METADATA,
-      arcrelight.METADATA,
-      assortedscans.METADATA,
-      comick.METADATA,
-      deathtollscans.METADATA,
-      disasterscans.METADATA,
-      guya.METADATA,
-      hniscantrad.METADATA,
-      immortalupdates.METADATA,
-      isekaiscan.METADATA,
-      kireicake.METADATA,
-      komga.METADATA,
-      komikcast.METADATA,
-      kouhaiwork.METADATA,
-      lecercleduscan.METADATA,
-      leviatanscans.METADATA,
-      lilyreader.METADATA,
-      lupiteam.METADATA,
-      manga347.METADATA,
-      mangabat.METADATA,
-      mangadex.METADATA,
-      mangakakalot.METADATA,
-      mangakatana.METADATA,
-      mangakik.METADATA,
-      mangalife.METADATA,
-      manganato.METADATA,
-      mangapill.METADATA,
-      mangasee.METADATA,
-      mangatellers.METADATA,
-      menudofansub.METADATA,
-      nana.METADATA,
-      nhentai.METADATA,
-      nifteam.METADATA,
-      phoenixscans.METADATA,
-      readcomiconline.METADATA,
-      sensescans.METADATA,
-      silentsky.METADATA,
-      sleepingknightscans.METADATA,
-      tcbscans.METADATA,
-      toonily.METADATA,
-      tortugaceviri.METADATA,
-      tritiniascans.METADATA,
-      tuttoanimemanga.METADATA,
-      yuriism.METADATA,
-      zandynofansub.METADATA,
-    ];
+  private _getBuiltInMetadataList = (): ExtensionMetadata[] => {
+    return this._registry.getBuiltInMetadataList();
   };
 
   override getApkMigrationReport = (): ApkMigrationReport => {
@@ -5030,6 +5049,9 @@ export class TiyoClient extends TiyoClientAbstract {
   override refreshApkExtensions = () => {
     this._apkExtensionsCache = getApkExtensionInfoList(this.getApkExtensionsDirectory());
     this.cleanupApkSelectionState();
+    // Sync APK-virtual extensions into the registry so getExtensions()
+    // picks up any new/removed APK plugins immediately.
+    this._syncApkVirtualExtensions();
     return this._apkExtensionsCache;
   };
 
@@ -5652,19 +5674,6 @@ export class TiyoClient extends TiyoClientAbstract {
     );
   };
 
-  private _createExtensionEntry = <
-    T extends { METADATA: ExtensionMetadata } & {
-      ExtensionClient: new (webviewFn: WebviewFunc) => ExtensionClientInterface;
-    },
-  >(
-    extensionModule: T,
-  ) => {
-    return {
-      metadata: extensionModule.METADATA,
-      client: new extensionModule.ExtensionClient(this._webviewFn),
-    };
-  };
-
   private _createVirtualExtensionEntry = (mapping: ApkActiveMapping) => {
     const extensionLabel =
       mapping.version !== undefined
@@ -5716,99 +5725,46 @@ export class TiyoClient extends TiyoClientAbstract {
     };
   };
 
-  private _buildVirtualExtensions = (allowedIds?: Set<string>) => {
-    const builtInIds = new Set(this._getBuiltInMetadataList().map((metadata) => metadata.id));
+  /**
+   * Synchronize APK-virtual extensions with the registry.
+   * Clears all existing APK entries, then registers virtual extensions
+   * for each active APK mapping that doesn't already have a built-in entry.
+   */
+  private _syncApkVirtualExtensions = (allowedIds?: Set<string>): void => {
+    this._registry.clearApkEntries();
 
-    return this.getActiveApkMappings().reduce(
-      (acc, mapping) => {
-        if (allowedIds !== undefined && !allowedIds.has(mapping.extensionId)) {
-          return acc;
-        }
+    const activeMappings = this.getActiveApkMappings();
 
-        if (builtInIds.has(mapping.extensionId)) {
-          return acc;
-        }
+    for (const mapping of activeMappings) {
+      if (allowedIds !== undefined && !allowedIds.has(mapping.extensionId)) {
+        continue;
+      }
 
-        if (acc[mapping.extensionId] !== undefined) {
-          return acc;
-        }
+      // Skip if a built-in extension already occupies this ID
+      if (this._registry.hasBuiltIn(mapping.extensionId)) {
+        continue;
+      }
 
-        acc[mapping.extensionId] = this._createVirtualExtensionEntry(mapping);
-        return acc;
-      },
-      {} as {
-        [key: string]: { metadata: ExtensionMetadata; client: ExtensionClientInterface };
-      },
-    );
+      const entry = this._createVirtualExtensionEntry(mapping);
+      this._registry.registerApk(entry.metadata.id, entry.metadata, entry.client);
+    }
   };
 
+  /**
+   * Build the base extensions map from the registry, filtered by allowed IDs.
+   * Replaces the old _buildBaseExtensions which rebuilt extensions fresh each call.
+   */
   private _buildBaseExtensions = (allowedIds?: Set<string>) => {
-    const extensionModules = [
-      anatanomotokare,
-      arcrelight,
-      assortedscans,
-      comick,
-      deathtollscans,
-      disasterscans,
-      guya,
-      hniscantrad,
-      immortalupdates,
-      isekaiscan,
-      kireicake,
-      komga,
-      komikcast,
-      kouhaiwork,
-      lecercleduscan,
-      leviatanscans,
-      lilyreader,
-      lupiteam,
-      manga347,
-      mangabat,
-      mangadex,
-      mangakakalot,
-      mangakatana,
-      mangakik,
-      mangalife,
-      manganato,
-      mangapill,
-      mangasee,
-      mangatellers,
-      menudofansub,
-      nana,
-      nhentai,
-      nifteam,
-      phoenixscans,
-      readcomiconline,
-      sensescans,
-      silentsky,
-      sleepingknightscans,
-      tcbscans,
-      toonily,
-      tortugaceviri,
-      tritiniascans,
-      tuttoanimemanga,
-      yuriism,
-      zandynofansub,
-    ] as const;
+    this._syncApkVirtualExtensions(allowedIds);
 
-    const baseExtensions = extensionModules.reduce(
-      (acc, extensionModule) => {
-        if (allowedIds !== undefined && !allowedIds.has(extensionModule.METADATA.id)) {
-          return acc;
-        }
+    const allEntries = this._registry.getAll();
+    if (allowedIds === undefined) {
+      return allEntries;
+    }
 
-        acc[extensionModule.METADATA.id] = this._createExtensionEntry(extensionModule);
-        return acc;
-      },
-      {} as {
-        [key: string]: { metadata: ExtensionMetadata; client: ExtensionClientInterface };
-      },
-    );
-
-    return {
-      ...baseExtensions,
-      ...this._buildVirtualExtensions(allowedIds),
-    };
+    return Object.fromEntries(
+      Object.entries(allEntries).filter(([id]) => allowedIds.has(id)),
+    ) as Record<string, ExtensionEntry>;
   };
 
   override getExtensions = () => {
