@@ -10,6 +10,7 @@ export type ApkContent = {
   versionCode: number | undefined;
   sourceKey: string;
   sourceName: string;
+  baseUrl: string | undefined;
   entryCount: number;
 };
 
@@ -306,6 +307,10 @@ export const readApkContent = (filePath: string): ApkContent => {
   const manifestBytes = manifestEntry.getData();
   const manifest = parseManifest(manifestBytes);
 
+  // Extract base URL from classes.dex if available
+  const dexEntry = entries.find((entry) => entry.entryName === 'classes.dex');
+  const baseUrl = dexEntry ? extractBaseUrlFromDex(dexEntry.getData()) : undefined;
+
   // Derive source key from the last segment of the package name
   const packageParts = manifest.packageName
     .split('.')
@@ -327,6 +332,7 @@ export const readApkContent = (filePath: string): ApkContent => {
     versionCode: manifest.versionCode,
     sourceKey,
     sourceName,
+    baseUrl,
     entryCount,
   };
 };
@@ -370,4 +376,73 @@ export const tryReadApkContent = (
   } catch {
     return undefined;
   }
+};
+
+// ============================================================================
+// DEX URL Extraction
+// ============================================================================
+
+// Domains to exclude from DEX URL scanning (Android/system/internal)
+const DEX_URL_EXCLUDE_PATTERNS = [
+  /android\.com/i,
+  /schemas\.android/i,
+  /w3\.org/i,
+  /xmlns/i,
+  /google\.com/i,
+  /github\.com/i,
+  /gradle/i,
+  /kotlin/i,
+  /jetbrains/i,
+];
+
+/**
+ * Scan classes.dex bytecode for the extension's base URL.
+ *
+ * Tachiyomi extensions store their base URL as a string constant in
+ * the compiled DEX bytecode. Since strings are stored as UTF-8,
+ * we can find them with a regex scan.
+ *
+ * Returns the most likely base URL (shortest non-API URL), or undefined.
+ */
+export const extractBaseUrlFromDex = (
+  dexBytes: Buffer,
+): string | undefined => {
+  const text = dexBytes.toString('utf-8');
+
+  // Find all https?:// URLs in the DEX
+  const urlPattern =
+    /https?:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)*\.[a-zA-Z]{2,}(?::\d+)?(?:\/[^\x00-\x1f"'\s\\<>]*)?/g;
+  const matches = text.match(urlPattern);
+
+  if (!matches || matches.length === 0) {
+    return undefined;
+  }
+
+  // Deduplicate and filter out Android/system URLs
+  const uniqueUrls = [...new Set(matches)].filter((url) => {
+    return !DEX_URL_EXCLUDE_PATTERNS.some((pattern) => pattern.test(url));
+  });
+
+  if (uniqueUrls.length === 0) {
+    return undefined;
+  }
+
+  // Prefer the shortest non-API URL as the base URL.
+  // API URLs (/api/v1, /api/) are sub-paths of the base.
+  const nonApiUrls = uniqueUrls.filter(
+    (url) => !url.includes('/api/') && !url.includes('/api?v'),
+  );
+
+  const candidates = nonApiUrls.length > 0 ? nonApiUrls : uniqueUrls;
+
+  // Sort by length (shortest = base URL), then alphabetically for stability
+  candidates.sort((a, b) => {
+    const lenDiff = a.length - b.length;
+    if (lenDiff !== 0) return lenDiff;
+    return a.localeCompare(b);
+  });
+
+  // Return the URL without trailing slash for consistency
+  const baseUrl = candidates[0];
+  return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 };

@@ -140,6 +140,20 @@
 				"$tsc"
 			],
 			"group": "none"
+		},
+		{
+			"label": "dump-apk-contents",
+			"type": "shell",
+			"command": "node packages/online-reader/scripts/dump-apk.js 2>&1",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "dump-mangadex-apk",
+			"type": "shell",
+			"command": "node -e \"const AdmZip=require('adm-zip');const p=require('path');const z=new AdmZip(p.join(process.env.APPDATA,'Houdoku','Keiyoushi APK Extensions','tachiyomi-all.mangadex-v1.4.211.apk'));const d=z.getEntry('classes.dex').getData().toString('utf-8');const u=[...new Set(d.match(/https?:\\/\\/[a-zA-Z0-9][-a-zA-Z0-9]*\\.[a-zA-Z]{2,}[^\\x00-\\x1f\\\"'\\\\s\\\\]*(?:\\/api[^\\x00-\\x1f\\\"'\\\\s\\\\]*)?/g)||[])].filter(u=>!u.includes('android.com')&&!u.includes('schemas.android')&&!u.includes('w3.org')&&!u.includes('xmlns'));console.log(JSON.stringify(u,null,2))\"",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

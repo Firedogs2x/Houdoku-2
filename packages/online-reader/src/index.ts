@@ -209,6 +209,7 @@ import {
 } from './external/apk-adapters';
 import { buildSourceKeyToExtensionInfo, toCanonicalSourceKey } from './external/apk-source-keys';
 import { ExtensionRegistry } from './extension-registry';
+import { GenericApkExtensionClient } from './generic/generic-apk-client';
 import { loadInWebView } from './util/webview';
 
 export class TiyoClient extends TiyoClientAbstract {
@@ -5680,48 +5681,63 @@ export class TiyoClient extends TiyoClientAbstract {
         ? `${mapping.extensionName} (APK ${mapping.version})`
         : `${mapping.extensionName} (APK)`;
 
-    const virtualClient = {
-      webviewFn: this._webviewFn,
-      settings: {},
-      getSeries: async () => undefined,
-      getChapters: async () => [],
-      getPageRequesterData: async () => ({
-        server: '',
-        hash: '',
-        numPages: 0,
-        pageFilenames: [],
-      }),
-      getPageUrls: () => [],
-      getImage: async () => '',
-      getSearch: async () => ({ seriesList: [], hasMore: false }),
-      getDirectory: async () => ({ seriesList: [], hasMore: false }),
-      getSettingTypes: () => ({}),
-      getSettings: () => ({}),
-      setSettings: () => undefined,
-      getFilterOptions: () => [],
-      getExternalExtensions: () => ({
-        [ExternalClient.TACHIYOMI]: [],
-      }),
-      convertExternalData: () => ({
-        series: undefined,
-        chapters: [],
-        messages: [
-          {
-            text: `Source '${mapping.sourceKey}' is mapped from APK and ready for selection.`,
-            type: 'info' as const,
-          },
-        ],
-      }),
-    } as ExtensionClientInterface;
+    // Try to create a generic client from the APK file.
+    // If the APK has a base URL in its DEX, the generic client can
+    // auto-detect the CMS and provide real scraping functionality.
+    // Falls back to a no-op stub if no usable data is found.
+    const { tryReadApkContent } = require('./external/apk-reader');
+    const apkContent = tryReadApkContent(mapping.filePath);
+    const baseUrl = apkContent?.baseUrl;
+
+    const client: ExtensionClientInterface =
+      baseUrl
+        ? new GenericApkExtensionClient(
+            mapping.sourceKey,
+            baseUrl,
+            this._webviewFn,
+          )
+        : ({
+            webviewFn: this._webviewFn,
+            settings: {},
+            getSeries: async () => undefined,
+            getChapters: async () => [],
+            getPageRequesterData: async () => ({
+              server: '',
+              hash: '',
+              numPages: 0,
+              pageFilenames: [],
+            }),
+            getPageUrls: () => [],
+            getImage: async () => '',
+            getSearch: async () => ({ seriesList: [], hasMore: false }),
+            getDirectory: async () => ({ seriesList: [], hasMore: false }),
+            getSettingTypes: () => ({}),
+            getSettings: () => ({}),
+            setSettings: () => undefined,
+            getFilterOptions: () => [],
+            getExternalExtensions: () => ({
+              [ExternalClient.TACHIYOMI]: [],
+            }),
+            convertExternalData: () => ({
+              series: undefined,
+              chapters: [],
+              messages: [
+                {
+                  text: `Source '${mapping.sourceKey}' is mapped from APK and ready for selection.`,
+                  type: 'info' as const,
+                },
+              ],
+            }),
+          } as ExtensionClientInterface);
 
     return {
       metadata: {
         id: mapping.extensionId,
         name: extensionLabel,
-        url: `apk://${mapping.sourceKey}`,
+        url: baseUrl || `apk://${mapping.sourceKey}`,
         translatedLanguage: undefined,
       } as ExtensionMetadata,
-      client: virtualClient,
+      client,
     };
   };
 
