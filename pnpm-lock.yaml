@@ -269,6 +269,9 @@ importers:
       '@houdoku/common':
         specifier: workspace:*
         version: link:../common
+      adm-zip:
+        specifier: ^0.5.16
+        version: 0.5.18
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
@@ -1970,6 +1973,10 @@ packages:
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
+
+  adm-zip@0.5.18:
+    resolution: {integrity: sha512-ufJnssQGbxzLNS1Ho9bCtX4rQKCCvoVuDLHoJyc3F9dOGDB4BkWs2Ci0kv53lqocAEQ/Cbi+I2XCsNYGqVYqng==}
+    engines: {node: '>=12.0'}
 
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -6100,6 +6107,8 @@ snapshots:
   '@xmldom/xmldom@0.8.11': {}
 
   abbrev@1.1.1: {}
+
+  adm-zip@0.5.18: {}
 
   agent-base@6.0.2:
     dependencies:

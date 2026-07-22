@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ApkExtensionInfo, ApkRuntimeConfig, ApkSelectionState } from '@houdoku/common';
+import { tryReadApkContent } from './apk-reader';
 
 const APK_SUFFIX = '.apk';
 const DEFAULT_FOLDER_NAME = 'Keiyoushi APK Extensions';
@@ -129,14 +130,30 @@ const shouldReuseCachedEntry = (
   cached: ApkMetadataCacheEntry | undefined,
   stat: fs.Stats,
   fileName: string,
+  filePath: string,
 ): cached is ApkMetadataCacheEntry => {
   if (cached === undefined) {
     return false;
   }
 
-  return (
-    cached.size === stat.size && cached.mtimeMs === stat.mtimeMs && cached.fileName === fileName
-  );
+  // Quick checks first
+  if (cached.fileName !== fileName) {
+    return false;
+  }
+  if (cached.size !== stat.size) {
+    return false;
+  }
+  if (cached.mtimeMs !== stat.mtimeMs) {
+    return false;
+  }
+
+  // Strong validation: verify SHA1 matches
+  if (cached.sha1.length > 0) {
+    const currentSha1 = computeFileSha1(filePath);
+    return currentSha1 === cached.sha1;
+  }
+
+  return true;
 };
 
 const createCacheEntry = (
@@ -144,13 +161,32 @@ const createCacheEntry = (
   fileName: string,
   stat: fs.Stats,
 ): ApkMetadataCacheEntry => {
-  const parsed = parseFileName(fileName);
+  // Try to read actual APK content for accurate metadata.
+  // Falls back to filename-based parsing if the APK can't be read.
+  const apkContent = tryReadApkContent(fullPath);
+  const sha1 = computeFileSha1(fullPath);
+
+  let parsed: Omit<ApkExtensionInfo, 'filePath' | 'fileName'>;
+
+  if (apkContent !== undefined) {
+    parsed = {
+      packageName: apkContent.packageName,
+      sourceKey: apkContent.sourceKey,
+      sourceName:
+        SOURCE_NAME_MAP[apkContent.sourceKey] || apkContent.sourceName,
+      version: apkContent.versionName,
+    };
+  } else {
+    // Fallback: parse from filename
+    parsed = parseFileName(fileName);
+  }
+
   return {
     filePath: fullPath,
     fileName,
     size: stat.size,
     mtimeMs: stat.mtimeMs,
-    sha1: computeFileSha1(fullPath),
+    sha1,
     parsed,
   };
 };
@@ -350,7 +386,7 @@ export const getApkExtensionInfoList = (
       const stat = fs.statSync(fullPath);
 
       const cached = existingCache[fullPath];
-      if (shouldReuseCachedEntry(cached, stat, entry.name)) {
+      if (shouldReuseCachedEntry(cached, stat, entry.name, fullPath)) {
         nextCache[fullPath] = cached;
       } else {
         nextCache[fullPath] = createCacheEntry(fullPath, entry.name, stat);

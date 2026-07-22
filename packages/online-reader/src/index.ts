@@ -192,6 +192,7 @@ import * as tuttoanimemanga from './extensions/tuttoanimemanga';
 import * as yuriism from './extensions/yuriism';
 import * as zandynofansub from './extensions/zandynofansub';
 import {
+  ensureApkExtensionsDirectory,
   getApkExtensionInfoList,
   getDefaultApkConfigFilePath,
   getDefaultApkExtensionsDirectory,
@@ -216,7 +217,30 @@ export class TiyoClient extends TiyoClientAbstract {
 
   constructor(spoofWindow: BrowserWindow) {
     super(spoofWindow);
+    this._initializeApkSupport();
   }
+
+  /**
+   * Ensure the APK extensions directory exists (creates on new install)
+   * and scan for APK files (detects changes on existing install).
+   */
+  private _initializeApkSupport = (): void => {
+    try {
+      const defaultDir = getDefaultApkExtensionsDirectory();
+      ensureApkExtensionsDirectory(defaultDir);
+
+      const apkDir = this.getApkExtensionsDirectory();
+      if (fs.existsSync(apkDir)) {
+        console.info(`Scanning APK extensions directory: ${apkDir}`);
+        const apkList = this.refreshApkExtensions();
+        console.info(
+          `APK scan complete: ${apkList.length} extension(s) found`,
+        );
+      }
+    } catch (err) {
+      console.warn('APK initialization skipped:', err);
+    }
+  };
 
   _webviewFn: WebviewFunc = (url, options) => loadInWebView(this.spoofWindow, url, options);
 

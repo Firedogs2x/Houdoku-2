@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@houdoku/common": "workspace:*",
+    "adm-zip": "^0.5.16",
     "jsdom": "^25.0.1",
     "node-fetch": "^2.6.7"
   },
