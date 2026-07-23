@@ -207,6 +207,7 @@ import {
   getSupportedApkAdapterSourceKeys,
   hasApkAdapterProfile,
 } from './external/apk-adapters';
+import { tryReadApkContent } from './external/apk-reader';
 import { buildSourceKeyToExtensionInfo, toCanonicalSourceKey } from './external/apk-source-keys';
 import { ExtensionRegistry } from './extension-registry';
 import { GenericApkExtensionClient } from './generic/generic-apk-client';
@@ -5685,7 +5686,6 @@ export class TiyoClient extends TiyoClientAbstract {
     // If the APK has a base URL in its DEX, the generic client can
     // auto-detect the CMS and provide real scraping functionality.
     // Falls back to a no-op stub if no usable data is found.
-    const { tryReadApkContent } = require('./external/apk-reader');
     const apkContent = tryReadApkContent(mapping.filePath);
     const baseUrl = apkContent?.baseUrl;
 
@@ -5761,8 +5761,15 @@ export class TiyoClient extends TiyoClientAbstract {
         continue;
       }
 
-      const entry = this._createVirtualExtensionEntry(mapping);
-      this._registry.registerApk(entry.metadata.id, entry.metadata, entry.client);
+      try {
+        const entry = this._createVirtualExtensionEntry(mapping);
+        this._registry.registerApk(entry.metadata.id, entry.metadata, entry.client);
+      } catch (err) {
+        console.warn(
+          `Failed to create virtual extension for ${mapping.sourceKey}:`,
+          err,
+        );
+      }
     }
   };
 
@@ -5771,7 +5778,11 @@ export class TiyoClient extends TiyoClientAbstract {
    * Replaces the old _buildBaseExtensions which rebuilt extensions fresh each call.
    */
   private _buildBaseExtensions = (allowedIds?: Set<string>) => {
-    this._syncApkVirtualExtensions(allowedIds);
+    try {
+      this._syncApkVirtualExtensions(allowedIds);
+    } catch (err) {
+      console.warn('Failed to sync APK virtual extensions:', err);
+    }
 
     const allEntries = this._registry.getAll();
     if (allowedIds === undefined) {
