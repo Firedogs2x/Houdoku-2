@@ -154,6 +154,27 @@
 			"command": "node -e \"const AdmZip=require('adm-zip');const p=require('path');const z=new AdmZip(p.join(process.env.APPDATA,'Houdoku','Keiyoushi APK Extensions','tachiyomi-all.mangadex-v1.4.211.apk'));const d=z.getEntry('classes.dex').getData().toString('utf-8');const u=[...new Set(d.match(/https?:\\/\\/[a-zA-Z0-9][-a-zA-Z0-9]*\\.[a-zA-Z]{2,}[^\\x00-\\x1f\\\"'\\\\s\\\\]*(?:\\/api[^\\x00-\\x1f\\\"'\\\\s\\\\]*)?/g)||[])].filter(u=>!u.includes('android.com')&&!u.includes('schemas.android')&&!u.includes('w3.org')&&!u.includes('xmlns'));console.log(JSON.stringify(u,null,2))\"",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "test-mangafire-html",
+			"type": "shell",
+			"command": "node -e \"const fetch=require('node-fetch');fetch('https://mangafire.to').then(r=>r.text()).then(t=>{const m=t.match(/<title>([^<]*)<\\/title>/);console.log('Title:',m?m[1]:'none');const imgs=(t.match(/<img[^>]*src=[\\\"'][^\\\"']*[\\\"']/gi)||[]).slice(0,5);console.log('Sample imgs:',imgs);const links=(t.match(/<a[^>]*href=[\\\"'][^\\\"']*[\\\"']/gi)||[]).slice(0,5);console.log('Sample links:',links);console.log('Length:',t.length);console.log('Has react:',t.includes('react')||t.includes('__NEXT'));}).catch(e=>console.log('Error:',e.message))\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "test-sites-html",
+			"type": "shell",
+			"command": "node packages/online-reader/scripts/test-sites.js 2>&1",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "cleanup-temp-scripts",
+			"type": "shell",
+			"command": "powershell -Command \"Remove-Item 'packages/online-reader/scripts/test-sites.js','packages/online-reader/scripts/test-apk-reader.js','packages/online-reader/scripts/dump-apk.js' -Force -ErrorAction SilentlyContinue; Write-Output 'Cleanup done'\"",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

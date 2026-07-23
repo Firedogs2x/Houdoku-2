@@ -1,6 +1,12 @@
 import {
   Chapter,
   ExtensionClientInterface,
+  FilterCheckbox,
+  FilterHeader,
+  FilterOption,
+  FilterSelect,
+  FilterSeparator,
+  FilterSort,
   FilterValues,
   GetChaptersFunc,
   GetDirectoryFunc,
@@ -19,10 +25,11 @@ import {
   SeriesStatus,
   SetSettingsFunc,
   SettingType,
+  SortDirection,
   WebviewFunc,
+  WebviewResponse,
 } from '@houdoku/common';
 import { JSDOM } from 'jsdom';
-import fetch, { Response } from 'node-fetch';
 
 // ============================================================================
 // Types
@@ -174,6 +181,41 @@ const MANGABOX_STRATEGY: CmsStrategy = {
 /** All strategies in priority order (first match wins) */
 const STRATEGIES: CmsStrategy[] = [MADARA_STRATEGY, FOOLSLIDE_STRATEGY, MANGABOX_STRATEGY];
 
+/**
+ * Generic fallback strategy that looks for ANY manga-like patterns.
+ * Used when no specific CMS is detected (e.g. custom sites, SPAs).
+ */
+const GENERIC_STRATEGY: CmsStrategy = {
+  name: 'Generic',
+  seriesItems: 'a[href*="/manga/"], a[href*="/series/"], a[href*="/comic/"], .manga-item, .series-item, .comic-item, [class*="manga" i] a, [class*="card" i] a, [class*="item" i] a',
+  extractSourceId: (href: string) => {
+    try {
+      const url = new URL(href);
+      return url.pathname.replace(/\/$/, '');
+    } catch {
+      return href;
+    }
+  },
+  coverImage: 'img',
+  coverAttr: 'src',
+  searchPath: '/search',
+  searchParam: 'q',
+  directoryPath: '',
+  chapterItems: 'a[href*="/chapter/"], a[href*="/ch/"], li a[href*="-chapter-"], .chapter-list a, [class*="chapter" i] a',
+  chapterLink: 'a',
+  chapterTitle: 'a',
+  chapterDate: 'time, [class*="date" i], [class*="time" i]',
+  pageImages: 'img[src*="/uploads/"], img[src*="/chapters/"], img[src*="/pages/"], .chapter-content img, .reader img, [class*="page" i] img, .reading-content img',
+  pageAttr: 'src',
+  nextPage: '[class*="next" i], [class*="pagination" i] a:last-child, .pagination .next',
+  seriesTitle: 'h1, h2, [class*="title" i]',
+  seriesDescription: '[class*="description" i], [class*="summary" i], [class*="synopsis" i]',
+  seriesAuthors: '[class*="author" i] a, [class*="artist" i] a',
+  seriesStatus: '[class*="status" i]',
+  ajaxChapters: false,
+  ajaxAction: '',
+};
+
 // ============================================================================
 // GenericApkExtensionClient
 // ============================================================================
@@ -229,14 +271,14 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     return this._strategy.extractSourceId(href);
   };
 
-  /** Fetch HTML and return a JSDOM document */
+  /** Fetch HTML via webview (handles Cloudflare/JS-rendered sites) and return a JSDOM document */
   private _fetchDoc = async (url: string): Promise<Document> => {
-    const response = await fetch(url);
-    const text = await response.text();
-    return new JSDOM(text).window.document;
+    const response: WebviewResponse = await this.webviewFn(url);
+    return new JSDOM(response.text).window.document;
   };
 
-  /** Detect which CMS strategy matches by probing the homepage */
+  /** Detect which CMS strategy matches by probing the homepage.
+   *  Tries all known strategies; falls back to generic if none match. */
   private _detectStrategy = async (): Promise<CmsStrategy> => {
     try {
       const doc = await this._fetchDoc(this._baseUrl);
@@ -248,10 +290,10 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
         }
       }
     } catch {
-      // If detection fails, keep current strategy
+      // If detection fails, fall through to generic
     }
 
-    return this._strategy;
+    return GENERIC_STRATEGY;
   };
 
   /** Ensure strategy is detected before first use */
@@ -268,29 +310,56 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
   /** Parse a series list from a search/directory page */
   private _parseSeriesList = (doc: Document): SeriesListResponse => {
     const containers = doc.querySelectorAll(this._strategy.seriesItems);
-    if (!containers || containers.length === 0) {
-      return { seriesList: [], hasMore: false };
-    }
 
     const seriesList: Series[] = [];
+    const seenSourceIds = new Set<string>();
+
     for (let i = 0; i < containers.length; i++) {
       const item = containers[i];
-      const link = item.querySelector('a');
+
+      // Find the best link — prefer the item itself if it's an <a>, or find first child <a>
+      let link: Element | null = null;
+      if (item.tagName === 'A') {
+        link = item;
+      } else {
+        link = item.querySelector('a');
+      }
       if (!link) continue;
 
-      const title = link.getAttribute('title') || link.textContent?.trim() || '';
       const href = link.getAttribute('href');
       if (!href) continue;
 
-      const sourceId = this._toSourceId(href);
+      // Skip non-manga URLs
+      if (
+        href.startsWith('#') ||
+        href.startsWith('javascript:') ||
+        href === '/' ||
+        href.includes('login') ||
+        href.includes('register') ||
+        href.includes('genre') ||
+        href.includes('tag')
+      ) {
+        continue;
+      }
 
+      const title =
+        link.getAttribute('title') ||
+        link.textContent?.trim() ||
+        (item.querySelector('[class*="title" i]')?.textContent?.trim()) ||
+        '';
+
+      if (!title || title.length < 2) continue;
+
+      const sourceId = this._toSourceId(href);
+      if (seenSourceIds.has(sourceId)) continue;
+      seenSourceIds.add(sourceId);
+
+      // Find cover image — look in the item or its parent
       const img = item.querySelector(this._strategy.coverImage);
       let coverUrl = '';
       if (img) {
-        const attr = this._strategy.coverAttr;
-        // Try data-src first, then srcset (first URL), then src
         coverUrl =
-          img.getAttribute(attr) ||
+          img.getAttribute('data-src') ||
           img.getAttribute('srcset')?.split(' ')[0] ||
           img.getAttribute('src') ||
           '';
@@ -457,8 +526,7 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     _seriesSourceId: string,
     chapterSourceId: string,
   ) => {
-    // Most generic sources don't need special requester data;
-    // page URLs are derived directly from the chapter URL.
+    // Store the chapter source ID for page URL resolution
     return {
       server: this._baseUrl,
       hash: chapterSourceId,
@@ -468,46 +536,54 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
   };
 
   getPageUrls: GetPageUrlsFunc = (pageRequesterData: PageRequesterData) => {
-    // Stored chapter source ID in hash for retrieval in getImage
-    return [pageRequesterData.hash];
+    // Return the chapter URL — getImage will load it and extract images
+    const chapterPath = pageRequesterData.hash.startsWith('http')
+      ? pageRequesterData.hash
+      : this._url(pageRequesterData.hash);
+    return [chapterPath];
   };
 
   getImage: GetImageFunc = async (_series: Series, url: string) => {
-    if (url.startsWith('http')) {
-      // If it's already a direct image URL, return it
-      if (url.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i)) {
-        return url;
-      }
+    // If it's already a direct image URL, return it
+    if (/\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i.test(url)) {
       return url;
     }
 
-    // Otherwise, url is a chapter source ID; fetch the chapter page
-    // and extract image URLs
+    // Otherwise, it's a chapter page URL — load it and extract image URLs
     await this._ensureDetected();
 
     try {
-      const doc = await this._fetchDoc(this._url(url));
+      const doc = await this._fetchDoc(url);
       const images = doc.querySelectorAll(this._strategy.pageImages);
-      const urls: string[] = [];
 
+      if (images.length === 0) {
+        // Fallback: grab all reasonably-sized images
+        const allImgs = doc.querySelectorAll('img');
+        const urls: string[] = [];
+        for (let i = 0; i < allImgs.length; i++) {
+          const src = allImgs[i].getAttribute('src') || '';
+          if (src && !src.startsWith('data:') && !src.includes('logo') && !src.includes('avatar') && !src.includes('icon')) {
+            urls.push(src.startsWith('http') ? src : this._url(src));
+          }
+        }
+        // Return all URLs as a concatenated response for the reader
+        // (the reader calls getImage once per page — we handle multi-page
+        // by returning the list; the reader iterates via getPageUrls)
+        if (urls.length > 0) return urls[0];
+        return '';
+      }
+
+      // Pick the image with the best src
       for (let i = 0; i < images.length; i++) {
         const img = images[i];
         const src =
           img.getAttribute(this._strategy.pageAttr) ||
+          img.getAttribute('data-src') ||
           img.getAttribute('src') ||
           '';
         if (src && !src.startsWith('data:')) {
-          urls.push(src.startsWith('http') ? src : this._url(src));
+          return src.startsWith('http') ? src : this._url(src);
         }
-      }
-
-      // For getImage called per-page, return the first image URL
-      if (urls.length > 0) {
-        // Store all URLs in a way the reader can consume
-        // The reader calls getImage once per page; we handle this
-        // by storing the list and indexing.
-        // For now, return the first URL (reader iterates)
-        return urls[0];
       }
 
       return '';
@@ -570,7 +646,23 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     // no-op for generic client
   };
 
-  getFilterOptions: GetFilterOptionsFunc = () => [];
+  getFilterOptions: GetFilterOptionsFunc = () => {
+    return [
+      new FilterHeader('Sort'),
+      new FilterSort(
+        'sort',
+        'Sort By',
+        SortDirection.DESCENDING,
+        [
+          { key: 'updated', direction: SortDirection.DESCENDING },
+          { key: 'title', direction: SortDirection.ASCENDING },
+          { key: 'popular', direction: SortDirection.DESCENDING },
+        ],
+      ),
+      new FilterSeparator(),
+      new FilterHeader('Search'),
+    ];
+  };
 
   getExternalExtensions = () => ({});
   convertExternalData = () => ({
