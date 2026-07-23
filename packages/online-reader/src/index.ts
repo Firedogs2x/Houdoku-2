@@ -5051,6 +5051,9 @@ export class TiyoClient extends TiyoClientAbstract {
   override refreshApkExtensions = () => {
     this._apkExtensionsCache = getApkExtensionInfoList(this.getApkExtensionsDirectory());
     this.cleanupApkSelectionState();
+    // Auto-select the best APK for each source key so new plugins
+    // become active immediately without manual configuration.
+    this.autoSelectAllPreferredApks();
     // Sync APK-virtual extensions into the registry so getExtensions()
     // picks up any new/removed APK plugins immediately.
     this._syncApkVirtualExtensions();

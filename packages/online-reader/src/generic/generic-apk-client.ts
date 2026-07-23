@@ -307,83 +307,160 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     return this._detectionPromise;
   };
 
-  /** Parse a series list from a search/directory page */
+  /** Parse a series list from a search/directory page.
+   *  Uses strategy selectors first; falls back to aggressive blind scan. */
   private _parseSeriesList = (doc: Document): SeriesListResponse => {
+    // --- Pass 1: strategy-based parsing ---
     const containers = doc.querySelectorAll(this._strategy.seriesItems);
-
     const seriesList: Series[] = [];
     const seenSourceIds = new Set<string>();
 
     for (let i = 0; i < containers.length; i++) {
       const item = containers[i];
-
-      // Find the best link — prefer the item itself if it's an <a>, or find first child <a>
-      let link: Element | null = null;
-      if (item.tagName === 'A') {
-        link = item;
-      } else {
-        link = item.querySelector('a');
+      const result = this._extractSeriesFromElement(item, doc);
+      if (result && !seenSourceIds.has(result.sourceId)) {
+        seenSourceIds.add(result.sourceId);
+        seriesList.push(result);
       }
-      if (!link) continue;
+    }
 
-      const href = link.getAttribute('href');
-      if (!href) continue;
-
-      // Skip non-manga URLs
-      if (
-        href.startsWith('#') ||
-        href.startsWith('javascript:') ||
-        href === '/' ||
-        href.includes('login') ||
-        href.includes('register') ||
-        href.includes('genre') ||
-        href.includes('tag')
-      ) {
-        continue;
+    // --- Pass 2: blind fallback — scan for ANY card-like elements with image + link ---
+    if (seriesList.length === 0) {
+      const allCards = doc.querySelectorAll(
+        '[class*="card" i], [class*="item" i], [class*="manga" i], [class*="series" i], [class*="comic" i], article, .col, [class*="grid" i] > *, [class*="list" i] > *',
+      );
+      for (let i = 0; i < allCards.length; i++) {
+        const card = allCards[i];
+        const result = this._extractSeriesFromElement(card, doc);
+        if (result && !seenSourceIds.has(result.sourceId)) {
+          seenSourceIds.add(result.sourceId);
+          seriesList.push(result);
+        }
+        if (seriesList.length >= 50) break;
       }
+    }
 
-      const title =
-        link.getAttribute('title') ||
-        link.textContent?.trim() ||
-        (item.querySelector('[class*="title" i]')?.textContent?.trim()) ||
-        '';
+    // --- Pass 3: last resort — grab any link that looks like a manga URL ---
+    if (seriesList.length === 0) {
+      const allLinks = doc.querySelectorAll('a[href]');
+      for (let i = 0; i < allLinks.length; i++) {
+        const link = allLinks[i];
+        const href = link.getAttribute('href') || '';
+        if (
+          href.startsWith('#') ||
+          href === '/' ||
+          href.startsWith('javascript:') ||
+          href.includes('login') ||
+          href.includes('register')
+        ) continue;
 
-      if (!title || title.length < 2) continue;
+        const title = link.getAttribute('title') || link.textContent?.trim() || '';
+        if (!title || title.length < 3) continue;
 
-      const sourceId = this._toSourceId(href);
-      if (seenSourceIds.has(sourceId)) continue;
-      seenSourceIds.add(sourceId);
+        // Only keep links that have an adjacent image
+        const parent = link.closest('div, li, article, section');
+        const img = parent?.querySelector('img');
+        const coverUrl = img
+          ? img.getAttribute('data-src') || img.getAttribute('src') || ''
+          : '';
 
-      // Find cover image — look in the item or its parent
-      const img = item.querySelector(this._strategy.coverImage);
-      let coverUrl = '';
-      if (img) {
-        coverUrl =
-          img.getAttribute('data-src') ||
-          img.getAttribute('srcset')?.split(' ')[0] ||
-          img.getAttribute('src') ||
-          '';
+        const sourceId = this._toSourceId(href);
+        if (seenSourceIds.has(sourceId)) continue;
+        seenSourceIds.add(sourceId);
+
+        seriesList.push({
+          id: undefined,
+          extensionId: this._sourceKey,
+          sourceId,
+          title,
+          altTitles: [],
+          description: '',
+          authors: [],
+          artists: [],
+          tags: [],
+          status: SeriesStatus.ONGOING,
+          originalLanguageKey: LanguageKey.MULTI,
+          numberUnread: 0,
+          remoteCoverUrl: coverUrl,
+        });
+        if (seriesList.length >= 50) break;
       }
-
-      seriesList.push({
-        id: undefined,
-        extensionId: this._sourceKey,
-        sourceId,
-        title,
-        altTitles: [],
-        description: '',
-        authors: [],
-        artists: [],
-        tags: [],
-        status: SeriesStatus.ONGOING,
-        originalLanguageKey: LanguageKey.MULTI,
-        numberUnread: 0,
-        remoteCoverUrl: coverUrl,
-      });
     }
 
     const nextEl = doc.querySelector(this._strategy.nextPage);
     return { seriesList, hasMore: nextEl !== null };
+  };
+
+  /** Try to extract series data from a single DOM element using multiple strategies */
+  private _extractSeriesFromElement = (
+    item: Element,
+    _doc: Document,
+  ): Series | null => {
+    // Find the link
+    let link: Element | null = null;
+    if (item.tagName === 'A') {
+      link = item;
+    } else {
+      link = item.querySelector('a');
+    }
+    if (!link) return null;
+
+    const href = link.getAttribute('href');
+    if (!href) return null;
+
+    // Skip utility links
+    if (
+      href.startsWith('#') ||
+      href.startsWith('javascript:') ||
+      href === '/' ||
+      /\/login|\/register|\/genre|\/tag|\/search/i.test(href)
+    ) return null;
+
+    // Get title from multiple possible sources
+    const title =
+      link.getAttribute('title') ||
+      link.getAttribute('aria-label') ||
+      item.querySelector('[class*="title" i]')?.textContent?.trim() ||
+      item.querySelector('h1, h2, h3, h4, h5, h6')?.textContent?.trim() ||
+      link.textContent?.trim() ||
+      '';
+
+    if (!title || title.length < 2) return null;
+
+    const sourceId = this._toSourceId(href);
+
+    // Find cover image
+    let coverUrl = '';
+    // Search in item + children
+    const imgs = item.querySelectorAll('img');
+    for (let i = 0; i < imgs.length; i++) {
+      const src =
+        imgs[i].getAttribute('data-src') ||
+        imgs[i].getAttribute('data-cfsrc') ||
+        imgs[i].getAttribute('srcset')?.split(' ')[0] ||
+        imgs[i].getAttribute('src') ||
+        '';
+      if (src && !src.startsWith('data:') && !src.includes('avatar') && !src.includes('icon') && !src.includes('logo')) {
+        coverUrl = src;
+        break;
+      }
+    }
+
+    return {
+      id: undefined,
+      extensionId: this._sourceKey,
+      sourceId,
+      title,
+      altTitles: [],
+      description: '',
+      authors: [],
+      artists: [],
+      tags: [],
+      status: SeriesStatus.ONGOING,
+      originalLanguageKey: LanguageKey.MULTI,
+      numberUnread: 0,
+      remoteCoverUrl: coverUrl,
+    };
   };
 
   /** Parse chapters from a series detail page */
@@ -506,12 +583,10 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
         const formBody = new URLSearchParams();
         formBody.append('action', this._strategy.ajaxAction);
         formBody.append('post', postId);
-        const response = await fetch(this._url('/wp-admin/admin-ajax.php'), {
-          method: 'POST',
-          body: formBody,
-        });
-        const text = await response.text();
-        const doc = new JSDOM(text).window.document;
+        const response = await this.webviewFn(
+          `${this._url('/wp-admin/admin-ajax.php')}?${formBody.toString()}`,
+        );
+        const doc = new JSDOM(response.text).window.document;
         return this._parseChapters(doc);
       }
 
@@ -526,70 +601,108 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     _seriesSourceId: string,
     chapterSourceId: string,
   ) => {
-    // Store the chapter source ID for page URL resolution
-    return {
-      server: this._baseUrl,
-      hash: chapterSourceId,
-      numPages: 0,
-      pageFilenames: [],
-    };
+    // Load the chapter page NOW and extract all image URLs.
+    // Store them in pageFilenames so getPageUrls can return them directly.
+    await this._ensureDetected();
+
+    try {
+      const chapterUrl = chapterSourceId.startsWith('http')
+        ? chapterSourceId
+        : this._url(chapterSourceId);
+      const doc = await this._fetchDoc(chapterUrl);
+      const imgs = doc.querySelectorAll(this._strategy.pageImages);
+
+      const pageFilenames: string[] = [];
+      // If strategy found images, use them
+      if (imgs.length > 0) {
+        for (let i = 0; i < imgs.length; i++) {
+          const src =
+            imgs[i].getAttribute(this._strategy.pageAttr) ||
+            imgs[i].getAttribute('data-src') ||
+            imgs[i].getAttribute('data-cfsrc') ||
+            imgs[i].getAttribute('src') ||
+            '';
+          if (src && !src.startsWith('data:')) {
+            pageFilenames.push(src.startsWith('http') ? src : this._url(src));
+          }
+        }
+      }
+
+      // Fallback: grab ALL images that look like page content
+      if (pageFilenames.length === 0) {
+        const allImgs = doc.querySelectorAll('img');
+        for (let i = 0; i < allImgs.length; i++) {
+          const src =
+            allImgs[i].getAttribute('data-src') ||
+            allImgs[i].getAttribute('data-cfsrc') ||
+            allImgs[i].getAttribute('src') ||
+            '';
+          if (
+            src &&
+            !src.startsWith('data:') &&
+            !src.includes('avatar') &&
+            !src.includes('icon') &&
+            !src.includes('logo') &&
+            !src.includes('banner') &&
+            !src.includes('header')
+          ) {
+            pageFilenames.push(src.startsWith('http') ? src : this._url(src));
+          }
+        }
+      }
+
+      return {
+        server: this._baseUrl,
+        hash: chapterSourceId,
+        numPages: pageFilenames.length,
+        pageFilenames,
+      };
+    } catch {
+      return {
+        server: this._baseUrl,
+        hash: chapterSourceId,
+        numPages: 0,
+        pageFilenames: [],
+      };
+    }
   };
 
   getPageUrls: GetPageUrlsFunc = (pageRequesterData: PageRequesterData) => {
-    // Return the chapter URL — getImage will load it and extract images
-    const chapterPath = pageRequesterData.hash.startsWith('http')
-      ? pageRequesterData.hash
-      : this._url(pageRequesterData.hash);
-    return [chapterPath];
+    // Return the pre-extracted page image URLs directly
+    if (pageRequesterData.pageFilenames.length > 0) {
+      return pageRequesterData.pageFilenames;
+    }
+    // Fallback for single-page mode
+    return [pageRequesterData.hash];
   };
 
   getImage: GetImageFunc = async (_series: Series, url: string) => {
-    // If it's already a direct image URL, return it
+    // Image URLs are resolved by getPageRequesterData + getPageUrls.
+    // If the URL looks like a direct image, return it as-is.
+    // Otherwise, try to load the page and extract the first image.
     if (/\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i.test(url)) {
       return url;
     }
 
-    // Otherwise, it's a chapter page URL — load it and extract image URLs
-    await this._ensureDetected();
-
+    // Fallback: load the URL as a page and extract the first content image
     try {
       const doc = await this._fetchDoc(url);
-      const images = doc.querySelectorAll(this._strategy.pageImages);
-
-      if (images.length === 0) {
-        // Fallback: grab all reasonably-sized images
-        const allImgs = doc.querySelectorAll('img');
-        const urls: string[] = [];
-        for (let i = 0; i < allImgs.length; i++) {
-          const src = allImgs[i].getAttribute('src') || '';
-          if (src && !src.startsWith('data:') && !src.includes('logo') && !src.includes('avatar') && !src.includes('icon')) {
-            urls.push(src.startsWith('http') ? src : this._url(src));
-          }
-        }
-        // Return all URLs as a concatenated response for the reader
-        // (the reader calls getImage once per page — we handle multi-page
-        // by returning the list; the reader iterates via getPageUrls)
-        if (urls.length > 0) return urls[0];
-        return '';
-      }
-
-      // Pick the image with the best src
-      for (let i = 0; i < images.length; i++) {
-        const img = images[i];
+      const imgs = doc.querySelectorAll(this._strategy.pageImages);
+      for (let i = 0; i < imgs.length; i++) {
         const src =
-          img.getAttribute(this._strategy.pageAttr) ||
-          img.getAttribute('data-src') ||
-          img.getAttribute('src') ||
+          imgs[i].getAttribute(this._strategy.pageAttr) ||
+          imgs[i].getAttribute('data-src') ||
+          imgs[i].getAttribute('src') ||
           '';
         if (src && !src.startsWith('data:')) {
           return src.startsWith('http') ? src : this._url(src);
         }
       }
-
-      return '';
     } catch {
-      return '';
+      // Return URL as-is if we can't extract
     }
+
+    return url;
   };
 
   getSearch: GetSearchFunc = async (
