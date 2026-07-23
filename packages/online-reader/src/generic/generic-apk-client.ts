@@ -271,10 +271,72 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
     return this._strategy.extractSourceId(href);
   };
 
-  /** Fetch HTML via webview (handles Cloudflare/JS-rendered sites) and return a JSDOM document */
+  /** Fetch HTML via webview and return doc + URL for logging */
   private _fetchDoc = async (url: string): Promise<Document> => {
     const response: WebviewResponse = await this.webviewFn(url);
-    return new JSDOM(response.text).window.document;
+    const doc = new JSDOM(response.text).window.document;
+    console.log(
+      `[${this._sourceKey}] Fetched ${url} → ${response.text.length} bytes, ` +
+      `title="${response.title}", imgs=${doc.querySelectorAll('img').length}, ` +
+      `links=${doc.querySelectorAll('a').length}`,
+    );
+    return doc;
+  };
+
+  /**
+   * Try fetching from multiple URL patterns and return the one with the most results.
+   * This is the key to making the generic client work: we don't know where the
+   * manga listing is, so we probe common paths.
+   */
+  private _fetchBestListingPage = async (searchText?: string): Promise<SeriesListResponse> => {
+    const pagePaths = [
+      '',                          // homepage
+      '/manga',                    // common manga listing
+      '/manga-list',               // alternative
+      '/series',                   // common series listing
+      '/comics',                   // comic listing
+      '/browse',                   // browse page
+      '/popular',                  // popular page
+      '/latest',                   // latest updates
+      '/directory',                // directory
+      '/all',                      // all series
+      '/mangas',                   // plural
+      '/comic',                    // singular
+      '/webtoon',                  // webtoon listing
+    ];
+
+    let bestResult: SeriesListResponse = { seriesList: [], hasMore: false };
+
+    for (const pagePath of pagePaths) {
+      try {
+        let url: string;
+        if (searchText) {
+          const params = new URLSearchParams();
+          params.append(this._strategy.searchParam || 'q', searchText);
+          url = pagePath
+            ? `${this._url(pagePath)}?${params.toString()}`
+            : `${this._baseUrl}?${params.toString()}`;
+        } else {
+          url = pagePath ? this._url(pagePath) : this._baseUrl;
+        }
+
+        const doc = await this._fetchDoc(url);
+        const result = this._parseSeriesList(doc);
+        console.log(
+          `[${this._sourceKey}] probed ${url} → ${result.seriesList.length} series found`,
+        );
+
+        if (result.seriesList.length > bestResult.seriesList.length) {
+          bestResult = result;
+          // If we found a good number, stop probing
+          if (bestResult.seriesList.length >= 10) break;
+        }
+      } catch (err) {
+        console.warn(`[${this._sourceKey}] failed to probe ${pagePath}:`, err);
+      }
+    }
+
+    return bestResult;
   };
 
   /** Detect which CMS strategy matches by probing the homepage.
@@ -707,50 +769,19 @@ export class GenericApkExtensionClient implements ExtensionClientInterface {
 
   getSearch: GetSearchFunc = async (
     text: string,
-    page: number,
+    _page: number,
     _filterValues: FilterValues,
   ) => {
     await this._ensureDetected();
-
-    try {
-      const params = new URLSearchParams();
-      params.append(this._strategy.searchParam, text);
-      if (page > 1) {
-        params.append('page', `${page}`);
-      }
-
-      const searchUrl = this._strategy.searchPath
-        ? `${this._url(this._strategy.searchPath)}?${params.toString()}`
-        : `${this._baseUrl}?${params.toString()}`;
-
-      const doc = await this._fetchDoc(searchUrl);
-      return this._parseSeriesList(doc);
-    } catch {
-      return { seriesList: [], hasMore: false };
-    }
+    return this._fetchBestListingPage(text);
   };
 
   getDirectory: GetDirectoryFunc = async (
-    page: number,
+    _page: number,
     _filterValues: FilterValues,
   ) => {
     await this._ensureDetected();
-
-    try {
-      let dirUrl = this._baseUrl;
-      if (this._strategy.directoryPath) {
-        dirUrl = this._url(this._strategy.directoryPath);
-      }
-      if (page > 1) {
-        const sep = dirUrl.includes('?') ? '&' : '?';
-        dirUrl = `${dirUrl}${sep}page=${page}`;
-      }
-
-      const doc = await this._fetchDoc(dirUrl);
-      return this._parseSeriesList(doc);
-    } catch {
-      return { seriesList: [], hasMore: false };
-    }
+    return this._fetchBestListingPage();
   };
 
   getSettingTypes: GetSettingTypesFunc = () => ({});

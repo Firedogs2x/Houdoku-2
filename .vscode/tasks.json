@@ -175,6 +175,20 @@
 			"command": "powershell -Command \"Remove-Item 'packages/online-reader/scripts/test-sites.js','packages/online-reader/scripts/test-apk-reader.js','packages/online-reader/scripts/dump-apk.js' -Force -ErrorAction SilentlyContinue; Write-Output 'Cleanup done'\"",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "diag-apk-urls",
+			"type": "shell",
+			"command": "node packages/online-reader/scripts/diag-apk.js 2>&1",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "cleanup-diag",
+			"type": "shell",
+			"command": "powershell -Command \"Remove-Item 'packages/online-reader/scripts/diag-apk.js' -Force -ErrorAction SilentlyContinue; Write-Output 'Done'\"",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }
