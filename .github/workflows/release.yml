@@ -11,6 +11,19 @@ on:
         options:
           - official
           - nightly
+      prerelease:
+        description: Mark as pre-release (uncheck for latest release)
+        type: boolean
+        required: true
+        default: false
+      version_track:
+        description: Major version track to build under
+        type: choice
+        required: true
+        default: v3
+        options:
+          - v2
+          - v3
       bump:
         description: Version bump type
         type: choice
@@ -44,10 +57,20 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags
-          latest=$(git tag -l 'V*' --sort=-v:refname | head -n 1)
+
+          version_track="${{ inputs.version_track }}"
+          if [ "$version_track" = "v2" ]; then
+            latest=$(git tag -l 'V2.*' --sort=-v:refname | head -n 1)
+          else
+            latest=$(git tag -l 'V3.*' --sort=-v:refname | head -n 1)
+          fi
 
           if [ -z "$latest" ]; then
-            latest="V0.0.0"
+            if [ "$version_track" = "v2" ]; then
+              latest="V2.0.0"
+            else
+              latest="V3.0.0"
+            fi
           fi
 
           base_version=${latest#V}
@@ -74,7 +97,7 @@ jobs:
             tag_name="V$major.$minor.$patch"
             release_name="Houdoku $tag_name"
             app_version="${tag_name#V}"
-            prerelease="false"
+            prerelease="${{ inputs.prerelease }}"
           else
             nightly_stamp="$(date -u +"%Y%m%d-%H%M")"
             nightly_display="$(date -u +"%d/%m/%Y %I:%M %p" | tr '[:upper:]' '[:lower:]')"
@@ -83,7 +106,7 @@ jobs:
             tag_name="nightly-$nightly_stamp"
             release_name="Nightly - $nightly_display UTC"
             app_version="$base_version-nightly.${GITHUB_RUN_NUMBER:-0}"
-            prerelease="true"
+            prerelease="${{ inputs.prerelease }}"
           fi
 
           echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
