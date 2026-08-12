@@ -190,10 +190,10 @@ export function ChapterTable(props: ChapterTableProps) {
           <span className="w-5 h-5">
             <Checkbox
               checked={
-                table.getIsAllRowsSelected() ||
+                table.getIsAllPageRowsSelected() ||
                 (table.getIsSomePageRowsSelected() && 'indeterminate')
               }
-              onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
             />
           </span>
         </div>
