@@ -56,7 +56,7 @@ import packageJson from '../../../../package.json';
 import { SettingsDialogContent } from '../settings/SettingsDialogContent';
 import { categoryListState } from '@/renderer/state/libraryStates';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { libraryFilterCategoryState } from '@/renderer/state/settingStates';
 import { NewCategoryDialog } from './NewCategoryDialog';
 import { Category } from '@/common/models/types';
@@ -69,6 +69,30 @@ import {
 import { EditCategoryDialog } from './EditCategoryDialog';
 import { RemoveCategoryDialog } from './RemoveCategoryDialog';
 
+/**
+ * Sorts categories: numeric values (0-9) first, then alphabetical (A-Z).
+ * Comparison is case-insensitive for alphabetical sorting.
+ */
+const sortCategories = (a: Category, b: Category): number => {
+  const aLabel = a.label.trim();
+  const bLabel = b.label.trim();
+
+  const aStartsWithDigit = /^\d/.test(aLabel);
+  const bStartsWithDigit = /^\d/.test(bLabel);
+
+  if (aStartsWithDigit && bStartsWithDigit) {
+    const aNum = parseInt(aLabel.match(/^\d+/)![0], 10);
+    const bNum = parseInt(bLabel.match(/^\d+/)![0], 10);
+    if (aNum !== bNum) return aNum - bNum;
+    // If numeric prefix is the same, fall through to alphabetical comparison
+    return aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' });
+  }
+  if (aStartsWithDigit && !bStartsWithDigit) return -1;
+  if (!aStartsWithDigit && bStartsWithDigit) return 1;
+
+  return aLabel.localeCompare(bLabel, undefined, { sensitivity: 'base' });
+};
+
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
   const [checkingForUpdate, setCheckingForUpdate] = useState(false);
@@ -77,6 +101,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const [showingRemoveCategoryDialog, setShowingRemoveCategoryDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const categories = useRecoilValue(categoryListState);
+  const sortedCategories = useMemo(() => [...categories].sort(sortCategories), [categories]);
   const setLibraryFilterCategory = useSetRecoilState(libraryFilterCategoryState);
 
   const handleUpdateCheck = () => {
@@ -136,7 +161,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
                         <span className="truncate max-w-[12rem]">All Series</span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
-                    {categories.map((category) => (
+                    {sortedCategories.map((category) => (
                       <SidebarMenuSubItem key={category.id}>
                         <ContextMenu>
                           <ContextMenuTrigger>
