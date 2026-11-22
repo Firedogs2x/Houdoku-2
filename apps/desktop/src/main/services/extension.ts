@@ -16,17 +16,17 @@ import { FSExtensionClient } from './extensions/filesystem';
 import ipcChannels from '@/common/constants/ipcChannels.json';
 import { EXTRACT_DIR, PLUGINS_DIR } from '../util/appdata';
 
-const TIYO_PACKAGE_NAME = '@tiyo/core';
+const DOWNLOADER_PACKAGE_NAME = '@houdoku/downloader-core';
 
-let TIYO_CLIENT: TiyoClientInterface | null = null;
+let DOWNLOADER_CLIENT: TiyoClientInterface | null = null;
 let FILESYSTEM_EXTENSION: FSExtensionClient | null = null;
 
 export async function loadPlugins(spoofWindow: BrowserWindow) {
-  if (TIYO_CLIENT !== null) {
-    TIYO_CLIENT = null;
+  if (DOWNLOADER_CLIENT !== null) {
+    DOWNLOADER_CLIENT = null;
 
     Object.keys(require.cache).forEach((name) => {
-      if (name.includes(`/${TIYO_PACKAGE_NAME}/`)) {
+      if (name.includes(`/${DOWNLOADER_PACKAGE_NAME}/`)) {
         delete require.cache[name];
       }
     });
@@ -35,20 +35,20 @@ export async function loadPlugins(spoofWindow: BrowserWindow) {
     FILESYSTEM_EXTENSION = null;
   }
 
-  console.info('Checking for Tiyo plugin...');
+  console.info('Checking for Downloader plugin...');
   aki.list(PLUGINS_DIR).forEach((pluginDetails: [string, string]) => {
     const pluginName = pluginDetails[0];
-    if (pluginName === TIYO_PACKAGE_NAME) {
+    if (pluginName === DOWNLOADER_PACKAGE_NAME) {
       const mod = aki.load(
         PLUGINS_DIR,
         pluginName,
         require as NodeRequire,
       );
 
-      TIYO_CLIENT = new mod.TiyoClient(spoofWindow);
+      DOWNLOADER_CLIENT = new mod.TiyoClient(spoofWindow);
       console.info(
-        `Loaded Tiyo plugin v${TIYO_CLIENT!.getVersion()}; it has ${
-          Object.keys(TIYO_CLIENT!.getExtensions()).length
+        `Loaded Downloader plugin v${DOWNLOADER_CLIENT!.getVersion()}; it has ${
+          Object.keys(DOWNLOADER_CLIENT!.getExtensions()).length
         } extensions`,
       );
     } else {
@@ -319,20 +319,20 @@ export const createExtensionIpcHandlers = (ipcMain: IpcMain, spoofWindow: Browse
     if (extensionId === FS_METADATA.id) {
       return FS_METADATA;
     }
-    if (TIYO_CLIENT && Object.keys(TIYO_CLIENT.getExtensions()).includes(extensionId)) {
-      return TIYO_CLIENT.getExtensions()[extensionId].metadata;
+    if (DOWNLOADER_CLIENT && Object.keys(DOWNLOADER_CLIENT.getExtensions()).includes(extensionId)) {
+      return DOWNLOADER_CLIENT.getExtensions()[extensionId].metadata;
     }
     return undefined;
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_ALL, () => {
     const result = [FS_METADATA];
-    if (TIYO_CLIENT) {
-      result.push(...Object.values(TIYO_CLIENT.getExtensions()).map((e) => e.metadata));
+    if (DOWNLOADER_CLIENT) {
+      result.push(...Object.values(DOWNLOADER_CLIENT.getExtensions()).map((e) => e.metadata));
     }
     return result;
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION, () => {
-    return TIYO_CLIENT ? TIYO_CLIENT.getVersion() : undefined;
+    return DOWNLOADER_CLIENT ? DOWNLOADER_CLIENT.getVersion() : undefined;
   });
   ipcMain.handle(ipcChannels.EXTENSION_MANAGER.CHECK_FOR_UPDATES, async () => {
     // TODO: check registry

@@ -17,8 +17,8 @@ import { Button } from '@houdoku/ui/components/Button';
 import { Loader2 } from 'lucide-react';
 
 const Plugins: React.FC = () => {
-  const [currentTiyoVersion, setCurrentTiyoVersion] = useState<string | undefined>(undefined);
-  const [availableTiyoVersion, setAvailableTiyoVersion] = useState<string | undefined>(undefined);
+  const [currentDownloaderVersion, setCurrentDownloaderVersion] = useState<string | undefined>(undefined);
+  const [availableDownloaderVersion, setAvailableDownloaderVersion] = useState<string | undefined>(undefined);
   const [showingSettingsModal, setShowingSettingsModal] = useState(false);
 
   const [installingPlugins, setInstallingPlugins] = useState<string[]>([]);
@@ -28,19 +28,19 @@ const Plugins: React.FC = () => {
 
   const refreshMetadata = async () => {
     setRefreshing(true);
-    setCurrentTiyoVersion(undefined);
-    setAvailableTiyoVersion(undefined);
+    setCurrentDownloaderVersion(undefined);
+    setAvailableDownloaderVersion(undefined);
 
     const currentVersion = await ipcRenderer.invoke(ipcChannels.EXTENSION_MANAGER.GET_TIYO_VERSION);
-    setCurrentTiyoVersion(currentVersion);
+    setCurrentDownloaderVersion(currentVersion);
 
     await aki
       // TODO hack
-      .search('author:xgi @tiyo/core', '', 1)
+      .search('author:xgi @houdoku/downloader-core', '', 1)
       // biome-ignore lint/suspicious/noExplicitAny: TODO external schema
       .then((results: any) => {
         if (results.objects.length > 0) {
-          setAvailableTiyoVersion(results.objects[0].package.version);
+          setAvailableDownloaderVersion(results.objects[0].package.version);
         }
       })
       .catch(console.error);
@@ -78,23 +78,23 @@ const Plugins: React.FC = () => {
   };
 
   const renderInstallOrUninstallButton = () => {
-    const isNotInstalled = currentTiyoVersion === undefined && availableTiyoVersion !== undefined;
-    const loading = installingPlugins.includes('@tiyo/core');
+    const isNotInstalled = currentDownloaderVersion === undefined && availableDownloaderVersion !== undefined;
+    const loading = installingPlugins.includes('@houdoku/downloader-core');
 
     if (isNotInstalled) {
       return (
         <Button
           disabled={loading}
-          onClick={() => handleInstall('@tiyo/core', availableTiyoVersion)}
+          onClick={() => handleInstall('@houdoku/downloader-core', availableDownloaderVersion)}
         >
           {loading && <Loader2 className="animate-spin" />}
-          {installingPlugins.includes('@tiyo/core') ? 'Installing...' : 'Install'}
+          {installingPlugins.includes('@houdoku/downloader-core') ? 'Installing...' : 'Install'}
         </Button>
       );
     }
 
     return (
-      <Button variant="destructive" onClick={() => handleRemove('@tiyo/core')}>
+      <Button variant="destructive" onClick={() => handleRemove('@houdoku/downloader-core')}>
         Uninstall
       </Button>
     );
@@ -104,8 +104,8 @@ const Plugins: React.FC = () => {
     refreshMetadata();
   }, [location]);
 
-  const tiyoCanUpdate =
-    currentTiyoVersion && availableTiyoVersion && gt(currentTiyoVersion, availableTiyoVersion);
+  const downloaderCanUpdate =
+    currentDownloaderVersion && availableDownloaderVersion && gt(currentDownloaderVersion, availableDownloaderVersion);
 
   return (
     <div className="h-full overflow-auto flex flex-col">
@@ -118,7 +118,7 @@ const Plugins: React.FC = () => {
         </Button>
         <Button
           variant="outline"
-          disabled={reloading || currentTiyoVersion === undefined}
+          disabled={reloading || currentDownloaderVersion === undefined}
           onClick={() => reloadPlugins()}
         >
           {reloading && <Loader2 className="animate-spin" />}
@@ -136,30 +136,30 @@ const Plugins: React.FC = () => {
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell>Tiyo Extension Manager</TableCell>
+            <TableCell>Houdoku-2-Downloader</TableCell>
             <TableCell>
               Adds support for importing content from other sources, including 3rd-party websites.
             </TableCell>
             <TableCell className="text-center">
-              {availableTiyoVersion === currentTiyoVersion || !currentTiyoVersion ? (
-                availableTiyoVersion
+              {availableDownloaderVersion === currentDownloaderVersion || !currentDownloaderVersion ? (
+                availableDownloaderVersion
               ) : (
                 <>
-                  {currentTiyoVersion}→
-                  <span className="font-bold underline">{availableTiyoVersion}</span>
+                  {currentDownloaderVersion}→
+                  <span className="font-bold underline">{availableDownloaderVersion}</span>
                 </>
               )}
             </TableCell>
             <TableCell>
               <div className="flex space-x-2">
-                {currentTiyoVersion !== undefined ? (
+                {currentDownloaderVersion !== undefined ? (
                   <Button variant={'outline'} onClick={() => setShowingSettingsModal(true)}>
                     Settings
                   </Button>
                 ) : undefined}
 
-                {tiyoCanUpdate ? (
-                  <Button onClick={() => handleInstall('@tiyo/core', availableTiyoVersion)}>
+                {downloaderCanUpdate ? (
+                  <Button onClick={() => handleInstall('@houdoku/downloader-core', availableDownloaderVersion)}>
                     Update
                   </Button>
                 ) : undefined}

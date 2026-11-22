@@ -1,0 +1,18 @@
+{
+  "name": "@houdoku/downloader-core",
+  "version": "2.0.0",
+  "dependencies": {
+    "tslib": "2.3.0",
+    "jsdom": "23.2.0",
+    "node-fetch": "2.6.7",
+    "debug": "4.3.4",
+    "html-encoding-sniffer": "4.0.0",
+    "iconv-lite": "0.4.24",
+    "ms": "2.1.2",
+    "safer-buffer": "2.1.2",
+    "whatwg-encoding": "3.1.1"
+  },
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts"
+}
